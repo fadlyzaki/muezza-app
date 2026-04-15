@@ -895,7 +895,7 @@ function MuezzaApp() {
               onToggleHabit={toggleHabit}
               onEditHabit={openEditHabitForm}
               onDeleteHabit={handleDeleteHabit}
-              onAddHabitClick={() => setShowAddHabit(true)}
+              onAddHabitClick={openAddHabitForm}
               onStartJourney={startJourney}
               onOpenInfoModal={() => setShowInfoModal(true)}
               prayerTimes={prayerTimes}
@@ -1041,6 +1041,82 @@ function MuezzaApp() {
           onSelectResult={selectManualLocation}
           onDetect={selectManualLocation} 
         />
+
+        {/* Habit Composer Modal */}
+        {showAddHabit && (
+          <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 animate-in fade-in duration-300">
+            <div 
+              className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"
+              onClick={resetHabitComposer}
+            />
+            <div className="relative w-full max-w-md bg-white rounded-t-[3rem] sm:rounded-[4rem] p-10 shadow-2xl animate-in slide-in-from-bottom-10 duration-500">
+              <div className="w-16 h-1.5 bg-slate-100 rounded-full mx-auto mb-10 sm:hidden" />
+              
+              <div className="flex items-center justify-between mb-10">
+                <div>
+                  <h3 className="text-2xl font-black text-slate-800 tracking-tighter">
+                    {editingHabitId ? 'Refine Path' : 'New Habit'}
+                  </h3>
+                  <p className="text-[10px] font-black text-emerald-500 uppercase tracking-widest mt-1">
+                    Grounded Ritual Performance
+                  </p>
+                </div>
+                <button 
+                  onClick={resetHabitComposer}
+                  className="p-3 bg-slate-50 text-slate-400 rounded-2xl border border-slate-100 active:scale-95 transition-all"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              <div className="space-y-8">
+                <div className="space-y-3">
+                  <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest px-1">Habit Definition</label>
+                  <input
+                    type="text"
+                    placeholder="e.g., Read 10 Ayahs of Quran..."
+                    value={newHabitTitle}
+                    onChange={(e) => setNewHabitTitle(e.target.value)}
+                    className="w-full bg-slate-50 border border-slate-100 p-5 rounded-3xl text-slate-800 font-bold placeholder:text-slate-300 focus:outline-none focus:border-emerald-300 focus:ring-4 focus:ring-emerald-500/5 transition-all"
+                    autoFocus
+                  />
+                </div>
+
+                <div className="space-y-3">
+                  <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest px-1">Dimensional Focus</label>
+                  <div className="grid grid-cols-3 gap-3">
+                    {['Ruh', 'Aql', 'Jasad'].map((cat) => (
+                      <button
+                        key={cat}
+                        onClick={() => setNewHabitCategory(cat)}
+                        className={`py-4 rounded-2xl font-black text-[11px] uppercase tracking-tighter border-2 transition-all ${
+                          newHabitCategory === cat
+                            ? 'bg-emerald-600 border-emerald-500 text-white shadow-lg shadow-emerald-600/20 scale-[0.98]'
+                            : 'bg-white border-slate-100 text-slate-400 hover:border-emerald-100 hover:bg-emerald-50/30'
+                        }`}
+                      >
+                        {cat}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <button
+                  onClick={handleSaveHabit}
+                  disabled={!newHabitTitle.trim()}
+                  className={`w-full py-5 rounded-[2.5rem] font-black text-lg shadow-xl transition-all flex items-center justify-center space-x-3 active:scale-[0.98] mt-4 ${
+                    newHabitTitle.trim()
+                      ? 'bg-slate-900 text-white hover:bg-slate-800 shadow-slate-900/20'
+                      : 'bg-slate-100 text-slate-300 cursor-not-allowed'
+                  }`}
+                >
+                  <CheckCircle2 className={`w-6 h-6 ${newHabitTitle.trim() ? 'text-emerald-400' : ''}`} />
+                  <span>{editingHabitId ? 'Save Changes' : 'Initialize Habit'}</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
 
         {/* Main Footer */}
