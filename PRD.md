@@ -31,6 +31,8 @@ Muezza is a mobile-first web app designed to bridge the gap between abstract spi
 | **OAuth2 / PKCE** | ✅ Shipped | Proper Basic Auth token exchange for secure sessions |
 | **Legal Documentation** | ✅ Shipped | Privacy Policy and Terms of Service for production compliance |
 | **Vercel Deployment** | ✅ Shipped | Serverless `/api/token` and `/api/tafsir` endpoints |
+| **Wisdom Reminder**   | ✅ Shipped | Niyyah Protocol triggering reflections after missed days |
+| **Premium Error UX**  | ✅ Shipped | Illustrative fail states and high-fidelity ErrorBoundaries |
 
 ---
 
@@ -70,21 +72,13 @@ Muezza extensively utilizes the Quran Foundation capabilities:
 | **User APIs** | `GET /auth/v1/streaks`<br>`POST /auth/v1/bookmarks` | Fully Integrated |
 | **Auth / OAuth2** | `GET /oauth2/auth`<br>`POST /oauth2/token` | Fully Integrated (Basic Auth Exchange) |
 | **Aladhan API** | `GET /v1/timings` (Prayer times) | Integrated (Requires Geo-permission) |
+| **Nominatim API** | `GET /search` (City fallback) | Integrated (Manual location override) |
 
 ---
 
 ## 5. Known Gaps & Future Roadmap
 
-Next iteration (v1.1) considerations for product maturity:
-
-| Capability Gap | Impact | Effort | Status |
-|---|---|---|---|
-| **Manual Geolocation Search** | Prayer times support manual city override via Nominatim. | Low | ✅ Integrated |
-| **Timezone-Aware Reset** | Precision `getTodayKey` logic for cross-timezone reliability. | Low | ✅ Integrated |
-| **Amiri/Quran Font** | Native `Amiri Quran` font for all Arabic script blocks. | Low | ✅ Integrated |
-| **Translation Focus** | Persistent English (Saheeh International) focus in reader. | Low | ✅ Integrated |
-| **Legal Documentation** | Privacy Policy & Terms at `/privacy` and `/terms`. | Low | ✅ Integrated |
-| **Streak Recovery Tools** | Manual restore and local backup for streak/data resilience. | Med | ✅ Integrated |
+| **Technical Polish** | Zero-downtime loaders (Skeletons) and absolute OG paths. | High | ✅ Integrated |
 
 ---
 

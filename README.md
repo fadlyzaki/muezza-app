@@ -20,6 +20,8 @@ The system is engineered as a state-driven, client-heavy Progressive Web Applica
 ### I. The Content Substrate
 *   **Quran Foundation Content API v4**: Orchestrates pristine Uthmani text, multi-translation delivery (Saheeh International), and real-time Tafsir streams.
 *   **Audio CDN**: Streaming recitation loops via Quran Foundation's globally distributed content delivery network.
+*   **Geolocation Substrate**: Real-time prayer timings via **Aladhan v1** with a manual city search fallback powered by **Nominatim**.
+*   **Resilient Interface**: Zero-downtime loading via high-fidelity **Skeleton Loaders** and illustrative **Error Boundaries** to handle network partitions gracefully.
 
 ### II. Identity & Continuity
 *   **OAuth2 PKCE Flow**: Secure, stateless authentication bridging Muezza with the global Quran.com user profile.
@@ -35,7 +37,7 @@ The system is engineered as a state-driven, client-heavy Progressive Web Applica
 
 Muezza operates on a continuous, self-reinforcing grounding loop:
 
-1.  **Check-in**: System initializes state, resetting daily energy and surfacing contextual prayer timings via **Aladhan v1**.
+1.  **Check-in**: System initializes state, resetting daily energy and surfacing contextual prayer timings. If a missed day is detected, the **Niyyah Protocol** triggers a Morning Reflection (Daily Wisdom).
 2.  **Convergence**: The user completes obligatory and sunnah tasks, yielding **Dinar** (virtual currency) and filling the global energy gauge.
 3.  **Immersion**: Native Quran Reader allows for deep reading, audio streaming, and "Ask Muezza" (Tafsir Insight) interactions.
 4.  **Preservation**: Bookmarks and Streaks are committed to the Quran Foundation cloud, hardening the user's spiritual profile.
