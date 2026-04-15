@@ -26,7 +26,8 @@ export default function Callback() {
           body: JSON.stringify({
             code,
             code_verifier: codeVerifier,
-            redirect_uri: `${import.meta.env.VITE_APP_URL}/callback`
+            // Must exactly match the redirect_uri sent in the first leg of the OAuth flow
+            redirect_uri: `${(import.meta.env.VITE_APP_URL || window.location.origin).replace(/\/$/, '')}/callback`
           })
         });
 

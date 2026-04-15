@@ -145,8 +145,6 @@ const DAILY_INSIGHTS = [
 
 const TRANSLATION_OPTIONS = [
   { id: 20, label: 'EN', name: 'Saheeh International' },
-  { id: 33, label: 'ID', name: 'Bahasa Indonesia' },
-  { id: 131, label: 'UR', name: 'Dr. Israr Ahmed' },
 ];
 
 const DEFAULT_RECITER_ID = 2;
@@ -1510,21 +1508,7 @@ function MuezzaApp() {
                       </div>
                     )}
 
-                    <div className="flex gap-2 flex-wrap">
-                      {TRANSLATION_OPTIONS.map((option) => (
-                        <button
-                          key={option.id}
-                          onClick={() => setTranslationId(option.id)}
-                          className={`px-3 py-2 rounded-xl text-xs font-bold border transition-colors ${
-                            translationId === option.id
-                              ? 'bg-emerald-600 text-white border-emerald-600'
-                              : 'bg-white text-slate-500 border-slate-200 hover:border-emerald-300 hover:text-emerald-700'
-                          }`}
-                        >
-                          {option.label}
-                        </button>
-                      ))}
-                    </div>
+                    {/* Translation UI removed as per request to focus on English only */}
 
                     {isLoadingQuran && currentPage === 1 ? (
                       <div className="flex justify-center items-center py-10">
@@ -2030,29 +2014,6 @@ function MuezzaApp() {
 
                 {infoModalTab === 'settings' && (
                   <div className="space-y-4">
-                     <div className="rounded-2xl border border-slate-100 p-4 bg-white">
-                      <h4 className="font-bold text-slate-800 mb-3 flex items-center space-x-2">
-                        <Book className="w-4 h-4 text-emerald-500" />
-                        <span>Translation</span>
-                      </h4>
-                      <div className="flex flex-col space-y-2">
-                        {TRANSLATION_OPTIONS.map((opt) => (
-                          <button
-                            key={opt.id}
-                            onClick={() => setTranslationId(opt.id)}
-                            className={`flex items-center justify-between p-3 rounded-xl border transition-all ${
-                              translationId === opt.id 
-                                ? 'bg-emerald-50 border-emerald-200 text-emerald-800' 
-                                : 'bg-slate-50 border-slate-100 text-slate-500 hover:bg-slate-100'
-                            }`}
-                          >
-                            <span className="font-bold text-sm tracking-tight">{opt.name}</span>
-                            <span className="text-[10px] font-black opacity-60 bg-white/50 px-1.5 py-0.5 rounded uppercase">{opt.label}</span>
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-
                     <div className="rounded-2xl border border-slate-100 p-4 bg-white">
                       <h4 className="font-bold text-slate-800 mb-3 flex items-center space-x-2">
                          <Activity className="w-4 h-4 text-emerald-500" />

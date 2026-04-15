@@ -1,7 +1,15 @@
 import { fetchQuranFoundationContent, resolveDefaultTafsirId } from './_quranFoundation.js';
 
-function stripHtml(html) {
-  return html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+function cleanTafsirText(text) {
+  // Strip HTML
+  let cleaned = text.replace(/<[^>]+>/g, ' ');
+  // Normalize whitespace
+  cleaned = cleaned.replace(/\s+/g, ' ').trim();
+  // Truncate to keep it punchy (approx 600 chars)
+  if (cleaned.length > 600) {
+    cleaned = cleaned.slice(0, 597) + '...';
+  }
+  return cleaned;
 }
 
 export default async function handler(req, res) {
@@ -27,8 +35,8 @@ export default async function handler(req, res) {
     return res.status(200).json({
       verse: translationText || `Verse ${verseKey}`,
       reference: surahName ? `Surah ${surahName} ${verseKey}` : verseKey,
-      tafsir: stripHtml(tafsirRecord.text),
-      source: `${tafsirRecord.resource_name || 'Tafsir'} (${tafsirRecord.slug || verseKey})`,
+      tafsir: cleanTafsirText(tafsirRecord.text),
+      source: `Tafsir ${tafsirRecord.resource_name || 'Al-Jalalayn'}`,
       live: true,
     });
   } catch (error) {

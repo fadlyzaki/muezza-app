@@ -80,7 +80,7 @@ Next iteration (v1.1) considerations for product maturity:
 | **Manual Geolocation Search** | Prayer times support manual city override via Nominatim. | Low | ✅ Integrated |
 | **Timezone-Aware Reset** | Precision `getTodayKey` logic for cross-timezone reliability. | Low | ✅ Integrated |
 | **Amiri/Quran Font** | Native `Amiri Quran` font for all Arabic script blocks. | Low | ✅ Integrated |
-| **Translation Toggle** | Persistent setting for ID/EN/UR translations in Quran reader. | Low | ✅ Integrated |
+| **Translation Focus** | Persistent English (Saheeh International) focus in reader. | Low | ✅ Integrated |
 | **Streak Recovery Tools** | Manual restore and local backup for streak/data resilience. | Med | ✅ Integrated |
 
 ---

@@ -24,7 +24,10 @@ export function AuthProvider({ children }) {
     const codeChallenge = await generateCodeChallenge(codeVerifier);
     
     const clientId = import.meta.env.VITE_QURAN_CLIENT_ID;
-    const redirectUri = `${import.meta.env.VITE_APP_URL}/callback`;
+    
+    // Derive redirect URI dynamically based on current origin for maximum flexibility
+    const appUrl = (import.meta.env.VITE_APP_URL || window.location.origin).replace(/\/$/, '');
+    const redirectUri = `${appUrl}/callback`;
 
     // Store verifier for the callback route
     localStorage.setItem('pkce_code_verifier', codeVerifier);
