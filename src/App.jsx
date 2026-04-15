@@ -2036,6 +2036,17 @@ function MuezzaApp() {
                         </button>
                       </div>
                     </div>
+
+                    <div className="rounded-2xl border border-slate-100 p-4 bg-white">
+                      <h4 className="font-bold text-slate-800 mb-3 flex items-center space-x-2">
+                         <Info className="w-4 h-4 text-emerald-500" />
+                        <span>Legal</span>
+                      </h4>
+                      <div className="flex space-x-2">
+                        <a href="/privacy" className="flex-1 text-center py-2.5 rounded-xl bg-slate-50 border border-slate-100 text-[10px] font-black uppercase text-slate-500 hover:bg-slate-100 transition-colors">Privacy</a>
+                        <a href="/terms" className="flex-1 text-center py-2.5 rounded-xl bg-slate-50 border border-slate-100 text-[10px] font-black uppercase text-slate-500 hover:bg-slate-100 transition-colors">Terms</a>
+                      </div>
+                    </div>
                   </div>
                 )}
               </div>
@@ -2094,6 +2105,17 @@ function MuezzaApp() {
           </div>
         )}
 
+        {/* Main Footer */}
+        <footer className="mt-12 mb-8 px-6 flex flex-col items-center justify-center space-y-4 opacity-40 hover:opacity-100 transition-opacity">
+          <div className="flex items-center space-x-4">
+            <a href="/privacy" className="text-[10px] font-bold text-slate-500 hover:text-emerald-700 uppercase tracking-widest transition-colors">Privacy Policy</a>
+            <div className="w-1 h-1 bg-slate-300 rounded-full"></div>
+            <a href="/terms" className="text-[10px] font-bold text-slate-500 hover:text-emerald-700 uppercase tracking-widest transition-colors">Terms of Service</a>
+          </div>
+          <p className="text-[9px] font-bold text-slate-400 uppercase tracking-tighter">
+            © 2026 <a href="https://fadlyzaki-design.vercel.app/" target="_blank" rel="noopener noreferrer" className="hover:text-emerald-600 transition-colors">Fadly Uzzaki</a> • Grounded Quranic Habits
+          </p>
+        </footer>
       </div>
 
       <style dangerouslySetInnerHTML={{ __html: `
