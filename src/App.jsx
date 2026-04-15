@@ -31,12 +31,20 @@ function useLocalStorage(key, initialValue) {
 
 // --- Data & Content ---
 const INITIAL_PRAYERS = [
-  { id: 'fajr', name: 'Fajr', completed: false, missed: false, reward: 10, icon: Sunrise },
-  { id: 'dhuhr', name: 'Dhuhr', completed: false, missed: false, reward: 10, icon: Sun },
-  { id: 'asr', name: 'Asr', completed: false, missed: false, reward: 10, icon: Sun },
-  { id: 'maghrib', name: 'Maghrib', completed: false, missed: false, reward: 10, icon: Sunset },
-  { id: 'isha', name: 'Isha', completed: false, missed: false, reward: 10, icon: Moon },
+  { id: 'fajr', name: 'Fajr', completed: false, missed: false, reward: 10 },
+  { id: 'dhuhr', name: 'Dhuhr', completed: false, missed: false, reward: 10 },
+  { id: 'asr', name: 'Asr', completed: false, missed: false, reward: 10 },
+  { id: 'maghrib', name: 'Maghrib', completed: false, missed: false, reward: 10 },
+  { id: 'isha', name: 'Isha', completed: false, missed: false, reward: 10 },
 ];
+
+const PRAYER_ICONS = {
+  fajr: Sunrise,
+  dhuhr: Sun,
+  asr: Sun,
+  maghrib: Sunset,
+  isha: Moon,
+};
 
 const INITIAL_HABITS = [
   { id: 2, title: 'Drink a glass of water', category: 'Jasad', completed: false, reward: 25 },
@@ -585,7 +593,7 @@ function MuezzaApp() {
                   
                   <div className="flex justify-between items-center relative z-10">
                     {prayers.map((prayer) => {
-                      const Icon = prayer.icon;
+                      const Icon = PRAYER_ICONS[prayer.id] || Sun;
                       return (
                         <button
                           key={prayer.id}
