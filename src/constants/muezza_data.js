@@ -56,16 +56,19 @@ export const INITIAL_HABITS = [
 ];
 
 export const SHOP_ITEMS = [
+  // Spiritual Modules
   { id: 'sajjadah_red', name: 'Crimson Sajjadah', price: 60, type: 'rug', icon: '📿', desc: 'A beautiful prayer mat.' },
   { id: 'kufi_green', name: 'Emerald Kufi', price: 100, type: 'hat', icon: '🧢', desc: 'Keep Muezza looking sharp.' },
   { id: 'glasses_smart', name: 'Scholarly Glasses', price: 150, type: 'accessory', icon: '👓', desc: 'For deep Tafsir reading.' },
-  { id: 'lantern_gold', name: 'Golden Fanoos', price: 200, type: 'decor', icon: '🏮', desc: 'Illuminates the room.' },
-  { id: 'bow_lilac', name: 'Lilac Bow', price: 80, type: 'accessory', icon: '🎀', desc: 'A soft ribbon for gentle elegance.' },
-  { id: 'scarf_sky', name: 'Sky Scarf', price: 110, type: 'accessory', icon: '🧣', desc: 'A breezy scarf for cool evening dhikr.' },
-  { id: 'tasbih_amber', name: 'Amber Tasbih', price: 130, type: 'decor', icon: '📿', desc: 'Prayer beads that rest beside Muezza.' },
   { id: 'turban_cream', name: 'Cream Turban', price: 160, type: 'hat', icon: '🤍', desc: 'A classic wrap for a scholarly look.' },
-  { id: 'sunglasses_rose', name: 'Rose Sunglasses', price: 175, type: 'accessory', icon: '🕶️', desc: 'A playful pair for sunny Noor days.' },
+  { id: 'lantern_gold', name: 'Golden Fanoos', price: 200, type: 'decor', icon: '🏮', desc: 'Illuminates the room.' },
   { id: 'sajjadah_midnight', name: 'Midnight Sajjadah', price: 220, type: 'rug', icon: '🌌', desc: 'A deep-blue rug with moonlit accents.' },
+  
+  // Food & Sustenance
+  { id: 'dates_ajwa', name: 'Ajwa Dates', price: 30, type: 'food', icon: '🌴', desc: 'Sun-ripened dates from Madinah.' },
+  { id: 'zamzam_water', name: 'Zamzam Water', price: 45, type: 'food', icon: '💧', desc: 'Sacred water for spiritual vitality.' },
+  { id: 'honey_sidr', name: 'Yemeni Honey', price: 80, type: 'food', icon: '🍯', desc: 'Pure Sidr honey for energy restoration.' },
+  { id: 'milk_camel', name: 'Camel Milk', price: 50, type: 'food', icon: '🥛', desc: 'Fresh, nutrient-rich desert milk.' },
 ];
 
 export const DAILY_INSIGHTS = [

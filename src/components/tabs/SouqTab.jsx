@@ -1,9 +1,9 @@
 import React from 'react';
-import { ShoppingBag, Coins, Store, Sparkles, CheckCircle2 } from 'lucide-react';
+import { ShoppingBag, Coins, CheckCircle2 } from 'lucide-react';
 import CatSVG from '../CatSVG';
 import { SHOP_ITEMS } from '../../constants/muezza_data';
 
-export function SouqTab({ dinar, inventory, onBuyItem }) {
+export function SouqTab({ dinar, inventory, onBuy }) {
   return (
     <div className="px-6 py-4 pb-32 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="bg-slate-900 rounded-[2.5rem] p-8 mb-8 relative overflow-hidden shadow-2xl shadow-slate-900/20">
@@ -29,16 +29,16 @@ export function SouqTab({ dinar, inventory, onBuyItem }) {
       </div>
 
       <div className="flex items-center space-x-3 mb-6">
-        <div className="p-2 bg-emerald-100 rounded-xl">
-          <ShoppingBag className="w-5 h-5 text-emerald-600" />
+        <div className="p-3 bg-emerald-100 rounded-2xl">
+          <ShoppingBag className="w-6 h-6 text-emerald-600" />
         </div>
         <div>
-          <h3 className="text-xl font-black text-slate-800 tracking-tight">System Modules</h3>
-          <p className="text-xs text-slate-500 font-medium tracking-tight">Equip Muezza with advanced substrates</p>
+          <h3 className="text-2xl font-black text-slate-800 tracking-tighter">Muezza's Souq</h3>
+          <p className="text-sm text-slate-500 font-medium tracking-tight">Equip your substrate with divine modules and sustenance</p>
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {SHOP_ITEMS.map((item) => {
           const isOwned = inventory.includes(item.id);
           const canAfford = dinar >= item.price;
@@ -75,7 +75,7 @@ export function SouqTab({ dinar, inventory, onBuyItem }) {
                 </span>
               ) : (
                 <button
-                  onClick={() => onBuyItem(item)}
+                  onClick={() => onBuy(item)}
                   disabled={!canAfford}
                   className={`w-full py-3 rounded-xl font-black text-xs transition-all flex items-center justify-center space-x-2 ${
                     canAfford
