@@ -1,4 +1,6 @@
-const API_BASE = `${import.meta.env.VITE_QURAN_API_BASE || 'https://apis.quran.foundation'}/auth/v1`;
+import { getQuranUserApiBaseUrl } from '../lib/quranFoundation';
+
+const API_BASE = `${getQuranUserApiBaseUrl()}/auth/v1`;
 
 export async function getStreaks(accessToken) {
   const clientId = import.meta.env.VITE_QURAN_CLIENT_ID;

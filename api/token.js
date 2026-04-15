@@ -1,3 +1,5 @@
+import { getQuranFoundationConfig } from './_quranFoundation.js';
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method Not Allowed' });
@@ -10,15 +12,15 @@ export default async function handler(req, res) {
   }
 
   try {
-    const apiBase = process.env.VITE_QURAN_API_BASE || 'https://apis.quran.foundation';
-    const tokenResponse = await fetch(`${apiBase}/oauth2/token`, {
+    const { authBaseUrl, clientId, clientSecret } = getQuranFoundationConfig();
+    const tokenResponse = await fetch(`${authBaseUrl}/oauth2/token`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
       },
       body: new URLSearchParams({
-        client_id: process.env.VITE_QURAN_CLIENT_ID,
-        client_secret: process.env.QURAN_CLIENT_SECRET,
+        client_id: clientId,
+        client_secret: clientSecret,
         grant_type: 'authorization_code',
         code,
         redirect_uri,

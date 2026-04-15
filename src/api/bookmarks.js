@@ -1,4 +1,13 @@
-const API_BASE = `${import.meta.env.VITE_QURAN_API_BASE || 'https://apis.quran.foundation'}/auth/v1`;
+import { getQuranUserApiBaseUrl } from '../lib/quranFoundation';
+
+const API_BASE = `${getQuranUserApiBaseUrl()}/auth/v1`;
+
+function normalizeBookmarksResponse(payload) {
+  if (Array.isArray(payload)) return payload;
+  if (Array.isArray(payload?.bookmarks)) return payload.bookmarks;
+  if (Array.isArray(payload?.data)) return payload.data;
+  return [];
+}
 
 export async function getBookmarks(accessToken) {
   const clientId = import.meta.env.VITE_QURAN_CLIENT_ID;
@@ -13,9 +22,7 @@ export async function getBookmarks(accessToken) {
     });
     if (!res.ok) throw new Error('Failed to fetch bookmarks');
     const data = await res.json();
-    // Assuming data is an array or has a standard pagination structure
-    // Depends on specific payload structure, defaulting to data mapping
-    return data;
+    return normalizeBookmarksResponse(data);
   } catch (error) {
     console.error("Error fetching bookmarks:", error);
     return [];

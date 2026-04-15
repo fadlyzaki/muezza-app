@@ -1,29 +1,22 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { generateRandomString, generateCodeChallenge } from './pkce';
-
-const AuthContext = createContext();
+import { AuthContext } from './auth-context';
+import { getQuranAuthBaseUrl } from '../lib/quranFoundation';
 
 export function AuthProvider({ children }) {
-  const [accessToken, setAccessToken] = useState(null);
-  const [user, setUser] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
-
-  // Load token from local storage on mount
-  useEffect(() => {
-    const token = localStorage.getItem('qf_access_token');
+  const [accessToken, setAccessToken] = useState(() => localStorage.getItem('qf_access_token'));
+  const [user, setUser] = useState(() => {
     const idToken = localStorage.getItem('qf_id_token');
-    
-    if (token && idToken) {
-      setAccessToken(token);
-      try {
-        const payload = JSON.parse(atob(idToken.split('.')[1]));
-        setUser(payload);
-      } catch (e) {
-        console.error("Failed to parse id_token", e);
-      }
+    if (!idToken) return null;
+
+    try {
+      return JSON.parse(atob(idToken.split('.')[1]));
+    } catch (error) {
+      console.error('Failed to parse id_token', error);
+      return null;
     }
-    setIsLoading(false);
-  }, []);
+  });
+  const [isLoading] = useState(false);
 
   const login = async () => {
     const state = generateRandomString(32);
@@ -37,8 +30,7 @@ export function AuthProvider({ children }) {
     localStorage.setItem('pkce_code_verifier', codeVerifier);
     localStorage.setItem('oauth_state', state);
 
-    const apiBase = import.meta.env.VITE_QURAN_API_BASE || 'https://apis.quran.foundation';
-    const authUrl = new URL(`${apiBase}/oauth2/auth`);
+    const authUrl = new URL(`${getQuranAuthBaseUrl()}/oauth2/auth`);
     authUrl.searchParams.append('client_id', clientId);
     authUrl.searchParams.append('response_type', 'code');
     authUrl.searchParams.append('redirect_uri', redirectUri);
@@ -64,5 +56,3 @@ export function AuthProvider({ children }) {
     </AuthContext.Provider>
   );
 }
-
-export const useAuth = () => useContext(AuthContext);

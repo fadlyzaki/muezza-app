@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useAuth } from './AuthContext';
+import { useAuth } from './useAuth';
 
 export default function Callback() {
   const { setAccessToken, setUser } = useAuth();

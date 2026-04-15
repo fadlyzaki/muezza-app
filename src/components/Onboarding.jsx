@@ -17,9 +17,9 @@ const GOALS = [
     desc: 'Focus on daily Quran reading & reflection',
     color: 'emerald',
     habits: [
-      { id: 10, title: 'Read 1 Page of Quran', category: 'Aql', completed: false, reward: 25 },
-      { id: 11, title: 'Listen to a Surah recitation', category: 'Qalb', completed: false, reward: 25 },
-      { id: 12, title: 'Reflect on one Ayah meaning', category: 'Ruh', completed: false, reward: 25 },
+      { id: 10, title: 'Read 1 Page of Quran', category: 'Aql', completed: false, kind: 'quran_reading', energyReward: 25, coinReward: 25 },
+      { id: 11, title: 'Listen to a Surah recitation', category: 'Qalb', completed: false, kind: 'quran_audio', energyReward: 25, coinReward: 25 },
+      { id: 12, title: 'Reflect on one Ayah meaning', category: 'Ruh', completed: false, kind: 'ayah_reflection', energyReward: 25, coinReward: 25 },
     ],
   },
   {
@@ -29,9 +29,9 @@ const GOALS = [
     desc: 'Perfect your salah & connection with Allah',
     color: 'blue',
     habits: [
-      { id: 20, title: 'Pray Fajr on time', category: 'Ruh', completed: false, reward: 25 },
-      { id: 21, title: 'Make Dhikr after each prayer', category: 'Qalb', completed: false, reward: 25 },
-      { id: 22, title: 'Pray 2 Rakat Sunnah', category: 'Ruh', completed: false, reward: 25 },
+      { id: 20, title: 'Pray Fajr on time', category: 'Ruh', completed: false, kind: 'fajr_devotion', energyReward: 25, coinReward: 25 },
+      { id: 21, title: 'Make Dhikr after each prayer', category: 'Qalb', completed: false, kind: 'dhikr', energyReward: 25, coinReward: 25 },
+      { id: 22, title: 'Pray 2 Rakat Sunnah', category: 'Ruh', completed: false, kind: 'sunnah_prayer', energyReward: 25, coinReward: 25 },
     ],
   },
   {
@@ -41,9 +41,9 @@ const GOALS = [
     desc: 'Daily acts of kindness & self-improvement',
     color: 'amber',
     habits: [
-      { id: 30, title: 'Do one act of kindness', category: 'Qalb', completed: false, reward: 25 },
-      { id: 31, title: 'Say Alhamdulillah 10 times', category: 'Ruh', completed: false, reward: 25 },
-      { id: 32, title: 'Drink water & take care of Jasad', category: 'Jasad', completed: false, reward: 25 },
+      { id: 30, title: 'Do one act of kindness', category: 'Qalb', completed: false, kind: 'kindness', energyReward: 25, coinReward: 25 },
+      { id: 31, title: 'Say Alhamdulillah 10 times', category: 'Ruh', completed: false, kind: 'gratitude', energyReward: 25, coinReward: 25 },
+      { id: 32, title: 'Drink water & take care of Jasad', category: 'Jasad', completed: false, kind: 'body_care', energyReward: 25, coinReward: 25 },
     ],
   },
 ];

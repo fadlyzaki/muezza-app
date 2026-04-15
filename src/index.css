@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+.quran-arabic {
+  font-family: 'Amiri Quran', serif;
+}
+
 /* Hide scrollbar utility */
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
