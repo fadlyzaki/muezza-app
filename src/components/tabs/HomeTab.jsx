@@ -73,6 +73,7 @@ export function HomeTab({
               </div>
             </div>
           )}
+        </div>
 
       <div className="mb-14 space-y-6">
         <div className="flex items-center justify-between px-2">
