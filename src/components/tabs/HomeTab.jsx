@@ -71,6 +71,7 @@ export function HomeTab({
                    &quot;Complete daily tasks to unlock spiritual reflections.&quot;
                 </p>
               </div>
+            </div>
           )}
 
       <div className="mb-14 space-y-6">
