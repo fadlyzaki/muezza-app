@@ -474,45 +474,47 @@ function MuezzaApp() {
                 <p className="text-slate-500 text-sm mt-1">{greeting}, time to grow your Noor.</p>
               </div>
 
-              {/* Mascot & Energy */}
-              <div className="px-6 pb-6 flex flex-col items-center justify-center">
-                <div className="relative w-full flex justify-center items-center py-6 bg-gradient-to-b from-transparent via-[#F0EBE1]/60 to-[#E5E0D8]/40 rounded-[2.5rem] mb-5 overflow-hidden border border-slate-100/50 shadow-sm">
-                  {/* Decorative soft glow behind cat */}
-                  <div className="absolute inset-0 bg-emerald-400/5 blur-[60px] rounded-full"></div>
-                  
-                  <CatSVG awake={energy > 0} equipped={inventory} isPetting={showHearts} onPet={handlePetCat} className="w-52 h-52 relative z-10" />
-                  {energy === 100 && (
-                    <Sparkles className="absolute top-6 right-10 w-8 h-8 text-amber-400 animate-spin-slow pointer-events-none z-20" />
-                  )}
-                </div>
-                
-                <div className="w-full bg-white p-6 rounded-3xl shadow-sm border border-slate-200 hover:shadow-md transition-shadow">
-                  <div className="flex justify-between text-sm font-bold mb-3 text-slate-600">
-                    <span>Muezza's Energy</span>
-                    <span className={energy === 100 ? 'text-emerald-600' : ''}>{energy}%</span>
+              {/* Mascot & Energy — Unified Compact Card */}
+              <div className="px-6 pb-4">
+                <div className="bg-gradient-to-b from-[#F0EBE1]/60 to-white rounded-3xl border border-slate-100/50 shadow-sm overflow-hidden">
+                  {/* Cat Area */}
+                  <div className="relative flex justify-center items-center pt-4 pb-2">
+                    <div className="absolute inset-0 bg-emerald-400/5 blur-[60px] rounded-full"></div>
+                    <CatSVG awake={energy > 0} equipped={inventory} isPetting={showHearts} onPet={handlePetCat} className="w-36 h-36 relative z-10" />
+                    {energy === 100 && (
+                      <Sparkles className="absolute top-4 right-8 w-6 h-6 text-amber-400 animate-spin-slow pointer-events-none z-20" />
+                    )}
                   </div>
                   
-                  {energy < 100 ? (
-                    <div className="w-full bg-slate-100 rounded-full h-4 overflow-hidden relative shadow-inner">
-                      <div 
-                        className="bg-emerald-500 h-full rounded-full transition-all duration-1000 ease-out relative overflow-hidden"
-                        style={{ width: `${energy}%` }}
-                      >
-                         <div className="absolute top-0 left-0 right-0 bottom-0 bg-white/20 w-full h-full transform skew-x-[-20deg] animate-[shimmer_2s_infinite]"></div>
-                      </div>
+                  {/* Energy Bar */}
+                  <div className="px-5 pb-4">
+                    <div className="flex justify-between text-xs font-bold mb-2 text-slate-500">
+                      <span>Muezza's Energy</span>
+                      <span className={energy === 100 ? 'text-emerald-600' : ''}>{energy}%</span>
                     </div>
-                  ) : (
-                    <button 
-                      onClick={startJourney}
-                      className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3.5 px-6 rounded-2xl transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5 flex items-center justify-center space-x-2 animate-bounce"
-                    >
-                      <BookOpen className="w-5 h-5" />
-                      <span>Send on a Journey</span>
-                    </button>
-                  )}
-                  <p className="text-center text-xs font-semibold text-slate-400 mt-4">
-                    {energy === 100 ? "Muezza is ready to seek knowledge!" : "Complete daily habits to wake Muezza up."}
-                  </p>
+                    
+                    {energy < 100 ? (
+                      <div className="w-full bg-slate-100 rounded-full h-3 overflow-hidden relative shadow-inner">
+                        <div 
+                          className="bg-emerald-500 h-full rounded-full transition-all duration-1000 ease-out relative overflow-hidden"
+                          style={{ width: `${energy}%` }}
+                        >
+                           <div className="absolute top-0 left-0 right-0 bottom-0 bg-white/20 w-full h-full transform skew-x-[-20deg] animate-[shimmer_2s_infinite]"></div>
+                        </div>
+                      </div>
+                    ) : (
+                      <button 
+                        onClick={startJourney}
+                        className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-5 rounded-xl transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5 flex items-center justify-center space-x-2 animate-bounce text-sm"
+                      >
+                        <BookOpen className="w-4 h-4" />
+                        <span>Send on a Journey</span>
+                      </button>
+                    )}
+                    <p className="text-center text-[11px] font-semibold text-slate-400 mt-2">
+                      {energy === 100 ? "Muezza is ready to seek knowledge!" : "Complete daily habits to wake Muezza up."}
+                    </p>
+                  </div>
                 </div>
               </div>
 
