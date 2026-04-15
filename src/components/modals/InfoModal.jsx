@@ -2,11 +2,14 @@ import React from 'react';
 import { X, Book, Lightbulb, Activity } from 'lucide-react';
 
 export function InfoModal({ 
+  isOpen,
   onClose, 
   activeTab: infoModalTab, 
   setActiveTab: setInfoModalTab, 
   onReset 
 }) {
+  if (!isOpen) return null;
+
   return (
     <div className="absolute inset-0 bg-slate-900/70 backdrop-blur-sm z-50 flex items-center justify-center p-6">
       <div className="bg-white rounded-[2rem] w-full max-w-[22rem] shadow-2xl animate-in slide-in-from-bottom-10 zoom-in-95 duration-500 max-h-[78vh] flex flex-col overflow-hidden">

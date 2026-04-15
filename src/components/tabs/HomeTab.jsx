@@ -1,5 +1,5 @@
 import React from 'react';
-import { Sparkles, MapPin, Search, CheckCircle2, Circle, Pencil, Plus, Trash2, X, Activity } from 'lucide-react';
+import { Sparkles, MapPin, Search, CheckCircle2, Circle, Pencil, Plus, Trash2, X, Activity, ArrowRight } from 'lucide-react';
 import CatSVG from '../CatSVG';
 import { PRAYER_ICONS } from '../../constants/muezza_data';
 
@@ -20,7 +20,8 @@ export function HomeTab({
   onAddHabitClick,
   onStartJourney,
   journeyCooldown,
-  onOpenInfoModal
+  onOpenInfoModal,
+  onOpenAdvisorModal
 }) {
   return (
     <div className="px-6 py-4 pb-32 animate-in fade-in slide-in-from-bottom-4 duration-500">

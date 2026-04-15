@@ -2,6 +2,7 @@ import React from 'react';
 import { X, Search, MapPin, RefreshCw, CheckCircle2 } from 'lucide-react';
 
 export function LocationModal({ 
+  isOpen,
   onClose, 
   onDetect, 
   onSearch, 
@@ -11,6 +12,8 @@ export function LocationModal({
   searchResults, 
   onSelectResult 
 }) {
+  if (!isOpen) return null;
+
   return (
     <div className="absolute inset-0 bg-slate-900/70 backdrop-blur-sm z-50 flex items-center justify-center p-6">
       <div className="bg-white rounded-[2rem] w-full max-w-[22rem] shadow-2xl animate-in slide-in-from-bottom-10 zoom-in-95 duration-500 overflow-hidden flex flex-col max-h-[80vh]">

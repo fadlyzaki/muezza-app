@@ -32,7 +32,8 @@ import {
   CloudOff,
   RefreshCw,
   WifiOff,
-  AlertCircle
+  AlertCircle,
+  Zap
 } from 'lucide-react';
 import { useAuth } from './auth/useAuth';
 import LoginButton from './auth/LoginButton';
@@ -892,17 +893,17 @@ function MuezzaApp() {
             <HomeTab 
               dinar={dinar}
               streak={streakLocal}
-              energy={totalDailyPercentage}
+              energy={energy}
               prayers={prayers}
               habits={habits}
               locationLabel={formatLocationLabel(savedLocation)}
-              onOpenLocationModal={() => setShowLocationModal(true)}
+              onOpenLocationModal={() => setIsLocationModalOpen(true)}
               onPet={handlePetCat}
-              isPetting={isPetting}
+              isPetting={showHearts}
               inventory={inventory}
               onTogglePrayer={togglePrayer}
               onToggleHabit={toggleHabit}
-              onEditHabit={handleEditHabit}
+              onEditHabit={openEditHabitForm}
               onAddHabitClick={() => setShowAddHabit(true)}
               onStartJourney={startJourney}
               onOpenInfoModal={() => setShowInfoModal(true)}
@@ -948,7 +949,7 @@ function MuezzaApp() {
               user={accessToken ? { name: "Warrior" } : null}
               onRefresh={() => {}} 
               isSyncing={false}
-              bookmarks={bookmarks}
+              bookmarks={userBookmarks}
               onOpenSurahByBookmark={(bm) => openSurah({ id: bm.surah_id, name_simple: bm.surah_name })}
             />
           )}
@@ -1006,7 +1007,7 @@ function MuezzaApp() {
           onRetry={() => {
             setJourneyError(null);
             setIsJourneying(true);
-            handleMuezzaClick();
+            handlePetCat();
           }}
           inventory={inventory}
         />
@@ -1014,6 +1015,9 @@ function MuezzaApp() {
         <InfoModal 
           isOpen={showInfoModal}
           onClose={() => setShowInfoModal(false)}
+          activeTab={infoModalTab}
+          setActiveTab={setInfoModalTab}
+          onReset={handleExportData} 
         />
 
         <AdvisorModal 
@@ -1025,14 +1029,15 @@ function MuezzaApp() {
         />
 
         <LocationModal 
-          isOpen={showLocationModal}
-          onClose={() => setShowLocationModal(false)}
+          isOpen={isLocationModalOpen}
+          onClose={() => setIsLocationModalOpen(false)}
           searchQuery={locationSearchQuery}
-          onSearchChange={(e) => setLocationSearchQuery(e.target.value)}
+          setSearchQuery={setLocationSearchQuery}
           onSearch={handleCitySearch}
-          results={locationSearchResults}
+          searchResults={locationSearchResults}
           isSearching={isLocationSearching}
-          onSelect={selectManualLocation}
+          onSelectResult={selectManualLocation}
+          onDetect={selectManualLocation} 
         />
 
 
