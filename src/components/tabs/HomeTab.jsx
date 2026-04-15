@@ -83,6 +83,14 @@ export function HomeTab({
                 <div className="absolute inset-0 bg-[linear-gradient(45deg,rgba(255,255,255,0.2)_25%,transparent_25%,transparent_50%,rgba(255,255,255,0.2)_50%,rgba(255,255,255,0.2)_75%,transparent_75%,transparent)] bg-[length:20px_20px] animate-shimmer"></div>
               </div>
             </div>
+            
+            <button
+              onClick={() => onOpenAdvisorModal()}
+              className="mt-6 w-full bg-emerald-50 hover:bg-emerald-100/80 border border-emerald-100 text-emerald-700 py-3 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] transition-all flex items-center justify-center space-x-2 active:scale-95 group shadow-sm"
+            >
+              <Sparkles className="w-3.5 h-3.5 group-hover:rotate-12 transition-transform" />
+              <span>Consult Muezza</span>
+            </button>
           </div>
          </div>
 

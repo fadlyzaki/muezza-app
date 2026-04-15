@@ -137,3 +137,37 @@ export const DEFAULT_RECITER_ID = 2;
 export const DEFAULT_DINAR = 40;
 export const DEFAULT_STREAK = 0;
 export const INFO_MODAL_VERSION = 'v2';
+
+export const ADVISOR_MOODS = [
+  { id: 'grateful', label: 'Grateful', sub: 'Shukr', icon: '🤲' },
+  { id: 'anxious', label: 'Anxious', sub: 'Tawakkul', icon: '🍃' },
+  { id: 'tired', label: 'Overwhelmed', sub: 'Sabr', icon: '⏳' },
+  { id: 'searching', label: 'Searching', sub: 'Hidayah', icon: '🧭' },
+];
+
+export const MOOD_RESPONSES = {
+  grateful: {
+    muezza_advice: "Assalamualaikum! My whiskers are twitching with joy for you. Gratitude is a catalyst—it expands the heart and invites more blessings into your substrate.",
+    verse: "And [remember] when your Lord proclaimed, 'If you are grateful, I will surely increase you [in favor]...'",
+    reference: "Surah Ibrahim 14:7",
+    tafsir: "Shukr is not just a 'thank you'. It is the preservation of blessings through their recognition and use in ways that please the Creator."
+  },
+  anxious: {
+    muezza_advice: "Peace be upon your heart, seeker. When the winds of dunya blow too hard, remember that I don't worry about my next bowl of milk because it is recorded. Your provision and path are even more secure.",
+    verse: "And will provide for him from where he does not expect. And whoever relies upon Allah - then He is sufficient for him.",
+    reference: "Surah At-Talaq 65:3",
+    tafsir: "Tawakkul is the quiet confidence that the outcome is handled, allowing the mind to focus exclusively on the effort."
+  },
+  tired: {
+    muezza_advice: "Even Muezza needs a long nap sometimes. But remember, every heavy breath you take in patience is a form of dhikr. Your struggle is not invisible; it is being written as strength.",
+    verse: "O you who have believed, seek help through patience and prayer. Indeed, Allah is with the patient.",
+    reference: "Surah Al-Baqarah 2:153",
+    tafsir: "Sabr is not passive waiting; it is the active restraint of the soul from despair while maintaining the rhythm of worship."
+  },
+  searching: {
+    muezza_advice: "The pursuit of knowledge is a light that never dims. My scholarly glasses are ready! To search is to admit that only He can guide, and that admission is the first step of Hidayah.",
+    verse: "And He found you lost and guided [you].",
+    reference: "Surah Ad-Duhaa 93:7",
+    tafsir: "Guidance is a continuous divine response to a sincere heart. If you are looking, it is because He is already reaching for you."
+  }
+};

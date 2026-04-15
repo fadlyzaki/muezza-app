@@ -83,6 +83,11 @@ import { WisdomReminder } from './components/modals/WisdomReminder';
 import { LocationModal } from './components/modals/LocationModal.jsx';
 import { InfoModal } from './components/modals/InfoModal';
 import { JourneyModal } from './components/modals/JourneyModal';
+import { AdvisorModal } from './components/modals/AdvisorModal';
+import {
+  ADVISOR_MOODS,
+  MOOD_RESPONSES
+} from './constants/muezza_data';
 import { HomeTab } from './components/tabs/HomeTab';
 import { QuranTab } from './components/tabs/QuranTab';
 import { NoorTab } from './components/tabs/NoorTab';
@@ -199,6 +204,11 @@ function MuezzaApp() {
   const [locationSearchQuery, setLocationSearchQuery] = useState('');
   const [isLocationSearching, setIsLocationSearching] = useState(false);
   const [locationSearchResults, setLocationSearchResults] = useState([]);
+
+  // Advisor States
+  const [isAdvisorModalOpen, setIsAdvisorModalOpen] = useState(false);
+  const [adviceResult, setAdviceResult] = useState(null);
+  const [isAdvisorThinking, setIsAdvisorThinking] = useState(false);
 
   // Cat Evolution Stage
   const catStage = useMemo(() => {
@@ -680,6 +690,23 @@ function MuezzaApp() {
     }
   };
 
+  const handleOpenAdvisorModal = () => {
+    setAdviceResult(null);
+    setIsAdvisorModalOpen(true);
+  };
+
+  const handleSeekAdvice = (moodId) => {
+    setIsAdvisorThinking(true);
+    setAdviceResult(null);
+
+    // Simulate AI Reflection thinking time
+    setTimeout(() => {
+      const result = MOOD_RESPONSES[moodId];
+      setAdviceResult(result);
+      setIsAdvisorThinking(false);
+    }, 1800);
+  };
+
   const handlePetCat = () => {
     if (energy > 0 && !showHearts) {
       setShowHearts(true);
@@ -879,6 +906,7 @@ function MuezzaApp() {
               onAddHabitClick={() => setShowAddHabit(true)}
               onStartJourney={startJourney}
               onOpenInfoModal={() => setShowInfoModal(true)}
+              onOpenAdvisorModal={handleOpenAdvisorModal}
             />
           )}
 
@@ -986,6 +1014,14 @@ function MuezzaApp() {
         <InfoModal 
           isOpen={showInfoModal}
           onClose={() => setShowInfoModal(false)}
+        />
+
+        <AdvisorModal 
+          isOpen={isAdvisorModalOpen}
+          onClose={() => setIsAdvisorModalOpen(false)}
+          onSeekAdvice={handleSeekAdvice}
+          adviceResult={adviceResult}
+          isThinking={isAdvisorThinking}
         />
 
         <LocationModal 
