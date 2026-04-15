@@ -54,8 +54,7 @@ export function HomeTab({
             
             </div>
           </div>
-        </div>
-      </div>
+
           {energy >= 100 ? (
              <button 
               onClick={onStartJourney}
