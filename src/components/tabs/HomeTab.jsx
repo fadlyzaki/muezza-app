@@ -7,64 +7,30 @@ export function HomeTab({
   energy, 
   prayers, 
   habits, 
-  locationLabel, 
-  onOpenLocationModal,
   onPet,
   isPetting,
   inventory,
   onTogglePrayer,
   onToggleHabit,
   onEditHabit,
+  onDeleteHabit,
   onAddHabitClick,
   onStartJourney,
   onOpenInfoModal,
-  onOpenAdvisorTab,
-  dinar,
-  streak
+  prayerTimes
 }) {
   return (
-    <div className="px-6 py-4 pb-32 animate-in fade-in slide-in-from-bottom-4 duration-500">
-      {/* New Aesthetic Header */}
-      <div className="flex flex-col space-y-4 mb-8 relative z-30">
-        <div className="flex items-center justify-between">
-          <button 
-            onClick={onOpenLocationModal}
-            className="flex items-center space-x-2 bg-white/50 hover:bg-white px-4 py-2 rounded-2xl transition-all border border-slate-100 shadow-sm active:scale-95 group"
-          >
-            <MapPin className="w-3.5 h-3.5 text-emerald-600" />
-            <span className="text-[11px] font-black text-slate-800 tracking-tight">{locationLabel}</span>
-          </button>
-          
-          <button 
-            onClick={onOpenInfoModal}
-            className="p-2.5 bg-white border border-slate-100 rounded-2xl text-slate-400 hover:text-emerald-600 hover:border-emerald-200 transition-all shadow-sm"
-          >
-            <Activity className="w-4 h-4" />
-          </button>
-        </div>
-
-        <div className="flex items-center space-x-3">
-          <div className="bg-emerald-600 px-4 py-2.5 rounded-2xl flex items-center space-x-2 shadow-lg shadow-emerald-600/20 border border-emerald-500">
-             <div className="w-2 h-2 bg-emerald-200 rounded-full animate-pulse"></div>
-             <span className="text-[10px] font-black text-emerald-50 uppercase tracking-[0.2em]">{streak} Noor Streak</span>
-          </div>
-          <div className="bg-amber-50 px-4 py-2.5 rounded-2xl flex items-center space-x-2 border border-amber-100 shadow-sm">
-             <span className="text-amber-500 text-sm font-black">🪙</span>
-             <span className="text-[11px] font-black text-amber-900 font-mono tracking-tighter">{dinar} Dinar</span>
-          </div>
-        </div>
-      </div>
-
-      <div className="bg-white rounded-[3rem] p-10 mb-10 shadow-xl shadow-emerald-900/5 border border-emerald-50 relative overflow-hidden group">
-        <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/5 rounded-full -translate-y-32 translate-x-32 blur-3xl group-hover:bg-emerald-500/10 transition-colors duration-700"></div>
-        <div className="absolute bottom-0 left-0 w-64 h-64 bg-amber-500/5 rounded-full translate-y-32 -translate-x-32 blur-3xl group-hover:bg-amber-500/10 transition-colors duration-700"></div>
+    <div className="px-6 py-6 pb-32 animate-in fade-in slide-in-from-bottom-4 duration-500">
+      <div className="bg-white rounded-[4rem] p-12 mb-12 shadow-xl shadow-emerald-900/5 border border-emerald-50 relative overflow-hidden group">
+        <div className="absolute top-0 right-0 w-80 h-80 bg-emerald-500/5 rounded-full -translate-y-40 translate-x-40 blur-3xl group-hover:bg-emerald-500/10 transition-colors duration-700"></div>
+        <div className="absolute bottom-0 left-0 w-80 h-80 bg-amber-500/5 rounded-full translate-y-40 -translate-x-40 blur-3xl group-hover:bg-amber-500/10 transition-colors duration-700"></div>
 
         <div className="flex flex-col items-center relative z-10">
           <div className="relative cursor-pointer select-none group/mascot" onClick={onPet}>
             <div className={`absolute inset-0 bg-emerald-400/10 blur-3xl rounded-full scale-110 transition-all duration-1000 ${isPetting ? 'opacity-100 scale-125' : 'opacity-0'}`}></div>
             <CatSVG 
               awake={energy > 0} 
-              className={`w-40 h-40 transition-all duration-500 relative z-10 drop-shadow-[0_10px_10px_rgba(0,0,0,0.1)] group-hover/mascot:drop-shadow-[0_15px_15px_rgba(0,0,0,0.15)] group-hover/mascot:-translate-y-1 ${isPetting ? 'scale-110' : ''}`}
+              className={`w-48 h-48 transition-all duration-500 relative z-10 drop-shadow-[0_15px_15px_rgba(0,0,0,0.1)] group-hover/mascot:drop-shadow-[0_20px_20px_rgba(0,0,0,0.15)] group-hover/mascot:-translate-y-2 ${isPetting ? 'scale-110' : ''}`}
               isPetting={isPetting} 
               equipped={inventory} 
             />
@@ -86,17 +52,10 @@ export function HomeTab({
               </div>
             </div>
             
-            <button
-              onClick={onOpenAdvisorTab}
-              className="mt-8 w-full bg-slate-900 hover:bg-slate-800 text-white py-5 rounded-[2.5rem] text-[11px] font-black uppercase tracking-[0.25em] transition-all flex items-center justify-center space-x-3 active:scale-95 group shadow-xl shadow-slate-900/20"
-            >
-              <Sparkles className="w-4 h-4 text-amber-400 group-hover:rotate-12 transition-transform" />
-              <span>Enter Advisor Hub</span>
-            </button>
+            </div>
           </div>
-         </div>
-
-        <div className="relative z-10 mt-6 pt-6 border-t border-slate-50">
+        </div>
+      </div>
           {energy >= 100 ? (
              <button 
               onClick={onStartJourney}
@@ -118,28 +77,30 @@ export function HomeTab({
         </div>
       </div>
 
-      <div className="mb-12 space-y-6">
-        <h4 className="text-xs font-black text-slate-400 uppercase tracking-[0.3em] px-2 flex items-center justify-between">
-          <span className="bg-slate-900 text-white px-3 py-1 rounded-lg">Protocol 01</span>
-          <span className="text-slate-800">Obligatory Rituals</span>
-        </h4>
+      <div className="mb-14 space-y-6">
+        <div className="flex items-center justify-between px-2">
+          <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.4em]">Obligatory Rituals</h4>
+          <span className="text-[9px] font-bold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-100">Live Timing</span>
+        </div>
         <div className="grid grid-cols-5 gap-3">
           {prayers.map((prayer) => {
             const IconComp = PRAYER_ICONS[prayer.id];
+            const prayerTime = prayerTimes ? prayerTimes[prayer.name] : '--:--';
             return (
               <button
                 key={prayer.id}
                 onClick={() => onTogglePrayer(prayer.id)}
-                className={`flex flex-col items-center p-3 rounded-2xl border-2 transition-all relative overflow-hidden group ${
+                className={`flex flex-col items-center p-3 rounded-3xl border-2 transition-all relative overflow-hidden group ${
                   prayer.completed
                     ? 'bg-emerald-50 border-emerald-100'
                     : 'bg-white border-slate-100 hover:border-emerald-200 hover:shadow-lg hover:-translate-y-0.5'
                 }`}
               >
-                <div className={`p-2 rounded-xl mb-2 transition-colors ${prayer.completed ? 'bg-emerald-100 text-emerald-600' : 'bg-slate-50 text-slate-400 group-hover:bg-emerald-50 group-hover:text-emerald-500'}`}>
+                <div className={`p-2.5 rounded-2xl mb-2 transition-colors ${prayer.completed ? 'bg-emerald-100 text-emerald-600' : 'bg-slate-50 text-slate-400 group-hover:bg-emerald-50 group-hover:text-emerald-500'}`}>
                   {IconComp && <IconComp className="w-4 h-4" />}
                 </div>
-                <span className={`text-[9px] font-black uppercase tracking-tight ${prayer.completed ? 'text-emerald-700' : 'text-slate-500'}`}>{prayer.name}</span>
+                <span className={`text-[9px] font-black uppercase tracking-tight mb-1 ${prayer.completed ? 'text-emerald-700' : 'text-slate-500'}`}>{prayer.name}</span>
+                <span className="text-[8px] font-bold text-slate-400 font-mono tracking-tighter opacity-80">{prayerTime}</span>
                 {prayer.completed && (
                    <div className="absolute top-1 right-1">
                       <CheckCircle2 className="w-2.5 h-2.5 text-emerald-500 fill-white" />
@@ -153,15 +114,13 @@ export function HomeTab({
 
       <div className="mb-8 space-y-6">
         <div className="flex items-center justify-between px-2">
-          <h4 className="text-xs font-black text-slate-400 uppercase tracking-[0.3em] flex items-center space-x-3">
-            <span className="bg-emerald-100 text-emerald-700 px-3 py-1 rounded-lg">Protocol 02</span>
-            <span className="text-slate-800">Performance Matrix</span>
-          </h4>
+          <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.4em]">Habit Matrix</h4>
           <button 
             onClick={onOpenInfoModal}
-            className="text-[9px] font-black text-emerald-600 uppercase tracking-widest bg-emerald-50 px-3 py-1.5 rounded-xl border border-emerald-100 active:scale-95"
+            className="text-[9px] font-black text-slate-500 hover:text-emerald-600 transition-colors uppercase tracking-widest flex items-center space-x-1"
           >
-            Glossary
+            <span>Glossary</span>
+            <Activity className="w-3 h-3" />
           </button>
         </div>
         <div className="space-y-3">
@@ -206,10 +165,16 @@ export function HomeTab({
               </div>
               <div className="flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
                 <button
-                  onClick={() => onEditHabit(habit.id)}
-                  className="p-2.5 text-slate-400 hover:text-slate-900 transition-colors bg-slate-50 rounded-xl"
+                  onClick={() => onEditHabit(habit)}
+                  className="p-2.5 text-slate-400 hover:text-emerald-600 transition-colors bg-slate-50 rounded-xl border border-slate-100"
                 >
                   <Pencil className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={() => onDeleteHabit(habit.id)}
+                  className="p-2.5 text-slate-400 hover:text-rose-600 transition-colors bg-slate-50 rounded-xl border border-slate-100"
+                >
+                  <Trash2 className="w-4 h-4" />
                 </button>
               </div>
             </div>

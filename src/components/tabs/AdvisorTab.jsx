@@ -29,13 +29,13 @@ export function AdvisorTab({ onSeekAdvice, adviceResult, isThinking }) {
         <div className="relative z-10">
           {!adviceResult && !isThinking ? (
             <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-              <div className="text-center">
-                <div className="bg-[#FAF8F4] p-10 rounded-[3rem] border border-slate-100 flex flex-col items-center relative group/mascot">
-                  <div className="absolute inset-0 bg-emerald-500/5 blur-3xl rounded-full scale-110 opacity-0 group-hover/mascot:opacity-100 transition-opacity"></div>
-                  <CatSVG awake={true} equipped={['glasses_smart', 'turban_cream']} className="w-40 h-40 mb-6 drop-shadow-2xl relative z-10" />
-                  <h4 className="text-2xl font-black text-slate-800 mb-2 font-serif italic tracking-tight">"Assalamualaikum, seeker."</h4>
-                  <p className="text-xs text-slate-500 font-medium max-w-[240px] leading-relaxed">
-                    How is your heart feeling today? I have prepared reflections from the sacred scrolls.
+              <div className="flex flex-col items-center">
+                <div className="bg-[#FAF8F4] w-full p-12 rounded-[4rem] border border-slate-100 flex flex-col items-center relative group/mascot mb-8 overflow-hidden shadow-sm">
+                  <div className="absolute inset-0 bg-emerald-500/5 blur-3xl rounded-full scale-150 animate-pulse"></div>
+                  <CatSVG awake={true} equipped={['glasses_smart', 'turban_cream']} className="w-52 h-52 mb-8 drop-shadow-2xl relative z-10" />
+                  <h4 className="text-3xl font-black text-slate-800 mb-4 font-serif italic tracking-tight">"Assalamu'alaikum"</h4>
+                  <p className="text-sm text-slate-500 font-medium max-w-[280px] leading-relaxed text-center">
+                    I have prepared my scrolls to reflect on your heart's current state. How are you feeling, seeker?
                   </p>
                 </div>
               </div>
@@ -88,47 +88,50 @@ export function AdvisorTab({ onSeekAdvice, adviceResult, isThinking }) {
                </div>
             </div>
           ) : (
-            <div className="animate-in fade-in slide-in-from-bottom-8 duration-700 space-y-10 pb-8">
-              <div className="bg-[#FAF8F4] p-8 rounded-[3rem] border border-emerald-100 relative group overflow-hidden shadow-sm">
-                <div className="absolute top-0 right-0 p-6 opacity-5">
-                  <Quote className="w-24 h-24 text-emerald-900" />
+            <div className="animate-in fade-in slide-in-from-bottom-8 duration-700 space-y-12 pb-8">
+              <div className="bg-slate-900 p-10 rounded-[4rem] relative group overflow-hidden shadow-2xl shadow-slate-900/20">
+                <div className="absolute top-0 right-0 p-8 opacity-10">
+                  <Quote className="w-32 h-32 text-white" />
                 </div>
-                <div className="flex items-start space-x-5 relative z-10">
-                   <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center shadow-lg border-4 border-white shrink-0">
-                      <CatSVG awake={true} equipped={['glasses_smart', 'turban_cream']} className="w-14 h-14" />
+                <div className="flex flex-col items-center relative z-10 text-center">
+                   <div className="w-24 h-24 bg-white/10 backdrop-blur-md rounded-full flex items-center justify-center border border-white/20 mb-8">
+                      <CatSVG awake={true} equipped={['glasses_smart', 'turban_cream']} className="w-16 h-16" />
                    </div>
-                   <div className="bg-emerald-600 text-white p-6 rounded-[2rem] rounded-tl-none shadow-xl shadow-emerald-600/10">
-                      <p className="text-sm font-bold leading-relaxed">{adviceResult.muezza_advice}</p>
+                   <div className="space-y-4">
+                      <p className="text-[10px] font-black text-emerald-400 uppercase tracking-[0.4em]">Muezza's Counsel</p>
+                      <p className="text-xl font-bold leading-relaxed text-white">{adviceResult.muezza_advice}</p>
                    </div>
                 </div>
               </div>
 
-              <div className="space-y-6">
-                <div className="flex items-center space-x-4 px-4">
+              <div className="space-y-8">
+                <div className="flex items-center space-x-6 px-4">
                    <div className="h-px bg-slate-100 flex-1"></div>
-                   <span className="text-[11px] font-black text-slate-300 uppercase tracking-[0.4em]">Scriptural Evidence</span>
+                   <span className="text-[11px] font-black text-slate-300 uppercase tracking-[0.5em]">The Source</span>
                    <div className="h-px bg-slate-100 flex-1"></div>
                 </div>
 
-                <div className="bg-white p-10 rounded-[3.5rem] border border-amber-100 shadow-xl shadow-amber-900/5 relative overflow-hidden">
-                   <div className="absolute top-0 right-0 w-48 h-48 bg-amber-50 rounded-full blur-3xl -translate-y-24 translate-x-24"></div>
-                   <p className="text-3xl font-bold text-slate-800 italic leading-relaxed text-center mb-8 relative z-10 font-serif">
-                     "{adviceResult.verse}"
-                   </p>
-                   <div className="flex flex-col items-center relative z-10">
-                      <div className="flex items-center space-x-2 bg-amber-50 border border-amber-100 px-5 py-2.5 rounded-2xl mb-8">
+                <div className="bg-white p-12 rounded-[4rem] border border-amber-100 shadow-xl shadow-amber-900/5 relative overflow-hidden">
+                   <div className="absolute top-0 right-0 w-64 h-64 bg-amber-50 rounded-full blur-3xl -translate-y-32 translate-x-32"></div>
+                   
+                   <div className="relative z-10 flex flex-col items-center">
+                     <div className="flex items-center space-x-3 bg-amber-50 border border-amber-100 px-6 py-2.5 rounded-full mb-10">
                         <Star className="w-4 h-4 text-amber-600 fill-amber-600" />
-                        <span className="text-xs font-black text-amber-700 uppercase tracking-widest">{adviceResult.reference}</span>
+                        <span className="text-[11px] font-black text-amber-900 uppercase tracking-widest">{adviceResult.reference}</span>
                       </div>
+
+                      <p className="text-3xl font-black text-slate-800 italic leading-relaxed text-center mb-12 font-serif tracking-tight">
+                        "{adviceResult.verse}"
+                      </p>
                       
-                      <div className="bg-slate-50 p-8 rounded-[2.5rem] w-full border border-slate-100 shadow-inner">
-                        <div className="flex items-center space-x-3 mb-4">
-                           <div className="p-2 bg-emerald-100 rounded-xl">
+                      <div className="bg-[#F8F9FB] p-10 rounded-[3.5rem] w-full border border-slate-100">
+                        <div className="flex items-center space-x-3 mb-6">
+                           <div className="p-2.5 bg-emerald-100 rounded-2xl">
                               <BookOpen className="w-4 h-4 text-emerald-600" />
                            </div>
-                           <h5 className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em]">Contextual Tafsir</h5>
+                           <h5 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em]">Deep Wisdom Insight</h5>
                         </div>
-                        <p className="text-[13px] text-slate-600 leading-relaxed font-semibold italic">{adviceResult.tafsir}</p>
+                        <p className="text-sm text-slate-600 leading-relaxed font-bold italic tracking-tight">{adviceResult.tafsir}</p>
                       </div>
                    </div>
                 </div>
@@ -136,10 +139,10 @@ export function AdvisorTab({ onSeekAdvice, adviceResult, isThinking }) {
 
               <button
                  onClick={() => setSelectedMood(null)}
-                 className="w-full py-6 bg-slate-900 text-white font-black rounded-[2.5rem] hover:bg-slate-800 transition-all shadow-2xl shadow-slate-900/20 active:scale-[0.98] flex items-center justify-center space-x-3"
+                 className="w-full py-6 bg-slate-100 text-slate-800 font-extrabold rounded-[3rem] hover:bg-emerald-50 hover:text-emerald-700 transition-all active:scale-[0.98] flex items-center justify-center space-x-3 border-2 border-transparent hover:border-emerald-100"
               >
-                 <Sparkles className="w-5 h-5 text-amber-400" />
-                 <span>Barakallahu Feek (End Session)</span>
+                 <Sparkles className="w-5 h-5" />
+                 <span>Barakallahu Feek • Seek Another Path</span>
               </button>
             </div>
           )}

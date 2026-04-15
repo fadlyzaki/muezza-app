@@ -452,35 +452,24 @@ function MuezzaApp() {
     return () => window.clearInterval(intervalId);
   }, [hasCompletedOnboarding, prayerTimes, prayers, setPrayers]);
 
+  const fetchSurahs = async () => {
+    setIsLoadingQuran(true);
+    setQuranError(null);
+
+    try {
+      const payload = await fetchJson('/api/chapters');
+      setSurahs(payload?.chapters || []);
+      setIsLoadingQuran(false);
+    } catch (error) {
+      console.error('Failed to load surahs:', error);
+      setQuranError(error.message);
+      setIsLoadingQuran(false);
+    }
+  };
+
   useEffect(() => {
-    if (activeTab !== 'quran' || surahs.length > 0) return undefined;
-
-    let cancelled = false;
-
-    const loadSurahs = async () => {
-      setIsLoadingQuran(true);
-      setQuranError(null);
-
-      try {
-        const payload = await fetchJson('/api/chapters');
-        if (!cancelled) {
-          setSurahs(payload?.chapters || []);
-          setIsLoadingQuran(false);
-        }
-      } catch (error) {
-        console.error('Failed to load surahs:', error);
-        if (!cancelled) {
-          setQuranError(error.message);
-          setIsLoadingQuran(false);
-        }
-      }
-    };
-
-    loadSurahs();
-
-    return () => {
-      cancelled = true;
-    };
+    if (activeTab !== 'quran' || surahs.length > 0) return;
+    fetchSurahs();
   }, [activeTab, surahs.length]);
 
   useEffect(() => () => {
@@ -575,11 +564,15 @@ function MuezzaApp() {
     setNewHabitCategory('Ruh');
   };
 
-  const openEditHabitForm = (habit) => {
+  const openEditHabitForm = (habitOrId) => {
+    const habitId = typeof habitOrId === 'object' ? habitOrId.id : habitOrId;
+    const targetHabit = habits.find((h) => h.id === habitId);
+    if (!targetHabit) return;
+
     setShowAddHabit(true);
-    setEditingHabitId(habit.id);
-    setNewHabitTitle(habit.title);
-    setNewHabitCategory(habit.category);
+    setEditingHabitId(targetHabit.id);
+    setNewHabitTitle(targetHabit.title);
+    setNewHabitCategory(targetHabit.category);
   };
 
   const handleSaveHabit = () => {
@@ -853,27 +846,59 @@ function MuezzaApp() {
 
   return (
     <div className="min-h-screen bg-[#E5E0D8] text-slate-800 font-sans sm:py-8 flex justify-center">
-      <div className="w-full max-w-md bg-[#FDFCFB] sm:rounded-[2.5rem] shadow-2xl sm:border-[8px] border-slate-100 overflow-hidden relative flex flex-col h-screen sm:h-[850px]">
-        <div id="main-scroll-container" className="flex-1 overflow-y-auto pb-24 scrollbar-hide">
+      <div className="w-full max-w-md bg-[#FDFCFB] sm:rounded-[4rem] shadow-2xl sm:border-[12px] border-slate-100 overflow-hidden relative flex flex-col h-screen sm:h-[900px]">
+        {/* Well-Organized Top Navigation Bar */}
+        <div className="flex justify-between items-center px-6 py-4 bg-white/90 backdrop-blur-md z-40 sticky top-0 border-b border-slate-100/50">
+          <button
+            onClick={() => setActiveTab('noor')}
+            className="flex items-center space-x-2.5 px-3.5 py-2 rounded-2xl bg-emerald-50 border border-emerald-100/50 active:scale-95 transition-all group"
+          >
+            <Zap className={`w-4 h-4 ${streakLocal > 0 ? 'text-amber-500 fill-amber-500 animate-pulse' : 'text-slate-400'}`} />
+            <div className="text-left">
+              <span className="block text-[10px] font-black text-emerald-900 leading-none">{streakLocal} NOOR</span>
+              <span className="block text-[7px] font-bold text-emerald-600/60 uppercase tracking-tighter">Streak</span>
+            </div>
+          </button>
+
+          <button 
+            onClick={() => setIsLocationModalOpen(true)}
+            className="flex items-center space-x-2 bg-slate-50 px-4 py-2.5 rounded-full border border-slate-100 shadow-sm active:scale-95 transition-all group"
+          >
+            <MapPin className="w-3.5 h-3.5 text-emerald-600 group-hover:animate-bounce" />
+            <span className="text-[11px] font-black text-slate-800 tracking-tight">{formatLocationLabel(savedLocation)}</span>
+          </button>
+
+          <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-2 bg-amber-50/80 px-4 py-2 rounded-2xl border border-amber-100 shadow-sm">
+              <span className="text-amber-500 text-sm">🪙</span>
+              <span className="font-mono text-xs font-black text-amber-900 tracking-tighter">{dinar}</span>
+            </div>
+            <button 
+              onClick={() => setShowInfoModal(true)}
+              className="p-2.5 rounded-2xl bg-white border border-slate-100 text-slate-400 hover:text-emerald-600 hover:border-emerald-200 transition-all shadow-sm"
+            >
+              <Info className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+
+        <div id="main-scroll-container" className="flex-1 overflow-y-auto pb-32 scrollbar-hide">
           {activeTab === 'home' && (
             <HomeTab 
               energy={energy}
               prayers={prayers}
               habits={habits}
-              locationLabel={formatLocationLabel(savedLocation)}
-              onOpenLocationModal={() => setIsLocationModalOpen(true)}
               onPet={handlePetCat}
               isPetting={showHearts}
               inventory={inventory}
               onTogglePrayer={togglePrayer}
               onToggleHabit={toggleHabit}
               onEditHabit={openEditHabitForm}
+              onDeleteHabit={handleDeleteHabit}
               onAddHabitClick={() => setShowAddHabit(true)}
               onStartJourney={startJourney}
               onOpenInfoModal={() => setShowInfoModal(true)}
-              onOpenAdvisorTab={() => setActiveTab('advisor')}
-              dinar={dinar}
-              streak={streakLocal}
+              prayerTimes={prayerTimes}
             />
           )}
 
