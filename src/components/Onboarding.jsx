@@ -14,25 +14,37 @@ const GOALS = [
     id: 'quran',
     title: 'Quran Journey',
     emoji: '📖',
-    desc: 'Focus on daily Quran reading',
+    desc: 'Focus on daily Quran reading & reflection',
     color: 'emerald',
-    habit: { id: 10, title: 'Read 1 Page of Quran', category: 'Aql', completed: false, reward: 25 },
+    habits: [
+      { id: 10, title: 'Read 1 Page of Quran', category: 'Aql', completed: false, reward: 25 },
+      { id: 11, title: 'Listen to a Surah recitation', category: 'Qalb', completed: false, reward: 25 },
+      { id: 12, title: 'Reflect on one Ayah meaning', category: 'Ruh', completed: false, reward: 25 },
+    ],
   },
   {
     id: 'prayer',
     title: 'Prayer Devotion',
     emoji: '🕌',
-    desc: 'Never miss a prayer',
+    desc: 'Perfect your salah & connection with Allah',
     color: 'blue',
-    habit: { id: 11, title: 'Pray Fajr on time', category: 'Ruh', completed: false, reward: 25 },
+    habits: [
+      { id: 20, title: 'Pray Fajr on time', category: 'Ruh', completed: false, reward: 25 },
+      { id: 21, title: 'Make Dhikr after each prayer', category: 'Qalb', completed: false, reward: 25 },
+      { id: 22, title: 'Pray 2 Rakat Sunnah', category: 'Ruh', completed: false, reward: 25 },
+    ],
   },
   {
     id: 'character',
     title: 'Noble Character',
     emoji: '🌙',
-    desc: 'Daily acts of kindness',
+    desc: 'Daily acts of kindness & self-improvement',
     color: 'amber',
-    habit: { id: 12, title: 'Do one act of kindness', category: 'Qalb', completed: false, reward: 25 },
+    habits: [
+      { id: 30, title: 'Do one act of kindness', category: 'Qalb', completed: false, reward: 25 },
+      { id: 31, title: 'Say Alhamdulillah 10 times', category: 'Ruh', completed: false, reward: 25 },
+      { id: 32, title: 'Drink water & take care of Jasad', category: 'Jasad', completed: false, reward: 25 },
+    ],
   },
 ];
 

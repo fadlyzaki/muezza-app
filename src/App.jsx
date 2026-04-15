@@ -157,12 +157,9 @@ function MuezzaApp() {
 
   // Onboarding completion handler
   const handleOnboardingComplete = (selectedGoal) => {
-    if (selectedGoal?.habit) {
-      // Add the chosen goal habit if it doesn't already exist
-      setHabits(prev => {
-        const exists = prev.some(h => h.id === selectedGoal.habit.id);
-        return exists ? prev : [...prev, selectedGoal.habit];
-      });
+    if (selectedGoal?.habits) {
+      // Replace default habits with the chosen path's curated habit set
+      setHabits(selectedGoal.habits);
     }
     setHasCompletedOnboarding(true);
   };
