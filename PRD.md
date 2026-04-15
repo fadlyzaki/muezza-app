@@ -7,6 +7,7 @@
 **Platform:** Mobile-First Progressive Web Application  
 **Stack:** React 19, Vite 8, Tailwind CSS v4, Lucide Icons  
 **Repository:** [github.com/fadlyzaki/muezza-app](https://github.com/fadlyzaki/muezza-app)  
+**Live Application:** [muezza-app.vercel.app](https://muezza-app.vercel.app/)  
 **Last Updated:** April 2026
 
 ---
@@ -28,6 +29,7 @@ Muezza is a mobile-first web app designed to bridge the gap between abstract spi
 | **Souq (Shop)** | ✅ Shipped | 4 equippable items rendering dynamically on SVG |
 | **Noor Streak Tab** | ✅ Shipped | Evolution timeline with cloud-sync state management |
 | **OAuth2 / PKCE** | ✅ Shipped | Proper Basic Auth token exchange for secure sessions |
+| **Legal Documentation** | ✅ Shipped | Privacy Policy and Terms of Service for production compliance |
 | **Vercel Deployment** | ✅ Shipped | Serverless `/api/token` and `/api/tafsir` endpoints |
 
 ---
@@ -81,6 +83,7 @@ Next iteration (v1.1) considerations for product maturity:
 | **Timezone-Aware Reset** | Precision `getTodayKey` logic for cross-timezone reliability. | Low | ✅ Integrated |
 | **Amiri/Quran Font** | Native `Amiri Quran` font for all Arabic script blocks. | Low | ✅ Integrated |
 | **Translation Focus** | Persistent English (Saheeh International) focus in reader. | Low | ✅ Integrated |
+| **Legal Documentation** | Privacy Policy & Terms at `/privacy` and `/terms`. | Low | ✅ Integrated |
 | **Streak Recovery Tools** | Manual restore and local backup for streak/data resilience. | Med | ✅ Integrated |
 
 ---
