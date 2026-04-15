@@ -4,8 +4,6 @@ import CatSVG from '../CatSVG';
 import { PRAYER_ICONS } from '../../constants/muezza_data';
 
 export function HomeTab({ 
-  dinar, 
-  streak, 
   energy, 
   prayers, 
   habits, 
@@ -19,46 +17,49 @@ export function HomeTab({
   onEditHabit,
   onAddHabitClick,
   onStartJourney,
-  journeyCooldown,
   onOpenInfoModal,
-  onOpenAdvisorModal
+  onOpenAdvisorTab,
+  dinar,
+  streak
 }) {
   return (
     <div className="px-6 py-4 pb-32 animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <div className="bg-white rounded-[2.5rem] p-8 mb-8 shadow-xl shadow-emerald-900/5 border border-emerald-50 relative overflow-hidden group">
-        <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 rounded-full -translate-y-16 translate-x-16 blur-3xl group-hover:bg-emerald-500/10 transition-colors duration-700"></div>
-        <div className="absolute bottom-0 left-0 w-32 h-32 bg-amber-500/5 rounded-full translate-y-16 -translate-x-16 blur-3xl group-hover:bg-amber-500/10 transition-colors duration-700"></div>
-
-        <div className="flex justify-between items-start mb-10 relative z-10">
+      {/* New Aesthetic Header */}
+      <div className="flex flex-col space-y-4 mb-8 relative z-30">
+        <div className="flex items-center justify-between">
           <button 
             onClick={onOpenLocationModal}
-            className="flex items-center space-x-3 bg-slate-50 hover:bg-emerald-50 px-5 py-3 rounded-2xl transition-all border border-slate-100 hover:border-emerald-100 group shadow-sm active:scale-95"
+            className="flex items-center space-x-2 bg-white/50 hover:bg-white px-4 py-2 rounded-2xl transition-all border border-slate-100 shadow-sm active:scale-95 group"
           >
-            <div className="p-2 bg-white rounded-xl shadow-sm group-hover:text-emerald-500 transition-colors">
-              <MapPin className="w-4 h-4 text-emerald-600" />
-            </div>
-            <div className="text-left">
-              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Current Sector</p>
-              <p className="text-xs font-black text-slate-800 tracking-tight flex items-center gap-1">
-                {locationLabel}
-                <Search className="w-3 h-3 text-slate-300 group-hover:text-emerald-400 transition-colors" />
-              </p>
-            </div>
+            <MapPin className="w-3.5 h-3.5 text-emerald-600" />
+            <span className="text-[11px] font-black text-slate-800 tracking-tight">{locationLabel}</span>
           </button>
-
-          <div className="flex flex-col items-end space-y-1.5">
-            <div className="bg-amber-50 border border-amber-100 px-4 py-2 rounded-2xl flex items-center space-x-2.5 shadow-sm">
-              <Sparkles className="w-4 h-4 text-amber-500 fill-amber-500" />
-              <span className="text-sm font-black text-amber-700 font-mono tracking-tighter">{dinar} D</span>
-            </div>
-            <div className="bg-rose-50 border border-rose-100 px-4 py-2 rounded-2xl flex items-center space-x-2.5 shadow-sm">
-              <span className="text-rose-500 text-lg font-black leading-none mt-0.5">🔥</span>
-              <span className="text-sm font-black text-rose-700 font-mono tracking-tighter">{streak} Days</span>
-            </div>
-          </div>
+          
+          <button 
+            onClick={onOpenInfoModal}
+            className="p-2.5 bg-white border border-slate-100 rounded-2xl text-slate-400 hover:text-emerald-600 hover:border-emerald-200 transition-all shadow-sm"
+          >
+            <Activity className="w-4 h-4" />
+          </button>
         </div>
 
-        <div className="flex flex-col items-center mb-10 relative z-10">
+        <div className="flex items-center space-x-3">
+          <div className="bg-emerald-600 px-4 py-2.5 rounded-2xl flex items-center space-x-2 shadow-lg shadow-emerald-600/20 border border-emerald-500">
+             <div className="w-2 h-2 bg-emerald-200 rounded-full animate-pulse"></div>
+             <span className="text-[10px] font-black text-emerald-50 uppercase tracking-[0.2em]">{streak} Noor Streak</span>
+          </div>
+          <div className="bg-amber-50 px-4 py-2.5 rounded-2xl flex items-center space-x-2 border border-amber-100 shadow-sm">
+             <span className="text-amber-500 text-sm font-black">🪙</span>
+             <span className="text-[11px] font-black text-amber-900 font-mono tracking-tighter">{dinar} Dinar</span>
+          </div>
+        </div>
+      </div>
+
+      <div className="bg-white rounded-[3rem] p-10 mb-10 shadow-xl shadow-emerald-900/5 border border-emerald-50 relative overflow-hidden group">
+        <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/5 rounded-full -translate-y-32 translate-x-32 blur-3xl group-hover:bg-emerald-500/10 transition-colors duration-700"></div>
+        <div className="absolute bottom-0 left-0 w-64 h-64 bg-amber-500/5 rounded-full translate-y-32 -translate-x-32 blur-3xl group-hover:bg-amber-500/10 transition-colors duration-700"></div>
+
+        <div className="flex flex-col items-center relative z-10">
           <div className="relative cursor-pointer select-none group/mascot" onClick={onPet}>
             <div className={`absolute inset-0 bg-emerald-400/10 blur-3xl rounded-full scale-110 transition-all duration-1000 ${isPetting ? 'opacity-100 scale-125' : 'opacity-0'}`}></div>
             <CatSVG 
@@ -86,11 +87,11 @@ export function HomeTab({
             </div>
             
             <button
-              onClick={() => onOpenAdvisorModal()}
-              className="mt-6 w-full bg-emerald-50 hover:bg-emerald-100/80 border border-emerald-100 text-emerald-700 py-3 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] transition-all flex items-center justify-center space-x-2 active:scale-95 group shadow-sm"
+              onClick={onOpenAdvisorTab}
+              className="mt-8 w-full bg-slate-900 hover:bg-slate-800 text-white py-5 rounded-[2.5rem] text-[11px] font-black uppercase tracking-[0.25em] transition-all flex items-center justify-center space-x-3 active:scale-95 group shadow-xl shadow-slate-900/20"
             >
-              <Sparkles className="w-3.5 h-3.5 group-hover:rotate-12 transition-transform" />
-              <span>Consult Muezza</span>
+              <Sparkles className="w-4 h-4 text-amber-400 group-hover:rotate-12 transition-transform" />
+              <span>Enter Advisor Hub</span>
             </button>
           </div>
          </div>
@@ -117,10 +118,10 @@ export function HomeTab({
         </div>
       </div>
 
-      <div className="mb-10 space-y-4">
-        <h4 className="text-xs font-black text-slate-400 uppercase tracking-widest px-2 mb-4 flex items-center justify-between">
-          <span>Obligatory Rituals</span>
-          <Activity className="w-3 h-3" />
+      <div className="mb-12 space-y-6">
+        <h4 className="text-xs font-black text-slate-400 uppercase tracking-[0.3em] px-2 flex items-center justify-between">
+          <span className="bg-slate-900 text-white px-3 py-1 rounded-lg">Protocol 01</span>
+          <span className="text-slate-800">Obligatory Rituals</span>
         </h4>
         <div className="grid grid-cols-5 gap-3">
           {prayers.map((prayer) => {
@@ -150,17 +151,18 @@ export function HomeTab({
         </div>
       </div>
 
-      <div className="mb-8">
-        <div className="flex items-center justify-between px-2 mb-6">
-          <h4 className="text-xs font-black text-slate-400 uppercase tracking-widest">Habit Matrix</h4>
-          <div className="flex items-center space-x-1 bg-slate-100 p-1 rounded-lg">
-             <button 
-              onClick={onOpenInfoModal}
-              className="p-1 px-2 text-[9px] font-black text-slate-500 hover:text-slate-800 transition-colors uppercase tracking-widest"
-             >
-                Glossary
-             </button>
-          </div>
+      <div className="mb-8 space-y-6">
+        <div className="flex items-center justify-between px-2">
+          <h4 className="text-xs font-black text-slate-400 uppercase tracking-[0.3em] flex items-center space-x-3">
+            <span className="bg-emerald-100 text-emerald-700 px-3 py-1 rounded-lg">Protocol 02</span>
+            <span className="text-slate-800">Performance Matrix</span>
+          </h4>
+          <button 
+            onClick={onOpenInfoModal}
+            className="text-[9px] font-black text-emerald-600 uppercase tracking-widest bg-emerald-50 px-3 py-1.5 rounded-xl border border-emerald-100 active:scale-95"
+          >
+            Glossary
+          </button>
         </div>
         <div className="space-y-3">
           {habits.map((habit) => (

@@ -84,7 +84,7 @@ import { WisdomReminder } from './components/modals/WisdomReminder';
 import { LocationModal } from './components/modals/LocationModal.jsx';
 import { InfoModal } from './components/modals/InfoModal';
 import { JourneyModal } from './components/modals/JourneyModal';
-import { AdvisorModal } from './components/modals/AdvisorModal';
+import { AdvisorTab } from './components/tabs/AdvisorTab';
 import {
   ADVISOR_MOODS,
   MOOD_RESPONSES
@@ -207,7 +207,6 @@ function MuezzaApp() {
   const [locationSearchResults, setLocationSearchResults] = useState([]);
 
   // Advisor States
-  const [isAdvisorModalOpen, setIsAdvisorModalOpen] = useState(false);
   const [adviceResult, setAdviceResult] = useState(null);
   const [isAdvisorThinking, setIsAdvisorThinking] = useState(false);
 
@@ -691,11 +690,6 @@ function MuezzaApp() {
     }
   };
 
-  const handleOpenAdvisorModal = () => {
-    setAdviceResult(null);
-    setIsAdvisorModalOpen(true);
-  };
-
   const handleSeekAdvice = (moodId) => {
     setIsAdvisorThinking(true);
     setAdviceResult(null);
@@ -859,40 +853,10 @@ function MuezzaApp() {
 
   return (
     <div className="min-h-screen bg-[#E5E0D8] text-slate-800 font-sans sm:py-8 flex justify-center">
-      <div className="w-full max-w-md bg-white sm:rounded-[2.5rem] shadow-2xl sm:border-[8px] border-slate-100 overflow-hidden relative flex flex-col h-screen sm:h-[850px]">
-        <div className="flex justify-between items-center p-6 bg-white/90 backdrop-blur-md z-30 shrink-0 sticky top-0 border-b border-slate-100/50">
-          <button
-            onClick={() => setActiveTab('streak')}
-            className={`flex items-center space-x-2 px-4 py-2 rounded-2xl border shadow-sm transition-colors ${
-              activeTab === 'streak'
-                ? 'bg-emerald-600 border-emerald-600 text-white'
-                : 'bg-emerald-50 border-emerald-100 text-emerald-900 hover:bg-emerald-100'
-            }`}
-            aria-label="Open Noor streak"
-          >
-            <Lightbulb className={`w-5 h-5 ${streak > 0 ? 'text-amber-500 fill-amber-500 animate-pulse' : 'text-slate-400'}`} />
-            <span className="font-bold">{streak} Noor</span>
-          </button>
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => setShowInfoModal(true)}
-              className="w-11 h-11 rounded-2xl border border-slate-200 bg-white text-slate-500 hover:text-emerald-700 hover:border-emerald-200 hover:bg-emerald-50 transition-colors shadow-sm flex items-center justify-center"
-              aria-label="Open app guide"
-            >
-              <Info className="w-5 h-5" />
-            </button>
-            <div className="flex items-center space-x-2 bg-amber-50 px-4 py-2 rounded-2xl border border-amber-100 shadow-sm">
-              <Coins className="w-5 h-5 text-amber-500 fill-amber-500" />
-              <span className="font-bold text-amber-900">{dinar}</span>
-            </div>
-          </div>
-        </div>
-
+      <div className="w-full max-w-md bg-[#FDFCFB] sm:rounded-[2.5rem] shadow-2xl sm:border-[8px] border-slate-100 overflow-hidden relative flex flex-col h-screen sm:h-[850px]">
         <div id="main-scroll-container" className="flex-1 overflow-y-auto pb-24 scrollbar-hide">
           {activeTab === 'home' && (
             <HomeTab 
-              dinar={dinar}
-              streak={streakLocal}
               energy={energy}
               prayers={prayers}
               habits={habits}
@@ -907,7 +871,9 @@ function MuezzaApp() {
               onAddHabitClick={() => setShowAddHabit(true)}
               onStartJourney={startJourney}
               onOpenInfoModal={() => setShowInfoModal(true)}
-              onOpenAdvisorModal={handleOpenAdvisorModal}
+              onOpenAdvisorTab={() => setActiveTab('advisor')}
+              dinar={dinar}
+              streak={streakLocal}
             />
           )}
 
@@ -953,17 +919,25 @@ function MuezzaApp() {
               onOpenSurahByBookmark={(bm) => openSurah({ id: bm.surah_id, name_simple: bm.surah_name })}
             />
           )}
+
+          {activeTab === 'advisor' && (
+            <AdvisorTab 
+              onSeekAdvice={handleSeekAdvice}
+              adviceResult={adviceResult}
+              isThinking={isAdvisorThinking}
+            />
+          )}
         </div>
 
-        <div className="absolute bottom-0 w-full bg-white border-t border-slate-100 px-6 py-4 flex justify-between items-center z-20 pb-safe shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.1)]">
+        <div className="absolute bottom-0 w-full bg-white border-t border-slate-100 px-3 py-4 flex justify-between items-center z-20 pb-safe shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.1)]">
           <button
             onClick={() => setActiveTab('home')}
             className={`flex flex-col items-center space-y-1 transition-colors flex-1 ${activeTab === 'home' ? 'text-emerald-600' : 'text-slate-400 hover:text-slate-600'}`}
           >
             <div className={`p-2 rounded-xl transition-all ${activeTab === 'home' ? 'bg-emerald-50' : 'bg-transparent'}`}>
-              <Home className="w-6 h-6" />
+              <Home className="w-5 h-5 sm:w-6 sm:h-6" />
             </div>
-            <span className="text-[10px] font-bold">Home</span>
+            <span className="text-[9px] font-bold">Home</span>
           </button>
 
           <button
@@ -971,9 +945,19 @@ function MuezzaApp() {
             className={`flex flex-col items-center space-y-1 transition-colors flex-1 ${activeTab === 'quran' ? 'text-emerald-600' : 'text-slate-400 hover:text-slate-600'}`}
           >
             <div className={`p-2 rounded-xl transition-all ${activeTab === 'quran' ? 'bg-emerald-50' : 'bg-transparent'}`}>
-              <Book className="w-6 h-6" />
+              <Book className="w-5 h-5 sm:w-6 sm:h-6" />
             </div>
-            <span className="text-[10px] font-bold">Quran</span>
+            <span className="text-[9px] font-bold">Quran</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab('advisor')}
+            className={`flex flex-col items-center space-y-1 transition-colors flex-1 ${activeTab === 'advisor' ? 'text-emerald-600' : 'text-slate-400 hover:text-slate-600'}`}
+          >
+            <div className={`p-2 rounded-xl transition-all ${activeTab === 'advisor' ? 'bg-emerald-50' : 'bg-transparent'}`}>
+              <Sparkles className={`w-5 h-5 sm:w-6 sm:h-6 ${activeTab === 'advisor' ? 'text-amber-500 fill-amber-500 shadow-sm' : ''}`} />
+            </div>
+            <span className="text-[9px] font-bold">Advisor</span>
           </button>
 
           <button
@@ -981,9 +965,9 @@ function MuezzaApp() {
             className={`flex flex-col items-center space-y-1 transition-colors flex-1 ${activeTab === 'souq' ? 'text-emerald-600' : 'text-slate-400 hover:text-slate-600'}`}
           >
             <div className={`p-2 rounded-xl transition-all ${activeTab === 'souq' ? 'bg-emerald-50' : 'bg-transparent'}`}>
-              <ShoppingBag className="w-6 h-6" />
+              <ShoppingBag className="w-5 h-5 sm:w-6 sm:h-6" />
             </div>
-            <span className="text-[10px] font-bold">Souq</span>
+            <span className="text-[9px] font-bold">Souq</span>
           </button>
 
           <button
@@ -991,9 +975,9 @@ function MuezzaApp() {
             className={`flex flex-col items-center space-y-1 transition-colors flex-1 ${activeTab === 'noor' ? 'text-emerald-600' : 'text-slate-400 hover:text-slate-600'}`}
           >
             <div className={`p-2 rounded-xl transition-all ${activeTab === 'noor' ? 'bg-emerald-50' : 'bg-transparent'}`}>
-              <Zap className="w-6 h-6" />
+              <Zap className="w-5 h-5 sm:w-6 sm:h-6" />
             </div>
-            <span className="text-[10px] font-bold">Noor</span>
+            <span className="text-[9px] font-bold">Noor</span>
           </button>
         </div>
 
@@ -1020,13 +1004,6 @@ function MuezzaApp() {
           onReset={handleExportData} 
         />
 
-        <AdvisorModal 
-          isOpen={isAdvisorModalOpen}
-          onClose={() => setIsAdvisorModalOpen(false)}
-          onSeekAdvice={handleSeekAdvice}
-          adviceResult={adviceResult}
-          isThinking={isAdvisorThinking}
-        />
 
         <LocationModal 
           isOpen={isLocationModalOpen}

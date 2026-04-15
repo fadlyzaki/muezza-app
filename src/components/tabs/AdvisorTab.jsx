@@ -1,0 +1,171 @@
+import React, { useState } from 'react';
+import { Sparkles, MessageSquare, Quote, BookOpen, Star, Heart, History, TrendingUp } from 'lucide-react';
+import CatSVG from '../CatSVG';
+import { ADVISOR_MOODS, MOOD_RESPONSES } from '../../constants/muezza_data';
+
+export function AdvisorTab({ onSeekAdvice, adviceResult, isThinking }) {
+  const [selectedMood, setSelectedMood] = useState(null);
+
+  return (
+    <div className="px-6 py-4 pb-32 animate-in fade-in slide-in-from-bottom-4 duration-500">
+      <div className="bg-white rounded-[3rem] p-8 mb-8 shadow-xl shadow-emerald-900/5 border border-emerald-50 relative overflow-hidden group">
+        <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 rounded-full -translate-y-16 translate-x-16 blur-3xl group-hover:bg-emerald-500/10 transition-colors duration-700"></div>
+        
+        <div className="flex items-center justify-between mb-10 relative z-10">
+          <div className="flex items-center space-x-3">
+            <div className="p-2.5 bg-emerald-50 rounded-2xl shadow-sm">
+              <Sparkles className="w-5 h-5 text-emerald-600" />
+            </div>
+            <div>
+              <h3 className="text-xl font-black text-slate-800 tracking-tighter">Advisor Portal</h3>
+              <p className="text-[10px] font-black text-emerald-500 uppercase tracking-widest leading-none mt-1">Grounded Wisdom Engine</p>
+            </div>
+          </div>
+          <div className="flex items-center space-x-1 bg-slate-50 p-1 rounded-xl border border-slate-100">
+             <div className="p-1 px-3 text-[9px] font-black text-emerald-700 bg-white rounded-lg shadow-sm">Active</div>
+          </div>
+        </div>
+
+        <div className="relative z-10">
+          {!adviceResult && !isThinking ? (
+            <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+              <div className="text-center">
+                <div className="bg-[#FAF8F4] p-10 rounded-[3rem] border border-slate-100 flex flex-col items-center relative group/mascot">
+                  <div className="absolute inset-0 bg-emerald-500/5 blur-3xl rounded-full scale-110 opacity-0 group-hover/mascot:opacity-100 transition-opacity"></div>
+                  <CatSVG awake={true} equipped={['glasses_smart', 'turban_cream']} className="w-40 h-40 mb-6 drop-shadow-2xl relative z-10" />
+                  <h4 className="text-2xl font-black text-slate-800 mb-2 font-serif italic tracking-tight">"Assalamualaikum, seeker."</h4>
+                  <p className="text-xs text-slate-500 font-medium max-w-[240px] leading-relaxed">
+                    How is your heart feeling today? I have prepared reflections from the sacred scrolls.
+                  </p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                {ADVISOR_MOODS.map((mood) => (
+                  <button
+                    key={mood.id}
+                    onClick={() => setSelectedMood(mood.id)}
+                    className={`p-6 rounded-[2.5rem] border-2 transition-all text-left group relative overflow-hidden ${
+                      selectedMood === mood.id 
+                        ? 'bg-emerald-600 border-emerald-500 text-white shadow-xl shadow-emerald-600/20 scale-[0.98]' 
+                        : 'bg-white border-slate-100 hover:border-emerald-200 hover:bg-emerald-50/30'
+                    }`}
+                  >
+                    <div className="text-3xl mb-3 group-hover:scale-110 transition-transform">{mood.icon}</div>
+                    <p className={`font-black tracking-tight ${selectedMood === mood.id ? 'text-white' : 'text-slate-800'}`}>{mood.label}</p>
+                    <p className={`text-[10px] uppercase tracking-widest font-black opacity-60 ${selectedMood === mood.id ? 'text-emerald-50' : 'text-slate-400'}`}>{mood.sub}</p>
+                  </button>
+                ))}
+              </div>
+
+              <button
+                disabled={!selectedMood}
+                onClick={() => onSeekAdvice(selectedMood)}
+                className={`w-full py-6 rounded-[2.5rem] font-black text-lg shadow-xl shadow-slate-900/10 transition-all flex items-center justify-center space-x-3 active:scale-[0.98] ${
+                  selectedMood 
+                    ? 'bg-slate-900 text-white hover:bg-slate-800' 
+                    : 'bg-slate-100 text-slate-300 cursor-not-allowed'
+                }`}
+              >
+                <MessageSquare className={`w-6 h-6 ${selectedMood ? 'text-amber-400' : ''}`} />
+                <span>Begin Reflection</span>
+              </button>
+            </div>
+          ) : isThinking ? (
+            <div className="py-20 flex flex-col items-center justify-center space-y-10 animate-in fade-in zoom-in duration-700">
+               <div className="relative">
+                  <div className="absolute inset-0 bg-emerald-500/20 blur-3xl rounded-full scale-150 animate-pulse"></div>
+                  <CatSVG awake={true} equipped={['glasses_smart', 'turban_cream', 'lantern_gold']} className="w-56 h-56 relative z-10" />
+               </div>
+               <div className="flex flex-col items-center space-y-5 text-center">
+                  <div className="flex space-x-3">
+                    <div className="w-3 h-3 bg-emerald-500 rounded-full animate-bounce shadow-lg shadow-emerald-500/30"></div>
+                    <div className="w-3 h-3 bg-emerald-500 rounded-full animate-bounce delay-150 shadow-lg shadow-emerald-500/30"></div>
+                    <div className="w-3 h-3 bg-emerald-500 rounded-full animate-bounce delay-300 shadow-lg shadow-emerald-500/30"></div>
+                  </div>
+                  <h4 className="text-3xl font-black text-slate-800 tracking-tighter">Muezza is Reflecting...</h4>
+                  <p className="text-[11px] text-slate-400 font-mono uppercase tracking-[0.4em] animate-pulse">Querying Sacred Archetypes</p>
+               </div>
+            </div>
+          ) : (
+            <div className="animate-in fade-in slide-in-from-bottom-8 duration-700 space-y-10 pb-8">
+              <div className="bg-[#FAF8F4] p-8 rounded-[3rem] border border-emerald-100 relative group overflow-hidden shadow-sm">
+                <div className="absolute top-0 right-0 p-6 opacity-5">
+                  <Quote className="w-24 h-24 text-emerald-900" />
+                </div>
+                <div className="flex items-start space-x-5 relative z-10">
+                   <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center shadow-lg border-4 border-white shrink-0">
+                      <CatSVG awake={true} equipped={['glasses_smart', 'turban_cream']} className="w-14 h-14" />
+                   </div>
+                   <div className="bg-emerald-600 text-white p-6 rounded-[2rem] rounded-tl-none shadow-xl shadow-emerald-600/10">
+                      <p className="text-sm font-bold leading-relaxed">{adviceResult.muezza_advice}</p>
+                   </div>
+                </div>
+              </div>
+
+              <div className="space-y-6">
+                <div className="flex items-center space-x-4 px-4">
+                   <div className="h-px bg-slate-100 flex-1"></div>
+                   <span className="text-[11px] font-black text-slate-300 uppercase tracking-[0.4em]">Scriptural Evidence</span>
+                   <div className="h-px bg-slate-100 flex-1"></div>
+                </div>
+
+                <div className="bg-white p-10 rounded-[3.5rem] border border-amber-100 shadow-xl shadow-amber-900/5 relative overflow-hidden">
+                   <div className="absolute top-0 right-0 w-48 h-48 bg-amber-50 rounded-full blur-3xl -translate-y-24 translate-x-24"></div>
+                   <p className="text-3xl font-bold text-slate-800 italic leading-relaxed text-center mb-8 relative z-10 font-serif">
+                     "{adviceResult.verse}"
+                   </p>
+                   <div className="flex flex-col items-center relative z-10">
+                      <div className="flex items-center space-x-2 bg-amber-50 border border-amber-100 px-5 py-2.5 rounded-2xl mb-8">
+                        <Star className="w-4 h-4 text-amber-600 fill-amber-600" />
+                        <span className="text-xs font-black text-amber-700 uppercase tracking-widest">{adviceResult.reference}</span>
+                      </div>
+                      
+                      <div className="bg-slate-50 p-8 rounded-[2.5rem] w-full border border-slate-100 shadow-inner">
+                        <div className="flex items-center space-x-3 mb-4">
+                           <div className="p-2 bg-emerald-100 rounded-xl">
+                              <BookOpen className="w-4 h-4 text-emerald-600" />
+                           </div>
+                           <h5 className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em]">Contextual Tafsir</h5>
+                        </div>
+                        <p className="text-[13px] text-slate-600 leading-relaxed font-semibold italic">{adviceResult.tafsir}</p>
+                      </div>
+                   </div>
+                </div>
+              </div>
+
+              <button
+                 onClick={() => setSelectedMood(null)}
+                 className="w-full py-6 bg-slate-900 text-white font-black rounded-[2.5rem] hover:bg-slate-800 transition-all shadow-2xl shadow-slate-900/20 active:scale-[0.98] flex items-center justify-center space-x-3"
+              >
+                 <Sparkles className="w-5 h-5 text-amber-400" />
+                 <span>Barakallahu Feek (End Session)</span>
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div className="space-y-4">
+          <h4 className="text-xs font-black text-slate-400 uppercase tracking-widest px-2 flex items-center justify-between">
+            <span>Session Analytics</span>
+            <TrendingUp className="w-3 h-3 font-black" />
+          </h4>
+          <div className="bg-white rounded-[2.5rem] p-6 border border-slate-100 shadow-sm flex items-center justify-between">
+             <div className="flex items-center space-x-4">
+                <div className="p-3 bg-rose-50 rounded-2xl">
+                   <Heart className="w-5 h-5 text-rose-500 fill-rose-500" />
+                </div>
+                <div>
+                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Heart Resonance</p>
+                  <p className="text-sm font-black text-slate-800 uppercase tracking-tight">Synchronized</p>
+                </div>
+             </div>
+             <div className="px-4 py-2 bg-slate-50 rounded-xl text-[10px] font-black text-slate-400 border border-slate-100 uppercase tracking-widest">
+                Protocol Active
+             </div>
+          </div>
+      </div>
+    </div>
+  );
+}
