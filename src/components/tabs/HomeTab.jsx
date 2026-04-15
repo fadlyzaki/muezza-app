@@ -71,10 +71,7 @@ export function HomeTab({
                    &quot;Complete daily tasks to unlock spiritual reflections.&quot;
                 </p>
               </div>
-            </div>
           )}
-        </div>
-      </div>
 
       <div className="mb-14 space-y-6">
         <div className="flex items-center justify-between px-2">
