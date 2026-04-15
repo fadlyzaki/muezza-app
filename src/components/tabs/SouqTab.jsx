@@ -69,7 +69,7 @@ export function SouqTab({ dinar, inventory, onBuy }) {
               <h4 className="text-sm font-black text-slate-800 mb-1">{item.name}</h4>
               <p className="text-[10px] text-slate-500 font-medium mb-4 h-8 overflow-hidden line-clamp-2">{item.desc}</p>
 
-              {isOwned ? (
+              {isOwned && item.type !== 'food' ? (
                 <span className="text-[10px] font-black text-emerald-600 uppercase tracking-widest bg-emerald-50 px-3 py-1.5 rounded-full border border-emerald-100">
                   Acquired
                 </span>

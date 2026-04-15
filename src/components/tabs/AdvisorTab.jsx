@@ -45,15 +45,15 @@ export function AdvisorTab({ onSeekAdvice, adviceResult, isThinking, onResetAdvi
                   <button
                     key={mood.id}
                     onClick={() => setSelectedMood(mood.id)}
-                    className={`p-6 rounded-[2.5rem] border-2 transition-all duration-300 text-left group relative overflow-hidden ${
+                    className={`p-6 rounded-[2.5rem] border-2 transition-all duration-500 text-left group relative overflow-hidden ${
                       selectedMood === mood.id 
-                        ? 'bg-emerald-600 border-emerald-500 text-white shadow-xl shadow-emerald-600/20 scale-[0.98]' 
-                        : 'bg-white border-slate-50 hover:border-emerald-100 hover:bg-emerald-50/10'
+                        ? 'bg-slate-900 border-slate-900 text-white shadow-xl shadow-slate-900/10' 
+                        : 'bg-white border-slate-50 hover:border-emerald-200 hover:shadow-lg hover:-translate-y-1'
                     }`}
                   >
-                    <div className="text-3xl mb-3 group-hover:scale-110 transition-transform">{mood.icon}</div>
+                    <div className="text-3xl mb-3 group-hover:drop-shadow-md transition-all duration-500">{mood.icon}</div>
                     <p className={`font-black tracking-tight ${selectedMood === mood.id ? 'text-white' : 'text-slate-800'}`}>{mood.label}</p>
-                    <p className={`text-[10px] uppercase tracking-widest font-black opacity-60 ${selectedMood === mood.id ? 'text-emerald-50' : 'text-slate-400'}`}>{mood.sub}</p>
+                    <p className={`text-[10px] uppercase tracking-widest font-black opacity-60 ${selectedMood === mood.id ? 'text-slate-300' : 'text-slate-400'}`}>{mood.sub}</p>
                   </button>
                 ))}
               </div>
