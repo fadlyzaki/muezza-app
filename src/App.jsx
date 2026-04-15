@@ -146,17 +146,20 @@ const DAILY_INSIGHTS = [
 const TRANSLATION_OPTIONS = [
   { id: 20, label: 'EN', name: 'Saheeh International' },
   { id: 33, label: 'ID', name: 'Bahasa Indonesia' },
+  { id: 131, label: 'UR', name: 'Dr. Israr Ahmed' },
 ];
 
 const DEFAULT_RECITER_ID = 2;
 const DEFAULT_DINAR = 40;
 const DEFAULT_STREAK = 0;
-const INFO_MODAL_VERSION = 'v1';
+const INFO_MODAL_VERSION = 'v2';
 
 function getTodayKey() {
   const now = new Date();
-  const localTime = new Date(now.getTime() - now.getTimezoneOffset() * 60000);
-  return localTime.toISOString().slice(0, 10);
+  // Ensure we use local date precisely
+  const offset = now.getTimezoneOffset() * 60000;
+  const localDate = new Date(now.getTime() - offset);
+  return localDate.toISOString().split('T')[0];
 }
 
 function inferHabitKind(title = '') {
@@ -219,14 +222,19 @@ function getTranslationText(verse) {
 }
 
 function getVerseAudioUrl(verse) {
-  return (
+  let url =
     verse?.audio?.url ||
     verse?.audio?.audio_url ||
     verse?.audio?.audioUrl ||
     verse?.audio_url ||
     verse?.audioUrl ||
-    null
-  );
+    null;
+
+  if (url && !url.startsWith('http') && !url.startsWith('//')) {
+    url = `https://audio.qurancdn.com/${url}`;
+  }
+
+  return url;
 }
 
 function getBookmarkVerseKey(bookmark) {
@@ -455,6 +463,30 @@ function MuezzaApp() {
   const [activeAudioVerseKey, setActiveAudioVerseKey] = useState(null);
   const [isAudioPlaying, setIsAudioPlaying] = useState(false);
   const [showInfoModal, setShowInfoModal] = useState(false);
+  const [infoModalTab, setInfoModalTab] = useState('guide'); // 'guide' | 'settings' | 'glossary'
+
+  // Translation state (persistent)
+  const [translationId, setTranslationId] = useState(() => {
+    return Number(localStorage.getItem('muezza_translation_id')) || 20;
+  });
+
+  useEffect(() => {
+    localStorage.setItem('muezza_translation_id', translationId.toString());
+  }, [translationId]);
+
+  // Location Search
+  const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
+  const [locationSearchQuery, setLocationSearchQuery] = useState('');
+  const [isLocationSearching, setIsLocationSearching] = useState(false);
+  const [locationSearchResults, setLocationSearchResults] = useState([]);
+
+  // Cat Evolution Stage
+  const catStage = useMemo(() => {
+    const currentStreak = Math.max(streakLocal, streakServer || 0);
+    if (currentStreak >= 31) return 'majestic';
+    if (currentStreak >= 8) return 'adult';
+    return 'kitten';
+  }, [streakLocal, streakServer]);
 
   const streak = streakServer !== null ? streakServer : streakLocal;
 
@@ -848,7 +880,7 @@ function MuezzaApp() {
 
   const handleDeleteHabit = (habitId) => {
     const targetHabit = habits.find((habit) => habit.id === habitId);
-    if (!targetHabit || targetHabit.kind !== 'custom') return;
+    if (!targetHabit) return;
 
     setHabits(habits.filter((habit) => habit.id !== habitId));
 
@@ -996,7 +1028,66 @@ function MuezzaApp() {
 
   const closeInfoModal = () => {
     setShowInfoModal(false);
+    setInfoModalTab('guide');
     setHasSeenInfoModal(INFO_MODAL_VERSION);
+  };
+
+  const handleCitySearch = async () => {
+    if (!locationSearchQuery.trim()) return;
+    setIsLocationSearching(true);
+    try {
+      const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(locationSearchQuery)}&limit=5`);
+      const data = await res.json();
+      setLocationSearchResults(data.map(item => ({
+        city: item.display_name.split(',')[0],
+        label: item.display_name,
+        latitude: parseFloat(item.lat),
+        longitude: parseFloat(item.lon),
+        country: item.display_name.split(',').pop().trim()
+      })));
+    } catch (error) {
+      console.error('Search failed', error);
+      alert('Search failed. Please try again.');
+    } finally {
+      setIsLocationSearching(false);
+    }
+  };
+
+  const selectManualLocation = (loc) => {
+    const newLoc = { ...loc, source: 'manual' };
+    setSavedLocation(newLoc);
+    setIsLocationModalOpen(false);
+    setLocationSearchQuery('');
+    setLocationSearchResults([]);
+  };
+
+  const handleStreakRestore = () => {
+    const val = prompt('Enter your current streak number to restore:', streakLocal.toString());
+    if (val !== null) {
+      const num = parseInt(val, 10);
+      if (!isNaN(num)) {
+        setStreakLocal(num);
+        alert('Streak restored successfully!');
+      }
+    }
+  };
+
+  const handleExportData = () => {
+    const data = {
+      habits,
+      prayers,
+      dinar,
+      streakLocal,
+      inventory,
+      lastResetDate
+    };
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `muezza_backup_${getTodayKey()}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
   };
 
   const hour = new Date().getHours();
@@ -1055,7 +1146,7 @@ function MuezzaApp() {
                 <div className="bg-gradient-to-b from-[#F0EBE1]/60 to-white rounded-3xl border border-slate-100/50 shadow-sm overflow-hidden">
                   <div className="relative flex justify-center items-center pt-4 pb-2">
                     <div className="absolute inset-0 bg-emerald-400/5 blur-[60px] rounded-full"></div>
-                    <CatSVG awake={energy > 0} equipped={inventory} isPetting={showHearts} onPet={handlePetCat} className="w-36 h-36 relative z-10" />
+                    <CatSVG awake={energy > 0} equipped={inventory} isPetting={showHearts} onPet={handlePetCat} stage={catStage} className="w-36 h-36 relative z-10" />
                     {energy === 100 && (
                       <Sparkles className="absolute top-4 right-8 w-6 h-6 text-amber-400 animate-spin-slow pointer-events-none z-20" />
                     )}
@@ -1103,10 +1194,14 @@ function MuezzaApp() {
                         <Star className="w-4 h-4 fill-emerald-200 text-emerald-200" />
                         <span>Obligatory Prayers</span>
                       </h3>
-                      <div className="flex items-center gap-1.5 mt-2 text-[10px] font-bold text-emerald-100/80 uppercase tracking-widest">
+                      <button 
+                        onClick={() => setIsLocationModalOpen(true)}
+                        className="flex items-center gap-1.5 mt-2 text-[10px] font-bold text-emerald-100/80 uppercase tracking-widest hover:text-white transition-colors"
+                      >
                         <MapPin className="w-3 h-3" />
                         <span>{locationLabel}</span>
-                      </div>
+                        <Pencil className="w-2.5 h-2.5 ml-1 opacity-50" />
+                      </button>
                     </div>
                     <span className="text-[10px] font-bold text-emerald-800 bg-emerald-200 px-2 py-1 rounded-md">
                       {prayers.filter((prayer) => prayer.completed).length}/5
@@ -1181,83 +1276,87 @@ function MuezzaApp() {
                   {habits.map((habit) => (
                     <div
                       key={habit.id}
-                      onClick={() => toggleHabit(habit.id)}
-                      role="button"
-                      tabIndex={0}
-                      className={`group cursor-pointer w-full flex items-center justify-between p-4 sm:p-5 rounded-3xl transition-all duration-300 border ${
+                      className={`group relative cursor-pointer w-full rounded-3xl transition-all duration-300 border ${
                         habit.completed
                           ? 'bg-emerald-50/50 border-emerald-100 opacity-70 shadow-none'
                           : 'bg-white border-slate-200 hover:border-emerald-300 hover:shadow-md shadow-sm'
                       }`}
                     >
-                      <div className="flex items-center space-x-4">
-                        {habit.completed ? (
-                          <div className="bg-emerald-100 p-1.5 rounded-full shrink-0">
-                            <CheckCircle2 className="w-6 h-6 text-emerald-600 fill-emerald-100" />
-                          </div>
-                        ) : (
-                          <div className="bg-slate-50 group-hover:bg-emerald-50 p-1.5 rounded-full transition-colors shrink-0">
-                            <Circle className="w-6 h-6 text-slate-300 group-hover:text-emerald-400" />
-                          </div>
-                        )}
+                      {/* Main row – tap to toggle */}
+                      <div
+                        onClick={() => toggleHabit(habit.id)}
+                        role="button"
+                        tabIndex={0}
+                        className="flex items-center justify-between p-4 sm:p-5"
+                      >
+                        <div className="flex items-center space-x-4 min-w-0">
+                          {habit.completed ? (
+                            <div className="bg-emerald-100 p-1.5 rounded-full shrink-0">
+                              <CheckCircle2 className="w-6 h-6 text-emerald-600 fill-emerald-100" />
+                            </div>
+                          ) : (
+                            <div className="bg-slate-50 group-hover:bg-emerald-50 p-1.5 rounded-full transition-colors shrink-0">
+                              <Circle className="w-6 h-6 text-slate-300 group-hover:text-emerald-400" />
+                            </div>
+                          )}
 
-                        <div className="text-left flex flex-col">
-                          <span
-                            className={`font-bold text-base transition-all ${
-                              habit.completed ? 'text-slate-400 line-through' : 'text-slate-800 group-hover:text-emerald-700'
-                            }`}
-                          >
-                            {habit.title}
-                          </span>
-                          <span className="text-[10px] font-bold text-emerald-600/80 uppercase tracking-widest mt-1 bg-emerald-50 w-fit px-2 py-0.5 rounded-md border border-emerald-100/50">
-                            {habit.category}
-                          </span>
+                          <div className="text-left flex flex-col min-w-0">
+                            <span
+                              className={`font-bold text-base leading-tight transition-all truncate ${
+                                habit.completed ? 'text-slate-400 line-through' : 'text-slate-800 group-hover:text-emerald-700'
+                              }`}
+                            >
+                              {habit.title}
+                            </span>
+                            <div className="flex items-center gap-2 mt-1.5">
+                              <span className="text-[10px] font-bold text-emerald-600/80 uppercase tracking-widest bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-100/50">
+                                {habit.category}
+                              </span>
+                              {!habit.completed && (
+                                <span className="text-[10px] font-bold text-amber-600/90 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-100/50">
+                                  +{habit.energyReward} Energy
+                                </span>
+                              )}
+                            </div>
+                          </div>
                         </div>
-                      </div>
 
-                      <div className="flex items-center space-x-2 shrink-0">
+                        {/* Primary CTA – only for quran reading */}
                         {!habit.completed && habit.kind === 'quran_reading' && (
                           <button
                             onClick={(event) => {
                               event.stopPropagation();
                               setActiveTab('quran');
                             }}
-                            className="text-xs font-bold text-emerald-700 bg-emerald-100 hover:bg-emerald-200 px-3 py-2 rounded-xl transition-colors shadow-sm"
+                            className="text-xs font-bold text-emerald-700 bg-emerald-100 hover:bg-emerald-200 px-3 py-2 rounded-xl transition-colors shadow-sm shrink-0 ml-3"
                           >
                             Read Now
                           </button>
                         )}
+                      </div>
 
-                        {habit.kind === 'custom' && (
-                          <>
-                            <button
-                              onClick={(event) => {
-                                event.stopPropagation();
-                                openEditHabitForm(habit);
-                              }}
-                              className="p-2 rounded-xl bg-slate-50 text-slate-500 hover:text-emerald-700 hover:bg-emerald-50 transition-colors"
-                              aria-label={`Edit ${habit.title}`}
-                            >
-                              <Pencil className="w-4 h-4" />
-                            </button>
-                            <button
-                              onClick={(event) => {
-                                event.stopPropagation();
-                                handleDeleteHabit(habit.id);
-                              }}
-                              className="p-2 rounded-xl bg-slate-50 text-slate-500 hover:text-rose-600 hover:bg-rose-50 transition-colors"
-                              aria-label={`Delete ${habit.title}`}
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </button>
-                          </>
-                        )}
-
-                        {!habit.completed && (
-                          <span className="text-xs font-bold text-amber-600 bg-amber-50 px-3 py-2 rounded-xl border border-amber-100 shadow-sm">
-                            +{habit.energyReward} E
-                          </span>
-                        )}
+                      {/* Edit / Delete – revealed on hover */}
+                      <div className="absolute top-3 right-3 flex items-center gap-1 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity duration-200">
+                        <button
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            openEditHabitForm(habit);
+                          }}
+                          className="p-1.5 rounded-lg bg-white/90 backdrop-blur text-slate-400 hover:text-emerald-700 hover:bg-emerald-50 transition-colors shadow-sm border border-slate-100"
+                          aria-label={`Edit ${habit.title}`}
+                        >
+                          <Pencil className="w-3.5 h-3.5" />
+                        </button>
+                        <button
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            handleDeleteHabit(habit.id);
+                          }}
+                          className="p-1.5 rounded-lg bg-white/90 backdrop-blur text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors shadow-sm border border-slate-100"
+                          aria-label={`Delete ${habit.title}`}
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
                       </div>
                     </div>
                   ))}
@@ -1376,7 +1475,7 @@ function MuezzaApp() {
                           </div>
 
                           <div className="text-right shrink-0">
-                            <span className="text-lg font-serif text-slate-700">{surah.name_arabic}</span>
+                            <span className="text-2xl font-['Amiri_Quran'] text-slate-700">{surah.name_arabic}</span>
                             <p className="text-[10px] text-slate-400 mt-1 uppercase">{surah.revelation_place}</p>
                           </div>
                         </button>
@@ -1484,7 +1583,7 @@ function MuezzaApp() {
                                 </div>
                               </div>
 
-                              <p className="text-right text-3xl leading-loose text-slate-800 mb-6 mt-2 quran-arabic notranslate" dir="rtl" translate="no">
+                              <p className="text-right text-4xl leading-[2.2] text-slate-800 mb-6 mt-2 font-['Amiri_Quran'] antialiased notranslate" dir="rtl" translate="no">
                                 {verse.text_uthmani}
                               </p>
 
@@ -1818,72 +1917,231 @@ function MuezzaApp() {
 
         {showInfoModal && (
           <div className="absolute inset-0 bg-slate-900/70 backdrop-blur-sm z-50 flex items-center justify-center p-6">
-            <div className="bg-white rounded-[2rem] p-5 w-full max-w-[22rem] shadow-2xl animate-in slide-in-from-bottom-10 zoom-in-95 duration-500 max-h-[78vh] flex flex-col">
-              <div className="flex items-start justify-between gap-4 mb-5 shrink-0">
-                <div>
-                  <p className="text-[11px] font-bold text-emerald-600 uppercase tracking-widest mb-2">
-                    App Guide
-                  </p>
-                  <h3 className="text-2xl font-extrabold text-slate-800">
-                    How Muezza Works
-                  </h3>
-                </div>
-                <button
-                  onClick={closeInfoModal}
-                  className="text-slate-400 hover:text-slate-700 transition-colors bg-slate-50 p-2 rounded-full shrink-0"
-                  aria-label="Close app guide"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-
-              <div className="flex-1 overflow-y-auto custom-scrollbar pr-1 space-y-3">
-                <div className="bg-[#F9F6F0] rounded-2xl p-3.5 border border-slate-100">
-                  <p className="text-sm text-slate-600 leading-relaxed">
-                    Muezza helps you build Quranic habits with low friction. Your progress stays on this device, and onboarding only runs once unless storage is cleared.
-                  </p>
+            <div className="bg-white rounded-[2rem] w-full max-w-[22rem] shadow-2xl animate-in slide-in-from-bottom-10 zoom-in-95 duration-500 max-h-[78vh] flex flex-col overflow-hidden">
+               <div className="p-5 pb-0">
+                <div className="flex items-start justify-between gap-4 mb-4 shrink-0">
+                  <div>
+                    <p className="text-[11px] font-bold text-emerald-600 uppercase tracking-widest mb-1.5 font-mono">
+                      Muezza Terminal
+                    </p>
+                    <h3 className="text-2xl font-black text-slate-800 tracking-tight">
+                      {infoModalTab === 'guide' ? 'System Guide' : infoModalTab === 'settings' ? 'Core Settings' : 'Glossary'}
+                    </h3>
+                  </div>
+                  <button
+                    onClick={closeInfoModal}
+                    className="text-slate-400 hover:text-slate-700 transition-colors bg-slate-50 p-2.5 rounded-2xl shrink-0 border border-slate-100 shadow-sm"
+                    aria-label="Close app guide"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
                 </div>
 
-                <div className="space-y-2.5">
-                  <div className="rounded-2xl border border-slate-100 p-3.5">
-                    <h4 className="font-bold text-slate-800 mb-1.5">Daily loop</h4>
-                    <p className="text-sm text-slate-600 leading-relaxed">
-                      Complete prayers and habits to fill Muezza&apos;s energy. At 100%, send Muezza on a journey and collect a reflection.
-                    </p>
-                  </div>
-
-                  <div className="rounded-2xl border border-slate-100 p-3.5">
-                    <h4 className="font-bold text-slate-800 mb-1.5">What to allow</h4>
-                    <p className="text-sm text-slate-600 leading-relaxed">
-                      Location improves prayer times for your city. Quran.com sync is optional, but needed for cloud streaks and bookmarks.
-                    </p>
-                  </div>
-
-                  <div className="rounded-2xl border border-slate-100 p-3.5">
-                    <h4 className="font-bold text-slate-800 mb-1.5">Quran reader</h4>
-                    <p className="text-sm text-slate-600 leading-relaxed">
-                      You can switch translations, play recitation audio, ask for tafsir, and bookmark verses after signing in on the Noor tab.
-                    </p>
-                  </div>
-
-                  <div className="rounded-2xl border border-slate-100 p-3.5">
-                    <h4 className="font-bold text-slate-800 mb-1.5">Saved state</h4>
-                    <p className="text-sm text-slate-600 leading-relaxed">
-                      Habits, prayers, dinar, inventory, translation choice, and onboarding state are stored locally. Tap the info button anytime to reopen this guide.
-                    </p>
-                  </div>
+                <div className="flex space-x-1 mb-5 bg-slate-50 p-1 rounded-xl border border-slate-200/50">
+                  {[
+                    { id: 'guide', label: 'Guide', icon: BookOpen },
+                    { id: 'glossary', label: 'Glossary', icon: Info },
+                    { id: 'settings', label: 'Settings', icon: Activity },
+                  ].map((tab) => (
+                    <button
+                      key={tab.id}
+                      onClick={() => setInfoModalTab(tab.id)}
+                      className={`flex-1 flex items-center justify-center space-x-1.5 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                        infoModalTab === tab.id
+                          ? 'bg-white text-emerald-700 shadow-sm border border-slate-200'
+                          : 'text-slate-400 hover:text-slate-600'
+                      }`}
+                    >
+                      <tab.icon className="w-3.5 h-3.5" />
+                      <span>{tab.label}</span>
+                    </button>
+                  ))}
                 </div>
               </div>
 
-              <button
-                onClick={closeInfoModal}
-                className="w-full mt-5 bg-slate-900 hover:bg-slate-800 text-white font-bold py-4 rounded-2xl transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5 shrink-0"
-              >
-                Continue
-              </button>
+              <div className="flex-1 overflow-y-auto custom-scrollbar px-5 pb-5 space-y-3">
+                {infoModalTab === 'guide' && (
+                  <>
+                    <div className="bg-[#F9F6F0] rounded-2xl p-4 border border-slate-200/50">
+                      <p className="text-sm text-slate-600 leading-relaxed">
+                        Muezza helps you build Quranic habits with low friction. Your progress stays on this device, and onboarding only runs once unless storage is cleared.
+                      </p>
+                    </div>
+
+                    <div className="space-y-2.5">
+                      <div className="rounded-2xl border border-slate-100 p-3.5 bg-white">
+                        <h4 className="font-bold text-slate-800 mb-1.5 flex items-center space-x-2">
+                          <Activity className="w-4 h-4 text-emerald-500" />
+                          <span>Daily loop</span>
+                        </h4>
+                        <p className="text-sm text-slate-600 leading-relaxed">
+                          Complete prayers and habits to fill Muezza&apos;s energy. At 100%, send Muezza on a journey and collect a reflection.
+                        </p>
+                      </div>
+
+                      <div className="rounded-2xl border border-slate-100 p-3.5 bg-white">
+                        <h4 className="font-bold text-slate-800 mb-1.5 flex items-center space-x-2">
+                          <MapPin className="w-4 h-4 text-emerald-500" />
+                          <span>What to allow</span>
+                        </h4>
+                        <p className="text-sm text-slate-600 leading-relaxed">
+                          Location improves prayer times for your city. Quran.com sync is optional, but needed for cloud streaks and bookmarks.
+                        </p>
+                      </div>
+
+                      <div className="rounded-2xl border border-slate-100 p-3.5 bg-white">
+                        <h4 className="font-bold text-slate-800 mb-1.5 flex items-center space-x-2">
+                          <Star className="w-4 h-4 text-emerald-500" />
+                          <span>Evolution</span>
+                        </h4>
+                        <p className="text-sm text-slate-600 leading-relaxed font-medium mb-2">Muezza grows with your streak:</p>
+                        <div className="grid grid-cols-3 gap-2">
+                          <div className="text-center p-2 rounded-xl bg-slate-50 border border-slate-100">
+                             <p className="text-[10px] font-bold text-slate-400 mb-1">STREAK</p>
+                             <p className="text-xs font-black text-slate-700">0-7D</p>
+                             <p className="text-[9px] font-medium text-slate-500 uppercase mt-0.5">Kitten</p>
+                          </div>
+                          <div className="text-center p-2 rounded-xl bg-slate-50 border border-slate-100">
+                             <p className="text-[10px] font-bold text-slate-400 mb-1">STREAK</p>
+                             <p className="text-xs font-black text-slate-700">8-30D</p>
+                             <p className="text-[9px] font-medium text-slate-500 uppercase mt-0.5">Adult</p>
+                          </div>
+                          <div className="text-center p-2 rounded-xl bg-slate-50 border border-slate-100">
+                             <p className="text-[10px] font-bold text-slate-400 mb-1">STREAK</p>
+                             <p className="text-xs font-black text-slate-700">31D+</p>
+                             <p className="text-[9px] font-medium text-slate-500 uppercase mt-0.5">Majestic</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </>
+                )}
+
+                {infoModalTab === 'glossary' && (
+                  <div className="rounded-2xl border border-slate-100 p-3.5 bg-white space-y-2.5">
+                    <div className="text-sm text-slate-600 leading-relaxed space-y-1">
+                      {[
+                        { term: 'Noor', desc: 'Light (your spiritual progress)' },
+                        { term: 'Ruh', desc: 'Soul/Spirit (spiritual connection)' },
+                        { term: 'Aql', desc: 'Mind/Intellect (learning & thought)' },
+                        { term: 'Jasad', desc: 'Body (physical health & care)' },
+                        { term: 'Qalb', desc: 'Heart (emotional & mindfulness)' },
+                        { term: 'Dinar', desc: 'Coins earned to spend in the shop' },
+                      ].map((item) => (
+                        <div key={item.term} className="flex space-x-2 py-1.5 border-b border-slate-50 last:border-0">
+                          <strong className="text-emerald-700 w-12 shrink-0">{item.term}:</strong>
+                          <span className="text-slate-500">{item.desc}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {infoModalTab === 'settings' && (
+                  <div className="space-y-4">
+                     <div className="rounded-2xl border border-slate-100 p-4 bg-white">
+                      <h4 className="font-bold text-slate-800 mb-3 flex items-center space-x-2">
+                        <Book className="w-4 h-4 text-emerald-500" />
+                        <span>Translation</span>
+                      </h4>
+                      <div className="flex flex-col space-y-2">
+                        {TRANSLATION_OPTIONS.map((opt) => (
+                          <button
+                            key={opt.id}
+                            onClick={() => setTranslationId(opt.id)}
+                            className={`flex items-center justify-between p-3 rounded-xl border transition-all ${
+                              translationId === opt.id 
+                                ? 'bg-emerald-50 border-emerald-200 text-emerald-800' 
+                                : 'bg-slate-50 border-slate-100 text-slate-500 hover:bg-slate-100'
+                            }`}
+                          >
+                            <span className="font-bold text-sm tracking-tight">{opt.name}</span>
+                            <span className="text-[10px] font-black opacity-60 bg-white/50 px-1.5 py-0.5 rounded uppercase">{opt.label}</span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="rounded-2xl border border-slate-100 p-4 bg-white">
+                      <h4 className="font-bold text-slate-800 mb-3 flex items-center space-x-2">
+                         <Activity className="w-4 h-4 text-emerald-500" />
+                        <span>Terminal Tools</span>
+                      </h4>
+                      <div className="grid grid-cols-2 gap-2">
+                         <button
+                          onClick={handleStreakRestore}
+                          className="flex flex-col items-center justify-center p-3 rounded-2xl bg-amber-50 border border-amber-100 text-amber-900 hover:bg-amber-100 transition-colors"
+                        >
+                          <Flame className="w-5 h-5 mb-1" />
+                          <span className="text-[10px] font-black uppercase">Restore Streak</span>
+                        </button>
+                        <button
+                          onClick={handleExportData}
+                          className="flex flex-col items-center justify-center p-3 rounded-2xl bg-blue-50 border border-blue-100 text-blue-900 hover:bg-blue-100 transition-colors"
+                        >
+                          <Activity className="w-5 h-5 mb-1" />
+                          <span className="text-[10px] font-black uppercase">Backup Data</span>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         )}
+
+        {isLocationModalOpen && (
+          <div className="absolute inset-0 bg-slate-900/70 backdrop-blur-sm z-50 flex items-center justify-center p-6">
+            <div className="bg-white rounded-[2rem] p-5 w-full max-w-[22rem] shadow-2xl animate-in slide-in-from-bottom-10 zoom-in-95 duration-500">
+               <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-xl font-black text-slate-800 tracking-tight">Set Location</h3>
+                  <button onClick={() => setIsLocationModalOpen(false)} className="text-slate-400 hover:text-slate-600"><X className="w-5 h-5" /></button>
+               </div>
+               
+               <div className="relative mb-4">
+                <input 
+                  type="text" 
+                  value={locationSearchQuery}
+                  onChange={(e) => setLocationSearchQuery(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && handleCitySearch()}
+                  placeholder="Enter city name..."
+                  className="w-full p-4 pl-11 bg-slate-50 border border-slate-200 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+                />
+                <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                <button 
+                  onClick={handleCitySearch}
+                  disabled={isLocationSearching}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-slate-900 text-white rounded-xl hover:bg-slate-800 disabled:bg-slate-300 transition-all shadow-sm"
+                >
+                  {isLocationSearching ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div> : <ArrowRight className="w-4 h-4" />}
+                </button>
+               </div>
+
+               <div className="space-y-2 max-h-[30vh] overflow-y-auto custom-scrollbar pr-1">
+                  {locationSearchResults.length > 0 ? (
+                    locationSearchResults.map((loc, idx) => (
+                      <button 
+                        key={idx}
+                        onClick={() => selectManualLocation(loc)}
+                        className="w-full text-left p-3 rounded-xl hover:bg-emerald-50 border border-transparent hover:border-emerald-100 transition-all flex items-start space-x-3 group"
+                      >
+                         <MapPin className="w-4 h-4 text-slate-300 group-hover:text-emerald-500 mt-0.5" />
+                         <span className="text-xs text-slate-600 font-medium group-hover:text-emerald-800 leading-tight">{loc.label}</span>
+                      </button>
+                    ))
+                  ) : locationSearchQuery && !isLocationSearching ? (
+                    <p className="text-center py-4 text-slate-400 text-xs italic">No results found for your query.</p>
+                  ) : (
+                    <p className="text-center py-4 text-emerald-600/60 text-xs font-bold uppercase tracking-widest bg-emerald-50/50 rounded-2xl border border-dashed border-emerald-200">
+                      Search by City Name
+                    </p>
+                  )}
+               </div>
+            </div>
+          </div>
+        )}
+
       </div>
 
       <style dangerouslySetInnerHTML={{ __html: `

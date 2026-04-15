@@ -38,16 +38,17 @@ async function fetchAccessToken() {
     return cachedToken;
   }
 
+  const authHeader = `Basic ${Buffer.from(`${clientId}:${clientSecret}`).toString('base64')}`;
+
   const tokenResponse = await fetch(`${authBaseUrl}/oauth2/token`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded',
+      'Authorization': authHeader,
     },
     body: new URLSearchParams({
       grant_type: 'client_credentials',
       scope: 'content',
-      client_id: clientId,
-      client_secret: clientSecret,
     }),
   });
 

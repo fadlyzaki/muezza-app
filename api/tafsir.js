@@ -18,7 +18,7 @@ export default async function handler(req, res) {
   try {
     const tafsirId = await resolveDefaultTafsirId();
     const data = await fetchQuranFoundationContent(`/tafsirs/${tafsirId}/by_ayah/${verseKey}`);
-    const tafsirRecord = data?.tafsir?.verses?.[verseKey];
+    const tafsirRecord = data?.tafsir;
 
     if (!tafsirRecord?.text) {
       return res.status(404).json({ error: 'No tafsir available for this verse yet.' });
