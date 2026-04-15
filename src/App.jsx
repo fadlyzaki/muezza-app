@@ -465,15 +465,6 @@ function MuezzaApp() {
   const [showInfoModal, setShowInfoModal] = useState(false);
   const [infoModalTab, setInfoModalTab] = useState('guide'); // 'guide' | 'settings' | 'glossary'
 
-  // Translation state (persistent)
-  const [translationId, setTranslationId] = useState(() => {
-    return Number(localStorage.getItem('muezza_translation_id')) || 20;
-  });
-
-  useEffect(() => {
-    localStorage.setItem('muezza_translation_id', translationId.toString());
-  }, [translationId]);
-
   // Location Search
   const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
   const [locationSearchQuery, setLocationSearchQuery] = useState('');
