@@ -1006,7 +1006,7 @@ function MuezzaApp() {
           <SidebarButton active={activeTab === 'home'} onClick={() => setActiveTab('home')} icon={Home} label="Vitals Hub" />
           <SidebarButton active={activeTab === 'quran'} onClick={() => setActiveTab('quran')} icon={Book} label="The Quran" />
           <SidebarButton active={activeTab === 'advisor'} onClick={() => setActiveTab('advisor')} icon={Sparkles} label="Muezza Advisor" />
-          <SidebarButton active={activeTab === 'shop'} onClick={() => setActiveTab('shop')} icon={ShoppingBag} label="Spiritual Souq" />
+          <SidebarButton active={activeTab === 'souq'} onClick={() => setActiveTab('souq')} icon={ShoppingBag} label="Spiritual Souq" />
           <SidebarButton active={activeTab === 'noor'} onClick={() => setActiveTab('noor')} icon={Activity} label="Spiritual Path" />
         </nav>
 
