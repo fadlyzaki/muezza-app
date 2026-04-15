@@ -1,4 +1,10 @@
-import { FALLBACK_LOCATION, INITIAL_PRAYERS, INITIAL_HABITS } from '../constants/muezza_data';
+import { 
+  FALLBACK_LOCATION, 
+  INITIAL_PRAYERS, 
+  INITIAL_HABITS,
+  DEFAULT_DINAR,
+  DEFAULT_STREAK
+} from '../constants/muezza_data';
 
 export function getTodayKey() {
   const now = new Date();
@@ -96,4 +102,88 @@ export function fetchJson(url, options = {}) {
     if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
     return res.json();
   });
+}
+
+export function readStorageJson(key) {
+  try {
+    const value = window.localStorage.getItem(key);
+    return value ? JSON.parse(value) : null;
+  } catch {
+    return null;
+  }
+}
+
+export function hasStoredAppState() {
+  const prayers = readStorageJson('muezza_prayers');
+  const habits = readStorageJson('muezza_habits');
+  const dinar = readStorageJson('muezza_dinar');
+  const streak = readStorageJson('muezza_streak');
+  const inventory = readStorageJson('muezza_inventory');
+  const lastInsight = readStorageJson('muezza_last_insight');
+
+  return Boolean(
+    (Array.isArray(prayers) && prayers.length > 0) ||
+      (Array.isArray(habits) && habits.length > 0) ||
+      (typeof dinar === 'number' && dinar !== DEFAULT_DINAR) ||
+      (typeof streak === 'number' && streak !== DEFAULT_STREAK) ||
+      (Array.isArray(inventory) && inventory.length > 0) ||
+      lastInsight
+  );
+}
+
+export function deriveInitialOnboardingState() {
+  const storedValue = readStorageJson('muezza_onboarded');
+  if (typeof storedValue === 'boolean') {
+    return storedValue;
+  }
+  return hasStoredAppState();
+}
+
+export function hasMeaningfulDailyState({ prayers, habits, dinar, streak, inventory, lastInsightRef }) {
+  return Boolean(
+    prayers.some((prayer) => prayer.completed || prayer.missed) ||
+      habits.some((habit) => habit.completed) ||
+      dinar !== DEFAULT_DINAR ||
+      streak !== DEFAULT_STREAK ||
+      inventory.length > 0 ||
+      lastInsightRef
+  );
+}
+
+export async function reverseGeocode(latitude, longitude) {
+  const params = new URLSearchParams({
+    lat: latitude,
+    lon: longitude,
+    format: 'jsonv2',
+    zoom: '10',
+  });
+  const response = await fetch(`https://nominatim.openstreetmap.org/reverse?${params.toString()}`, {
+    headers: {
+      Accept: 'application/json',
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to reverse geocode location.');
+  }
+
+  const payload = await response.json();
+  const address = payload.address || {};
+  const city =
+    address.city ||
+    address.town ||
+    address.municipality ||
+    address.county ||
+    address.state ||
+    FALLBACK_LOCATION.city;
+  const country = address.country || FALLBACK_LOCATION.country;
+
+  return {
+    city,
+    country,
+    latitude,
+    longitude,
+    label: `${city}, ${country}`,
+    source: 'geo',
+  };
 }
