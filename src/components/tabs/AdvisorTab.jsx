@@ -3,7 +3,7 @@ import { Sparkles, MessageSquare, Quote, BookOpen, Star, Heart, History, Trendin
 import CatSVG from '../CatSVG';
 import { ADVISOR_MOODS, MOOD_RESPONSES } from '../../constants/muezza_data';
 
-export function AdvisorTab({ onSeekAdvice, adviceResult, isThinking }) {
+export function AdvisorTab({ onSeekAdvice, adviceResult, isThinking, onResetAdvice }) {
   const [selectedMood, setSelectedMood] = useState(null);
 
   return (
@@ -45,10 +45,10 @@ export function AdvisorTab({ onSeekAdvice, adviceResult, isThinking }) {
                   <button
                     key={mood.id}
                     onClick={() => setSelectedMood(mood.id)}
-                    className={`p-6 rounded-[2.5rem] border-2 transition-all text-left group relative overflow-hidden ${
+                    className={`p-6 rounded-[2.5rem] border-2 transition-all duration-300 text-left group relative overflow-hidden ${
                       selectedMood === mood.id 
                         ? 'bg-emerald-600 border-emerald-500 text-white shadow-xl shadow-emerald-600/20 scale-[0.98]' 
-                        : 'bg-white border-slate-100 hover:border-emerald-200 hover:bg-emerald-50/30'
+                        : 'bg-white border-slate-50 hover:border-emerald-100 hover:bg-emerald-50/10'
                     }`}
                   >
                     <div className="text-3xl mb-3 group-hover:scale-110 transition-transform">{mood.icon}</div>
@@ -138,10 +138,13 @@ export function AdvisorTab({ onSeekAdvice, adviceResult, isThinking }) {
               </div>
 
               <button
-                 onClick={() => setSelectedMood(null)}
+                 onClick={() => {
+                   setSelectedMood(null);
+                   onResetAdvice();
+                 }}
                  className="w-full py-6 bg-slate-100 text-slate-800 font-extrabold rounded-[3rem] hover:bg-emerald-50 hover:text-emerald-700 transition-all active:scale-[0.98] flex items-center justify-center space-x-3 border-2 border-transparent hover:border-emerald-100"
               >
-                 <Sparkles className="w-5 h-5" />
+                 <Sparkles className="w-5 h-5 text-amber-500" />
                  <span>Barakallahu Feek • Seek Another Path</span>
               </button>
             </div>
@@ -154,19 +157,40 @@ export function AdvisorTab({ onSeekAdvice, adviceResult, isThinking }) {
             <span>Session Analytics</span>
             <TrendingUp className="w-3 h-3 font-black" />
           </h4>
-          <div className="bg-white rounded-[2.5rem] p-6 border border-slate-100 shadow-sm flex items-center justify-between">
-             <div className="flex items-center space-x-4">
-                <div className="p-3 bg-rose-50 rounded-2xl">
-                   <Heart className="w-5 h-5 text-rose-500 fill-rose-500" />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="bg-white rounded-[2.5rem] p-6 border border-slate-100 shadow-sm flex items-center justify-between group/stat">
+               <div className="flex items-center space-x-4">
+                  <div className="p-3 bg-rose-50 rounded-2xl group-hover/stat:bg-rose-100 transition-colors">
+                     <Heart className="w-5 h-5 text-rose-500 fill-rose-500" />
+                  </div>
+                  <div>
+                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Heart Resonance</p>
+                    <p className="text-sm font-black text-slate-800 uppercase tracking-tight">Synchronized</p>
+                  </div>
+               </div>
+               <div className="px-4 py-2 bg-slate-50 rounded-xl text-[10px] font-black text-slate-400 border border-slate-100 uppercase tracking-widest">
+                  Active
+               </div>
+            </div>
+
+            {selectedMood && (
+              <div className="bg-white rounded-[2.5rem] p-6 border border-emerald-100 shadow-sm flex items-center justify-between animate-in zoom-in duration-300">
+                <div className="flex items-center space-x-4">
+                    <div className="p-3 bg-emerald-50 rounded-2xl">
+                       <History className="w-5 h-5 text-emerald-600" />
+                    </div>
+                    <div>
+                      <p className="text-[10px] font-black text-emerald-500 uppercase tracking-widest mb-1">Emotion Logged</p>
+                      <p className="text-sm font-black text-slate-800 uppercase tracking-tight">
+                        {ADVISOR_MOODS.find(m => m.id === selectedMood)?.label}
+                      </p>
+                    </div>
                 </div>
-                <div>
-                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Heart Resonance</p>
-                  <p className="text-sm font-black text-slate-800 uppercase tracking-tight">Synchronized</p>
+                <div className="px-4 py-2 bg-emerald-600 text-white rounded-xl text-[9px] font-black uppercase tracking-widest shadow-lg shadow-emerald-500/20">
+                   Buffered
                 </div>
-             </div>
-             <div className="px-4 py-2 bg-slate-50 rounded-xl text-[10px] font-black text-slate-400 border border-slate-100 uppercase tracking-widest">
-                Protocol Active
-             </div>
+              </div>
+            )}
           </div>
       </div>
     </div>

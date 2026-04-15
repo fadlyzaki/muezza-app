@@ -776,13 +776,14 @@ function MuezzaApp() {
   const handleSeekAdvice = (moodId) => {
     setIsAdvisorThinking(true);
     setAdviceResult(null);
-
-    // Simulate AI Reflection thinking time
     setTimeout(() => {
-      const result = MOOD_RESPONSES[moodId];
-      setAdviceResult(result);
+      setAdviceResult(MOOD_RESPONSES[moodId] || MOOD_RESPONSES.grateful);
       setIsAdvisorThinking(false);
-    }, 1800);
+    }, 2000);
+  };
+
+  const resetAdvice = () => {
+    setAdviceResult(null);
   };
 
   const handlePetCat = () => {
@@ -886,11 +887,36 @@ function MuezzaApp() {
   };
 
   const selectManualLocation = (loc) => {
+    if (!loc) return;
     const newLoc = { ...loc, source: 'manual' };
     setSavedLocation(newLoc);
     setIsLocationModalOpen(false);
     setLocationSearchQuery('');
     setLocationSearchResults([]);
+  };
+
+  const handleDetectLocation = () => {
+    setLocationStatus('locating');
+    navigator.geolocation.getCurrentPosition(
+      async ({ coords }) => {
+        try {
+          const resolvedLocation = await reverseGeocode(coords.latitude, coords.longitude);
+          setSavedLocation(resolvedLocation);
+          setLocationStatus('resolved');
+          setIsLocationModalOpen(false);
+        } catch (error) {
+          console.error('Failed to resolve location:', error);
+          alert('Could not resolve your precise address. Please search manually.');
+          setLocationStatus('idle');
+        }
+      },
+      (error) => {
+        console.error('Geolocation error:', error);
+        alert('Location access denied or unavailable.');
+        setLocationStatus('idle');
+      },
+      { timeout: 10000 }
+    );
   };
 
   const handleStreakRestore = () => {
@@ -1077,6 +1103,7 @@ function MuezzaApp() {
               onSeekAdvice={handleSeekAdvice}
               adviceResult={adviceResult}
               isThinking={isAdvisorThinking}
+              onResetAdvice={resetAdvice}
             />
           )}
             </main>
@@ -1169,7 +1196,7 @@ function MuezzaApp() {
           searchResults={locationSearchResults}
           isSearching={isLocationSearching}
           onSelectResult={selectManualLocation}
-          onDetect={selectManualLocation} 
+          onDetect={handleDetectLocation} 
         />
 
         {/* Habit Composer Modal */}

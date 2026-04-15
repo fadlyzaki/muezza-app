@@ -146,6 +146,10 @@ export const ADVISOR_MOODS = [
   { id: 'anxious', label: 'Anxious', sub: 'Tawakkul', icon: '🍃' },
   { id: 'tired', label: 'Overwhelmed', sub: 'Sabr', icon: '⏳' },
   { id: 'searching', label: 'Searching', sub: 'Hidayah', icon: '🧭' },
+  { id: 'impatient', label: 'Impatient', sub: 'Istiqamah', icon: '🏃' },
+  { id: 'lonely', label: 'Lonely', sub: 'Uns', icon: '🕯️' },
+  { id: 'joyful', label: 'Joyful', sub: 'Hamd', icon: '✨' },
+  { id: 'confident', label: 'Confident', sub: 'Taqwa', icon: '🛡️' },
 ];
 
 export const MOOD_RESPONSES = {
@@ -172,5 +176,29 @@ export const MOOD_RESPONSES = {
     verse: "And He found you lost and guided [you].",
     reference: "Surah Ad-Duhaa 93:7",
     tafsir: "Guidance is a continuous divine response to a sincere heart. If you are looking, it is because He is already reaching for you."
+  },
+  impatient: {
+    muezza_advice: "Speed is for the dunya, but the heart travels in circles around the One. Slow your whiskers down, child. Istiqamah is not a sprint; it is the courage to repeat small good deeds without ceasing.",
+    verse: "So remain on a right course as you have been commanded...",
+    reference: "Surah Hud 11:112",
+    tafsir: "Consistency is more beloved to Allah than a temporary burst of extreme effort. True strength is found in the quiet repetition of the path."
+  },
+  lonely: {
+    muezza_advice: "Isolation is the playground of the mind, but solitude is the palace of the heart. You are never alone when the One who created your pulse is closer than your jugular vein. Let Uns (intimacy with the Divine) warm you.",
+    verse: "And We have already created man and know what his soul whispers to him, and We are closer to him than [his] jugular vein.",
+    reference: "Surah Qaf 50:16",
+    tafsir: "Loneliness is often a call from the Divine to return to a conversation that the world was drowning out. It is an invitation into closeness."
+  },
+  joyful: {
+    muezza_advice: "Ah! My ears are perked up at your light! Joy is a sign that you have recognized a gift from the Source. Amplify this light by sharing it, for Hamd (praise) is the fuel that keeps a blessing alive.",
+    verse: "Say, 'In the bounty of Allah and in His mercy - in that let them rejoice; it is better than what they accumulate.'",
+    reference: "Surah Yunus 10:58",
+    tafsir: "True joy is not found in the gift itself, but in the recognition of the Giver. Rejoicing in Allah's mercy is a form of worship that illuminates the substrate."
+  },
+  confident: {
+    muezza_advice: "Stability looks good on you! But remember, true confidence (Taqwa) is not self-assurance; it is 'Allah-assurance.' It is the shield that keeps your steps steady because you know who is guarding your back.",
+    verse: "And whoever fears Allah - He will make for him a way out.",
+    reference: "Surah At-Talaq 65:2",
+    tafsir: "Confidence is the byproduct of consciousness. When you are aware of the Highest Security, the local threats of the world lose their power over you."
   }
 };
