@@ -1,5 +1,9 @@
 # Muezza: Grounded Quranic Habits
 
+<p align="center">
+  <img src="public/logo.png" width="200" alt="Muezza Logo" />
+</p>
+
 > **Product Philosophy:** *"Spiritual habits break down not because people lack faith or intention, but because the daily structure around that intention is often disconnected. Muezza is not just another utility or a disconnected Quran app. It is an operational layer for self-directed spiritual growth, where daily Islamic obligations meet delightful, gamified motivation with as little cognitive friction as possible."*
 
 Welcome to the source system of **Muezza**: a digital companion that transforms abstract spiritual goals into a structured, visible, and rewarding daily loop. Built around a Tamagotchi-inspired virtual cat (Muezza), the app dynamically visualizes your spiritual energy through the completion of prayers, habits, and Quranic engagement. 
