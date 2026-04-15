@@ -3,7 +3,7 @@ import { ShoppingBag, Coins, CheckCircle2 } from 'lucide-react';
 import CatSVG from '../CatSVG';
 import { SHOP_ITEMS } from '../../constants/muezza_data';
 
-export function SouqTab({ dinar, inventory, onBuy }) {
+export function SouqTab({ dinar, inventory, onBuy, catStage }) {
   return (
     <div className="px-6 py-4 pb-32 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="bg-slate-900 rounded-[2.5rem] p-8 mb-8 relative overflow-hidden shadow-2xl shadow-slate-900/20">

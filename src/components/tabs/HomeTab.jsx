@@ -10,6 +10,7 @@ export function HomeTab({
   onPet,
   isPetting,
   inventory,
+  catStage,
   onTogglePrayer,
   onToggleMissedPrayer,
   onToggleHabit,
@@ -34,6 +35,7 @@ export function HomeTab({
               className={`w-48 h-48 transition-all duration-500 relative z-10 drop-shadow-[0_15px_15px_rgba(0,0,0,0.1)] group-hover/mascot:drop-shadow-[0_20px_20px_rgba(0,0,0,0.15)] group-hover/mascot:-translate-y-2 ${isPetting ? 'scale-110' : ''}`}
               isPetting={isPetting} 
               equipped={inventory} 
+              stage={catStage}
             />
           </div>
           

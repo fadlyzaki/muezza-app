@@ -1074,6 +1074,7 @@ function MuezzaApp() {
               onPet={handlePetCat}
               isPetting={showHearts}
               inventory={inventory}
+              catStage={streakLocal >= 30 ? 'majestic' : streakLocal >= 7 ? 'adult' : 'kitten'}
               onTogglePrayer={togglePrayer}
               onToggleMissedPrayer={toggleMissedPrayer}
               onToggleHabit={toggleHabit}
@@ -1117,6 +1118,7 @@ function MuezzaApp() {
               dinar={dinar}
               inventory={inventory}
               onBuy={buyItem}
+              catStage={streakLocal >= 30 ? 'majestic' : streakLocal >= 7 ? 'adult' : 'kitten'}
             />
           )}
 
@@ -1137,6 +1139,8 @@ function MuezzaApp() {
               adviceResult={adviceResult}
               isThinking={isAdvisorThinking}
               onResetAdvice={resetAdvice}
+              inventory={inventory}
+              catStage={streakLocal >= 30 ? 'majestic' : streakLocal >= 7 ? 'adult' : 'kitten'}
             />
           )}
             </main>

@@ -3,7 +3,7 @@ import { Sparkles, MessageSquare, Quote, BookOpen, Star, Heart, History, Trendin
 import CatSVG from '../CatSVG';
 import { ADVISOR_MOODS, MOOD_RESPONSES } from '../../constants/muezza_data';
 
-export function AdvisorTab({ onSeekAdvice, adviceResult, isThinking, onResetAdvice }) {
+export function AdvisorTab({ onSeekAdvice, adviceResult, isThinking, onResetAdvice, inventory, catStage }) {
   const [selectedMood, setSelectedMood] = useState(null);
 
   return (
@@ -32,7 +32,7 @@ export function AdvisorTab({ onSeekAdvice, adviceResult, isThinking, onResetAdvi
               <div className="flex flex-col items-center">
                 <div className="bg-[#FAF8F4] w-full p-12 rounded-[4rem] border border-slate-100 flex flex-col items-center relative group/mascot mb-8 overflow-hidden shadow-sm">
                   <div className="absolute inset-0 bg-emerald-500/5 blur-3xl rounded-full scale-150 animate-pulse"></div>
-                  <CatSVG awake={true} equipped={['glasses_smart', 'turban_cream']} className="w-52 h-52 mb-8 drop-shadow-2xl relative z-10" />
+                  <CatSVG awake={true} equipped={inventory} stage={catStage} className="w-52 h-52 mb-8 drop-shadow-2xl relative z-10" />
                   <h4 className="text-3xl font-black text-slate-800 mb-4 font-serif italic tracking-tight">"Assalamu'alaikum"</h4>
                   <p className="text-sm text-slate-500 font-medium max-w-[280px] leading-relaxed text-center">
                     I have prepared my scrolls to reflect on your heart's current state. How are you feeling, seeker?
@@ -75,7 +75,7 @@ export function AdvisorTab({ onSeekAdvice, adviceResult, isThinking, onResetAdvi
             <div className="py-20 flex flex-col items-center justify-center space-y-10 animate-in fade-in zoom-in duration-700">
                <div className="relative">
                   <div className="absolute inset-0 bg-emerald-500/20 blur-3xl rounded-full scale-150 animate-pulse"></div>
-                  <CatSVG awake={true} equipped={['glasses_smart', 'turban_cream', 'lantern_gold']} className="w-56 h-56 relative z-10" />
+                  <CatSVG awake={true} equipped={inventory} stage={catStage} className="w-56 h-56 relative z-10" />
                </div>
                <div className="flex flex-col items-center space-y-5 text-center">
                   <div className="flex space-x-3">
@@ -95,7 +95,7 @@ export function AdvisorTab({ onSeekAdvice, adviceResult, isThinking, onResetAdvi
                 </div>
                 <div className="flex flex-col items-center relative z-10 text-center">
                    <div className="w-24 h-24 bg-white/10 backdrop-blur-md rounded-full flex items-center justify-center border border-white/20 mb-8">
-                      <CatSVG awake={true} equipped={['glasses_smart', 'turban_cream']} className="w-16 h-16" />
+                      <CatSVG awake={true} equipped={inventory} stage={catStage} className="w-16 h-16" />
                    </div>
                    <div className="space-y-4">
                       <p className="text-[10px] font-black text-emerald-400 uppercase tracking-[0.4em]">Muezza's Counsel</p>
