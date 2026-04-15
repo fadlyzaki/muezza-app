@@ -1058,24 +1058,26 @@ function MuezzaApp() {
           {activeTab === 'quran' && (
             <QuranTab 
               surahs={surahs}
-              isLoading={isLoadingQuran}
-              error={quranError}
-              onRetry={fetchSurahs}
+              isLoadingQuran={isLoadingQuran}
+              quranError={quranError}
+              fetchSurahs={fetchSurahs}
               onOpenSurah={openSurah}
               selectedSurah={selectedSurah}
               onCloseSurah={() => setSelectedSurah(null)}
               verses={verses}
-              hasNextPage={hasMoreVerses}
+              hasMoreVerses={hasMoreVerses}
               onLoadMore={loadMoreVerses}
               isLoadingMore={isLoadingMore}
-              activeAudio={activeAudioVerseKey}
-              onToggleAudio={toggleVerseAudio}
-              isPlaying={isAudioPlaying}
-              onBookmark={saveBookmark}
-              bookmarkedKeys={bookmarkedVerseKeys}
-              readingHabit={quranReadingHabit}
+              activeAudioVerseKey={activeAudioVerseKey}
+              onToggleVerseAudio={toggleVerseAudio}
+              isAudioPlaying={isAudioPlaying}
+              onToggleBookmark={saveBookmark}
+              bookmarkedVerseKeys={bookmarkedVerseKeys}
+              quranReadingHabit={quranReadingHabit}
               onToggleHabit={toggleHabit}
-              onTafsir={handleVerseTafsir}
+              onVerseTafsir={handleVerseTafsir}
+              getVerseAudioUrl={getVerseAudioUrl}
+              getTranslationText={getTranslationText}
             />
           )}
 
@@ -1180,7 +1182,7 @@ function MuezzaApp() {
 
         <InfoModal 
           isOpen={showInfoModal}
-          onClose={() => setShowInfoModal(false)}
+          onClose={closeInfoModal}
           activeTab={infoModalTab}
           setActiveTab={setInfoModalTab}
           onReset={handleExportData} 
