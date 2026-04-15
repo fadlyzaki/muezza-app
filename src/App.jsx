@@ -566,17 +566,79 @@ function MuezzaApp() {
 
   const togglePrayer = (id) => {
     const targetPrayer = prayers.find((prayer) => prayer.id === id);
-    if (!targetPrayer || targetPrayer.missed) return;
+    if (!targetPrayer) return;
 
     const delta = targetPrayer.completed ? -targetPrayer.coinReward : targetPrayer.coinReward;
 
     setPrayers(
       prayers.map((prayer) =>
-        prayer.id === id ? { ...prayer, completed: !prayer.completed } : prayer,
+        prayer.id === id 
+          ? { ...prayer, completed: !prayer.completed, missed: false } 
+          : prayer
       ),
     );
     setDinar((currentDinar) => Math.max(0, currentDinar + delta));
   };
+
+  const toggleMissedPrayer = (id) => {
+    setPrayers((currentPrayers) =>
+      currentPrayers.map((p) =>
+        p.id === id 
+          ? { ...p, missed: !p.missed, completed: false } 
+          : p
+      )
+    );
+  };
+
+  // Auto-Skip Engine
+  useEffect(() => {
+    if (!prayerTimes) return;
+
+    const interval = setInterval(() => {
+      const now = new Date();
+      const RITUAL_SEQUENCE = ['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'];
+      
+      setPrayers((currentPrayers) => {
+        const nextPrayers = currentPrayers.map((prayer) => {
+          if (prayer.completed || prayer.missed) return prayer;
+
+          const currentIndex = RITUAL_SEQUENCE.indexOf(prayer.name);
+          if (currentIndex === -1) return prayer;
+
+          let nextRitualName;
+          let isNextDay = false;
+          
+          if (currentIndex === RITUAL_SEQUENCE.length - 1) {
+            nextRitualName = RITUAL_SEQUENCE[0]; // Isha -> Fajr
+            isNextDay = true;
+          } else {
+            nextRitualName = RITUAL_SEQUENCE[currentIndex + 1];
+          }
+
+          const nextRitualTimeStr = prayerTimes[nextRitualName];
+          if (!nextRitualTimeStr) return prayer;
+
+          const [hours, minutes] = nextRitualTimeStr.split(':').map(Number);
+          const nextRitualDate = new Date(now);
+          nextRitualDate.setHours(hours, minutes, 0, 0);
+          if (isNextDay) nextRitualDate.setDate(nextRitualDate.getDate() + 1);
+
+          // Threshold: 15 minutes before next prayer
+          const threshold = new Date(nextRitualDate.getTime() - 15 * 60000);
+
+          if (now > threshold) {
+            return { ...prayer, missed: true };
+          }
+          return prayer;
+        });
+
+        const hasChanges = JSON.stringify(nextPrayers) !== JSON.stringify(currentPrayers);
+        return hasChanges ? nextPrayers : currentPrayers;
+      });
+    }, 60000);
+
+    return () => clearInterval(interval);
+  }, [prayerTimes]);
 
   const resetHabitComposer = () => {
     setShowAddHabit(false);
@@ -956,6 +1018,7 @@ function MuezzaApp() {
               isPetting={showHearts}
               inventory={inventory}
               onTogglePrayer={togglePrayer}
+              onToggleMissedPrayer={toggleMissedPrayer}
               onToggleHabit={toggleHabit}
               onEditHabit={openEditHabitForm}
               onDeleteHabit={handleDeleteHabit}

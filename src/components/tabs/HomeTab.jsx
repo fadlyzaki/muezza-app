@@ -11,6 +11,7 @@ export function HomeTab({
   isPetting,
   inventory,
   onTogglePrayer,
+  onToggleMissedPrayer,
   onToggleHabit,
   onEditHabit,
   onDeleteHabit,
@@ -85,26 +86,75 @@ export function HomeTab({
             const IconComp = PRAYER_ICONS[prayer.id];
             const prayerTime = prayerTimes ? prayerTimes[prayer.name] : '--:--';
             return (
-              <button
-                key={prayer.id}
-                onClick={() => onTogglePrayer(prayer.id)}
-                className={`flex flex-col items-center p-3 rounded-3xl border-2 transition-all relative overflow-hidden group ${
-                  prayer.completed
-                    ? 'bg-emerald-50 border-emerald-100'
-                    : 'bg-white border-slate-100 hover:border-emerald-200 hover:shadow-lg hover:-translate-y-0.5'
-                }`}
-              >
-                <div className={`p-2.5 rounded-2xl mb-2 transition-colors ${prayer.completed ? 'bg-emerald-100 text-emerald-600' : 'bg-slate-50 text-slate-400 group-hover:bg-emerald-50 group-hover:text-emerald-500'}`}>
-                  {IconComp && <IconComp className="w-4 h-4" />}
-                </div>
-                <span className={`text-[9px] font-black uppercase tracking-tight mb-1 ${prayer.completed ? 'text-emerald-700' : 'text-slate-500'}`}>{prayer.name}</span>
-                <span className="text-[8px] font-bold text-slate-400 font-mono tracking-tighter opacity-80">{prayerTime}</span>
-                {prayer.completed && (
-                   <div className="absolute top-1 right-1">
+              <div key={prayer.id} className="relative group">
+                <button
+                  onClick={() => onTogglePrayer(prayer.id)}
+                  className={`w-full flex flex-col items-center p-3 rounded-3xl border-2 transition-all relative overflow-hidden ${
+                    prayer.completed
+                      ? 'bg-emerald-50 border-emerald-100 shadow-sm'
+                      : prayer.missed
+                      ? 'bg-rose-50/50 border-rose-100 opacity-80'
+                      : 'bg-white border-slate-100 hover:border-emerald-200 hover:shadow-lg hover:-translate-y-0.5'
+                  }`}
+                >
+                  <div className={`p-2.5 rounded-2xl mb-2 transition-colors ${
+                    prayer.completed 
+                      ? 'bg-emerald-100 text-emerald-600' 
+                      : prayer.missed 
+                      ? 'bg-rose-100/50 text-rose-400' 
+                      : 'bg-slate-50 text-slate-400 group-hover:bg-emerald-50 group-hover:text-emerald-500'
+                  }`}>
+                    {IconComp && <IconComp className="w-4 h-4" />}
+                  </div>
+                  <span className={`text-[9px] font-black uppercase tracking-tight mb-1 ${
+                    prayer.completed ? 'text-emerald-700' : prayer.missed ? 'text-rose-400' : 'text-slate-500'
+                  }`}>
+                    {prayer.name}
+                  </span>
+                  <span className={`text-[8px] font-bold font-mono tracking-tighter opacity-80 ${
+                    prayer.missed ? 'text-rose-300 line-through' : 'text-slate-400'
+                  }`}>
+                    {prayerTime}
+                  </span>
+                  
+                  {prayer.completed && (
+                    <div className="absolute top-1 right-1">
                       <CheckCircle2 className="w-2.5 h-2.5 text-emerald-500 fill-white" />
-                   </div>
+                    </div>
+                  )}
+                  
+                  {prayer.missed && (
+                    <div className="absolute top-1.5 right-1.5">
+                      <div className="w-2 h-2 bg-rose-400 rounded-full animate-pulse" />
+                    </div>
+                  )}
+                </button>
+
+                {/* Manual Skip Button */}
+                {!prayer.completed && !prayer.missed && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onToggleMissedPrayer(prayer.id);
+                    }}
+                    className="absolute -top-1 -left-1 w-5 h-5 bg-white border border-slate-100 rounded-full flex items-center justify-center text-slate-300 hover:text-rose-500 hover:border-rose-200 shadow-sm opacity-0 group-hover:opacity-100 transition-all z-10"
+                  >
+                    <X className="w-3 h-3" />
+                  </button>
                 )}
-              </button>
+                
+                {prayer.missed && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onToggleMissedPrayer(prayer.id);
+                    }}
+                    className="absolute -top-1 -left-1 w-5 h-5 bg-rose-500 text-white rounded-full flex items-center justify-center shadow-lg shadow-rose-500/20 z-10"
+                  >
+                    <X className="w-3 h-3" />
+                  </button>
+                )}
+              </div>
             );
           })}
         </div>
@@ -154,7 +204,6 @@ export function HomeTab({
                     }`}>
                       {habit.category}
                     </span>
-                    <span className="text-[8px] font-black text-slate-300 font-mono">ID_{habit.id.toString().slice(-4)}</span>
                   </div>
                   <h4 className={`text-sm font-black tracking-tight ${habit.completed ? 'text-slate-400 line-through' : 'text-slate-800 font-bold'}`}>
                     {habit.title}
