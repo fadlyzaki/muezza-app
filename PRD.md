@@ -4,10 +4,11 @@
 > **Product Philosophy:** *"Spiritual habits break down not because people lack faith, but because the daily structure around that faith is disconnected. Muezza is an operational layer for self-directed spiritual growth, where Islamic obligations meet delightful, gamified motivation with as little cognitive friction as possible."*
 
 **Hackathon:** Quran Foundation Hackathon (Ramadan — Shawwal 1447)  
-**Platform:** Mobile-First Progressive Web Application  
+**Platform:** Responsive Multi-Surface PWA (Desktop Dashboard + Mobile App)  
 **Stack:** React 19, Vite 8, Tailwind CSS v4, Lucide Icons  
 **Repository:** [github.com/fadlyzaki/muezza-app](https://github.com/fadlyzaki/muezza-app)  
 **Live Application:** [muezza-app.vercel.app](https://muezza-app.vercel.app/)  
+**System Version:** v1.6.0  
 **Last Updated:** April 2026
 
 ---
@@ -21,18 +22,12 @@ Muezza is a mobile-first web app designed to bridge the gap between abstract spi
 | Surface / Feature | Status | Notes |
 |---|---|---|
 | **Onboarding Flow** | ✅ Shipped | 4-step guided flow with dynamic habit path selection |
-| **Home Dashboard** | ✅ Shipped | Mascot states, energy gauge, modular checklist items |
-| **Habit Engine** | ✅ Shipped | Editable custom habits, prayer tracking, global glossary |
-| **Quran Reader** | ✅ Shipped | Full 114-surah, Uthmani text, multi-translation UI |
-| **Tafsir (Ask Muezza)**| ✅ Shipped | Integrated with authentic QF v4 Tafsir APIs per ayah |
-| **Audio Playback** | ✅ Shipped | Streaming recitation via Quran CDN |
-| **Souq (Shop)** | ✅ Shipped | 4 equippable items rendering dynamically on SVG |
-| **Noor Streak Tab** | ✅ Shipped | Evolution timeline with cloud-sync state management |
-| **OAuth2 / PKCE** | ✅ Shipped | Proper Basic Auth token exchange for secure sessions |
-| **Legal Documentation** | ✅ Shipped | Privacy Policy and Terms of Service for production compliance |
-| **Vercel Deployment** | ✅ Shipped | Serverless `/api/token` and `/api/tafsir` endpoints |
-| **Wisdom Reminder**   | ✅ Shipped | Niyyah Protocol triggering reflections after missed days |
-| **Premium Error UX**  | ✅ Shipped | Illustrative fail states and high-fidelity ErrorBoundaries |
+| **Ritual Engine**    | ✅ Shipped | **Auto-Skip Automation**: Rituals mark as missed 15m before next prayer. |
+| **Responsive UI**    | ✅ Shipped | **Responsive Pro**: Sidebar Dashboard for Desktop, Bottom Nav for Mobile. |
+| **Advisor Hub**      | ✅ Shipped | **8 Emotional Archetypes**: Expanded scholarly counsel with Session Analytics. |
+| **Souq (Shop)**      | ✅ Shipped | **Sustenance Added**: Ajwa Dates, Zamzam, Honey, Milk. |
+| **Habit Engine**     | ✅ Shipped | **Stable Lifecycle**: Full Add/Edit/Delete habit management. |
+| **Location Engine**  | ✅ Shipped | **Precise Resolution**: Manual search + Geolocation reverse geocoding. |
 
 ---
 

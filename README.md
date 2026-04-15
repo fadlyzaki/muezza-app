@@ -1,5 +1,5 @@
 # Muezza: Grounded Quranic Habits
-### [System Architecture v5.0 // Human Algorithm Protocol]
+### [System Architecture v6.0 // Responsive Pro Protocol]
 
 <p align="center">
   <img src="public/muezza-og.png" width="600" alt="Muezza System Preview" style="border-radius: 2rem; box-shadow: 0 20px 50px rgba(0,0,0,0.1);" />
@@ -13,15 +13,15 @@ Muezza is a high-fidelity digital companion designed to transmute abstract spiri
 
 ---
 
-## Architectural Topography
+### I. Responsive Architecture (Responsive Pro)
+*   **Desktop Dashboard**: A professional sidebar-based command center for deep ritual management.
+*   **Mobile App**: A thumb-friendly, bottom-navigation PWA for on-the-go spiritual consistency.
+*   **Atmospheric Layout**: Content area transitions between focused mobile columns and expansive dashboard grids dynamically.
 
-The system is engineered as a state-driven, client-heavy Progressive Web Application (PWA) deeply integrated with the **Quran Foundation v4 API Ecosystem**.
-
-### I. The Content Substrate
-*   **Quran Foundation Content API v4**: Orchestrates pristine Uthmani text, multi-translation delivery (Saheeh International), and real-time Tafsir streams.
-*   **Audio CDN**: Streaming recitation loops via Quran Foundation's globally distributed content delivery network.
-*   **Geolocation Substrate**: Real-time prayer timings via **Aladhan v1** with a manual city search fallback powered by **Nominatim**.
-*   **Resilient Interface**: Zero-downtime loading via high-fidelity **Skeleton Loaders** and illustrative **Error Boundaries** to handle network partitions gracefully.
+### II. The Ritual Substrate
+*   **Auto-Skip Automation**: Background logic engine that automatically marks rituals as "Missed" 15 minutes before the next prayer window opens.
+*   **Rose Visual State**: High-fidelity feedback for missed obligations, maintaining spiritual honesty and accountability.
+*   **Geolocation Engine**: High-precision location resolution via browser Geolocation + Reverse Geocoding for accurate prayer timings.
 
 ### II. Identity & Continuity
 *   **OAuth2 PKCE Flow**: Secure, stateless authentication bridging Muezza with the global Quran.com user profile.
