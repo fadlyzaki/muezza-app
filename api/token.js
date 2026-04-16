@@ -1,4 +1,4 @@
-import { getQuranFoundationConfig } from './_quranFoundation.js';
+import { exchangeAuthorizationCode } from './_quranFoundation.js';
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -12,35 +12,19 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { authBaseUrl, clientId, clientSecret } = getQuranFoundationConfig();
-    const authHeader = `Basic ${Buffer.from(`${clientId}:${clientSecret}`).toString('base64')}`;
-    
-    const tokenResponse = await fetch(`${authBaseUrl}/oauth2/token`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-        'Authorization': authHeader,
-      },
-      body: new URLSearchParams({
-        grant_type: 'authorization_code',
-        code,
-        redirect_uri,
-        code_verifier,
-      }),
+    const data = await exchangeAuthorizationCode({
+      code,
+      redirectUri: redirect_uri,
+      codeVerifier: code_verifier,
+      isConfidential: true // Muezza uses confidential client pattern
     });
-
-    const data = await tokenResponse.json();
-
-    if (!tokenResponse.ok) {
-      console.error('OAuth Token Error Response:', data);
-      return res.status(tokenResponse.status).json(data);
-    }
 
     // In a prod app, refresh_token should be set as httpOnly cookie.
     // For this MVP, we return it to the client to manage in localStorage.
     return res.status(200).json(data);
   } catch (error) {
-    console.error('Oauth API Request Failed:', error);
-    return res.status(500).json({ error: 'Internal Server Error' });
+    // Ensuring we never leak secrets, codes, or tokens in logs or responses
+    // and that we use the specific error message from the prompt.
+    return res.status(500).json({ error: 'Failed to exchange authorization code for tokens' });
   }
 }

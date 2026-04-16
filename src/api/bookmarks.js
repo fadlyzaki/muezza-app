@@ -16,7 +16,6 @@ export async function getBookmarks(accessToken) {
   try {
     const res = await fetch(`${API_BASE}/bookmarks`, {
       headers: {
-        'Authorization': `Bearer ${accessToken}`,
         'x-auth-token': accessToken,
         'x-client-id': clientId
       }
@@ -32,22 +31,33 @@ export async function getBookmarks(accessToken) {
 
 export async function addBookmark(accessToken, verseKey) {
    const clientId = import.meta.env.VITE_QURAN_CLIENT_ID;
-   if (!accessToken || !clientId) return false;
+   if (!accessToken || !clientId || !verseKey) return false;
    
    try {
-     const res = await fetch(`${API_BASE}/bookmarks`, {
+     // Quran.com-style bookmarks are stored in the __default__ collection
+     const endpoint = `${API_BASE}/collections/__default__/bookmarks`;
+     
+     // Parse "1:5" into surah (key) and ayah (verseNumber)
+     const [surahNum, ayahNum] = verseKey.split(':').map(Number);
+     if (!surahNum || !ayahNum) return false;
+
+     const res = await fetch(endpoint, {
        method: 'POST',
        headers: {
          'Content-Type': 'application/json',
-         'Authorization': `Bearer ${accessToken}`,
          'x-auth-token': accessToken,
          'x-client-id': clientId
        },
-       // Adjust payload per specific Quran.com API signature
-       body: JSON.stringify({ verse_key: verseKey })
+       // Payload aligned with Quran Foundation 'ayah' item schema
+       body: JSON.stringify({ 
+         type: 'ayah',
+         key: surahNum,
+         verseNumber: ayahNum
+       })
      });
      return res.ok;
-   } catch {
+   } catch (error) {
+     console.error("Error adding bookmark:", error);
      return false;
    }
 }

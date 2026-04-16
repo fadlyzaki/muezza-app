@@ -20,6 +20,7 @@ export function AuthProvider({ children }) {
 
   const login = async () => {
     const state = generateRandomString(32);
+    const nonce = generateRandomString(32);
     const codeVerifier = generateRandomString(128);
     const codeChallenge = await generateCodeChallenge(codeVerifier);
     
@@ -29,18 +30,20 @@ export function AuthProvider({ children }) {
     const appUrl = (import.meta.env.VITE_APP_URL || window.location.origin).replace(/\/$/, '');
     const redirectUri = `${appUrl}/callback`;
 
-    // Store verifier for the callback route
+    // Store parameters for the callback route
     localStorage.setItem('pkce_code_verifier', codeVerifier);
     localStorage.setItem('oauth_state', state);
+    localStorage.setItem('oauth_nonce', nonce);
 
     const authUrl = new URL(`${getQuranAuthBaseUrl()}/oauth2/auth`);
     authUrl.searchParams.append('client_id', clientId);
     authUrl.searchParams.append('response_type', 'code');
     authUrl.searchParams.append('redirect_uri', redirectUri);
     authUrl.searchParams.append('state', state);
+    authUrl.searchParams.append('nonce', nonce);
     authUrl.searchParams.append('code_challenge', codeChallenge);
     authUrl.searchParams.append('code_challenge_method', 'S256');
-    authUrl.searchParams.append('scope', 'openid user bookmark streak');
+    authUrl.searchParams.append('scope', 'openid offline_access user bookmark streak');
 
     window.location.href = authUrl.toString();
   };

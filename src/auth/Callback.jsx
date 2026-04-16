@@ -39,6 +39,13 @@ export default function Callback() {
         if (data.id_token) {
           localStorage.setItem('qf_id_token', data.id_token);
           const payload = JSON.parse(atob(data.id_token.split('.')[1]));
+          
+          // Verify nonce if it was stored
+          const savedNonce = localStorage.getItem('oauth_nonce');
+          if (savedNonce && payload.nonce !== savedNonce) {
+            throw new Error('Identity verification failed (nonce mismatch).');
+          }
+          
           setUser(payload);
         }
         if (data.refresh_token) {
@@ -49,6 +56,7 @@ export default function Callback() {
         
         // Clean up
         localStorage.removeItem('oauth_state');
+        localStorage.removeItem('oauth_nonce');
         localStorage.removeItem('pkce_code_verifier');
         
         // Redirect home and strip query string

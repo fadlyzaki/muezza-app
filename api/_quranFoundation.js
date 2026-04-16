@@ -7,20 +7,27 @@ function inferEnvironment(authBase) {
 }
 
 export function getQuranFoundationConfig() {
+  const env = process.env.QF_ENV || process.env.VITE_QF_ENV || 'production';
+  const isPreLive = env === 'prelive';
+
   const authBaseUrl =
-    process.env.QURAN_AUTH_BASE ||
+    process.env.QF_AUTH_BASE ||
     process.env.VITE_QURAN_AUTH_BASE ||
-    process.env.VITE_QURAN_API_BASE ||
-    'https://oauth2.quran.foundation';
-  const envName = process.env.QF_ENV || inferEnvironment(authBaseUrl);
+    (isPreLive
+      ? 'https://prelive-oauth2.quran.foundation'
+      : 'https://oauth2.quran.foundation');
+
   const apiBaseUrl =
-    process.env.QURAN_CONTENT_API_BASE ||
-    process.env.QURAN_USER_API_BASE ||
+    process.env.QF_USER_API_BASE ||
     process.env.VITE_QURAN_USER_API_BASE ||
-    (envName === 'prelive'
+    (isPreLive
       ? 'https://apis-prelive.quran.foundation'
       : 'https://apis.quran.foundation');
+
+  // Client ID can be shared between frontend/backend
   const clientId = process.env.QF_CLIENT_ID || process.env.VITE_QURAN_CLIENT_ID;
+  
+  // Client Secret MUST stay server-side
   const clientSecret = process.env.QF_CLIENT_SECRET || process.env.QURAN_CLIENT_SECRET;
 
   if (!clientId || !clientSecret) {
@@ -124,4 +131,67 @@ export async function resolveDefaultTafsirId() {
 
   cachedTafsirId = tafsir?.id || 169;
   return cachedTafsirId;
+}
+
+/**
+ * Implement Authorization Code token exchange for Quran Foundation OAuth2.
+ * Strictly follows the technical requirement prompt for Muezza.
+ */
+export async function exchangeAuthorizationCode({ code, redirectUri, codeVerifier, isConfidential = true }) {
+  const { authBaseUrl, clientId, clientSecret } = getQuranFoundationConfig();
+  
+  if (isConfidential && !clientSecret) {
+    throw new Error('Failed to exchange authorization code for tokens');
+  }
+
+  const params = new URLSearchParams();
+  params.append('grant_type', 'authorization_code');
+  params.append('code', code);
+  params.append('redirect_uri', redirectUri);
+  params.append('code_verifier', codeVerifier);
+
+  // For public clients, the client_id is included in the body
+  if (!isConfidential) {
+    params.append('client_id', clientId);
+  }
+
+  const headers = {
+    'Content-Type': 'application/x-www-form-urlencoded',
+  };
+
+  // For confidential server clients, authenticate the client on the server
+  if (isConfidential) {
+    headers['Authorization'] = `Basic ${Buffer.from(`${clientId}:${clientSecret}`).toString('base64')}`;
+  }
+
+  try {
+    const response = await fetch(`${authBaseUrl}/oauth2/token`, {
+      method: 'POST',
+      headers,
+      body: params.toString(),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      // As per prompt: On failure, throw a clear error: "Failed to exchange authorization code for tokens"
+      throw new Error('Failed to exchange authorization code for tokens');
+    }
+
+    // Precise output shape as required by the prompt
+    return {
+      access_token: data.access_token,
+      refresh_token: data.refresh_token,
+      id_token: data.id_token,
+      expires_in: data.expires_in,
+      scope: data.scope,
+      token_type: data.token_type,
+    };
+  } catch (error) {
+    // Enforce the strict error message requirement
+    if (error.message !== 'Failed to exchange authorization code for tokens') {
+       throw new Error('Failed to exchange authorization code for tokens');
+    }
+    throw error;
+  }
 }

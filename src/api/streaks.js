@@ -9,7 +9,6 @@ export async function getStreaks(accessToken) {
   try {
     const res = await fetch(`${API_BASE}/streaks`, {
       headers: {
-        'Authorization': `Bearer ${accessToken}`,
         'x-auth-token': accessToken,
         'x-client-id': clientId
       }
@@ -27,14 +26,24 @@ export async function addStreak(accessToken) {
   if (!accessToken || !clientId) return false;
   
   try {
-    const res = await fetch(`${API_BASE}/streaks`, {
+    // Determine user's timezone for accurate streak calculation (recommended by QF docs)
+    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    
+    const res = await fetch(`${API_BASE}/activity-days`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${accessToken}`,
         'x-auth-token': accessToken,
-        'x-client-id': clientId
-      }
+        'x-client-id': clientId,
+        'x-timezone': timezone
+      },
+      // Per pre-live docs, QURAN type uses seconds and ranges to power streaks
+      body: JSON.stringify({
+        type: 'QURAN',
+        seconds: 60, // Minimum activity to maintain/bump streak
+        ranges: '1:1-1:1', // Placeholder activity range
+        mushafId: 4 // Standard Uthmani Mushaf
+      })
     });
     return res.ok;
   } catch {
