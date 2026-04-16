@@ -178,6 +178,14 @@ function MuezzaApp() {
   const { accessToken, user, logout } = useAuth();
   const audioPlayerRef = useRef(null);
 
+  useEffect(() => {
+    const handleUnauthorized = () => {
+      logout();
+    };
+    window.addEventListener('qf_unauthorized', handleUnauthorized);
+    return () => window.removeEventListener('qf_unauthorized', handleUnauthorized);
+  }, [logout]);
+
   const [activeTab, setActiveTab] = useState('home');
   const [hasCompletedOnboarding, setHasCompletedOnboarding] = useLocalStorage(
     'muezza_onboarded',

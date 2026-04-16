@@ -13,6 +13,9 @@ export async function getStreaks(accessToken) {
         'x-client-id': clientId
       }
     });
+    if (res.status === 401 || res.status === 403) {
+      window.dispatchEvent(new CustomEvent('qf_unauthorized'));
+    }
     if (!res.ok) throw new Error('Failed to fetch streaks');
     return await res.json();
   } catch (error) {
@@ -45,6 +48,9 @@ export async function addStreak(accessToken) {
         mushafId: 4 // Standard Uthmani Mushaf
       })
     });
+    if (res.status === 401 || res.status === 403) {
+      window.dispatchEvent(new CustomEvent('qf_unauthorized'));
+    }
     return res.ok;
   } catch {
     return false;

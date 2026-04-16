@@ -20,6 +20,9 @@ export async function getBookmarks(accessToken) {
         'x-client-id': clientId
       }
     });
+    if (res.status === 401 || res.status === 403) {
+      window.dispatchEvent(new CustomEvent('qf_unauthorized'));
+    }
     if (!res.ok) throw new Error('Failed to fetch bookmarks');
     const data = await res.json();
     return normalizeBookmarksResponse(data);
@@ -55,6 +58,9 @@ export async function addBookmark(accessToken, verseKey) {
          verseNumber: ayahNum
        })
      });
+     if (res.status === 401 || res.status === 403) {
+       window.dispatchEvent(new CustomEvent('qf_unauthorized'));
+     }
      return res.ok;
    } catch (error) {
      console.error("Error adding bookmark:", error);

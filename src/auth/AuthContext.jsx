@@ -43,7 +43,7 @@ export function AuthProvider({ children }) {
     authUrl.searchParams.append('nonce', nonce);
     authUrl.searchParams.append('code_challenge', codeChallenge);
     authUrl.searchParams.append('code_challenge_method', 'S256');
-    authUrl.searchParams.append('scope', 'openid offline_access user bookmark streak');
+    authUrl.searchParams.append('scope', 'openid offline_access user collection');
 
     window.location.href = authUrl.toString();
   };
