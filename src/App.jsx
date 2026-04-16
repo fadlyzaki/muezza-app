@@ -54,7 +54,8 @@ import {
   DEFAULT_RECITER_ID,
   DEFAULT_DINAR,
   DEFAULT_STREAK,
-  INFO_MODAL_VERSION
+  INFO_MODAL_VERSION,
+  SURAH_NAMES_SIMPLE
 } from './constants/muezza_data';
 
 import {
@@ -927,12 +928,17 @@ function MuezzaApp() {
     const success = await addBookmark(accessToken, verse.verse_key);
     if (success) {
       const [surahId] = verse.verse_key.split(':').map(Number);
+      const [, ayahNumber] = verse.verse_key.split(':').map(Number);
       setUserBookmarks((currentBookmarks) => [
         ...currentBookmarks,
         {
           verse_key: verse.verse_key,
           surah_id: selectedSurah?.id || surahId,
-          surah_name: selectedSurah?.name_simple || (surahId ? `Surah ${surahId}` : 'Saved Ayah'),
+          ayah_number: ayahNumber,
+          surah_name:
+            selectedSurah?.name_simple ||
+            SURAH_NAMES_SIMPLE[surahId] ||
+            (surahId ? `Surah ${surahId}` : 'Saved Ayah'),
         },
       ]);
     }

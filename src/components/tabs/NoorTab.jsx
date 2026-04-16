@@ -173,7 +173,7 @@ export function NoorTab({
             ) : (
               bookmarks.map((bookmark) => (
                 <button
-                  key={bookmark.id}
+                  key={bookmark.id || bookmark.verse_key}
                   onClick={() => onOpenSurahByBookmark(bookmark)}
                   className="w-full bg-white p-4 sm:p-5 rounded-2xl sm:rounded-3xl border border-slate-100 flex items-center justify-between hover:border-emerald-200 transition-all shadow-sm group"
                 >
@@ -183,7 +183,9 @@ export function NoorTab({
                     </div>
                     <div className="text-left min-w-0">
                       <p className="font-black text-slate-800 truncate tracking-tight text-sm">{bookmark.surah_name}</p>
-                      <p className="text-[9px] sm:text-[10px] text-slate-400 font-bold uppercase tracking-widest">Ayah {bookmark.verse_key}</p>
+                      <p className="text-[9px] sm:text-[10px] text-slate-400 font-bold uppercase tracking-widest">
+                        Ayah {bookmark.ayah_number || bookmark.verse_key}
+                      </p>
                     </div>
                   </div>
                   <div className="p-2 bg-slate-100 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity">

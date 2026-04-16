@@ -1,4 +1,5 @@
 import { getQuranUserApiBaseUrl } from '../lib/quranFoundation';
+import { SURAH_NAMES_SIMPLE } from '../constants/muezza_data';
 
 const API_BASE = `${getQuranUserApiBaseUrl()}/auth/v1`;
 const MUSHAF_ID = 4;
@@ -16,19 +17,19 @@ function normalizeBookmarksResponse(payload) {
 }
 
 function normalizeBookmark(bookmark) {
-  const surahId = Number(
+  const rawSurahId =
     bookmark?.surah_id ||
     bookmark?.surahId ||
     bookmark?.chapter_id ||
     bookmark?.chapterId ||
-    bookmark?.key,
-  );
-  const ayahNumber = Number(
+    bookmark?.key;
+  const rawAyahNumber =
     bookmark?.ayah_number ||
     bookmark?.ayahNumber ||
     bookmark?.verse_number ||
-    bookmark?.verseNumber,
-  );
+    bookmark?.verseNumber;
+  const surahId = Number(rawSurahId);
+  const ayahNumber = Number(rawAyahNumber);
   const verseKey =
     bookmark?.verse_key ||
     bookmark?.verseKey ||
@@ -44,7 +45,9 @@ function normalizeBookmark(bookmark) {
       bookmark?.surahName ||
       bookmark?.chapter_name ||
       bookmark?.chapterName ||
+      SURAH_NAMES_SIMPLE[surahId] ||
       (surahId ? `Surah ${surahId}` : 'Saved Ayah'),
+    ayah_number: ayahNumber || bookmark?.ayah_number,
   };
 }
 
