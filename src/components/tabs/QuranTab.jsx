@@ -12,7 +12,9 @@ import {
   Star, 
   Bookmark as BookmarkIcon,
   Book,
-  AlertCircle
+  AlertCircle,
+  Plus,
+  RefreshCw
 } from 'lucide-react';
 import CatSVG from '../CatSVG';
 import { ErrorState } from '../common/ErrorState';

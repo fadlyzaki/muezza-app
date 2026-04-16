@@ -35,6 +35,7 @@ const localTokenApiPlugin = () => ({
               }),
             });
             const payload = await tokenResponse.json();
+            console.log("QURAN FOUNDATION TOKEN EXCHANGE PAYLOAD:", payload);
             
             res.setHeader('Content-Type', 'application/json');
             res.statusCode = tokenResponse.status;
