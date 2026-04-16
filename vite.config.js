@@ -55,4 +55,18 @@ const localTokenApiPlugin = () => ({
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react(), tailwindcss(), localTokenApiPlugin()],
+  server: {
+    proxy: {
+      '/api': {
+        target: 'https://muezza-app.vercel.app',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, '/api'),
+        bypass: (req) => {
+          if (req.url === '/api/token') {
+            return req.url; // Prevent proxying to Vercel, let our local plugin handle it
+          }
+        }
+      },
+    },
+  },
 })
