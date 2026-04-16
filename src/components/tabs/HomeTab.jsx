@@ -5,6 +5,7 @@ import { PRAYER_ICONS } from '../../constants/muezza_data';
 
 export function HomeTab({ 
   energy, 
+  canReflect,
   prayers, 
   habits, 
   onPet,
@@ -58,7 +59,7 @@ export function HomeTab({
             </div>
           </div>
 
-          {energy >= 100 ? (
+          {canReflect ? (
              <button 
               onClick={onStartJourney}
               className="w-full bg-slate-900 text-white font-black py-5 rounded-[2rem] shadow-xl shadow-slate-900/20 hover:bg-slate-800 transition-all active:scale-[0.98] flex items-center justify-center space-x-3 group"
@@ -71,7 +72,7 @@ export function HomeTab({
             <div className="flex flex-col items-center">
               <div className="flex items-center space-x-3 bg-slate-50/80 px-5 py-3.5 rounded-2xl border border-slate-100 w-full justify-center">
                 <p className="text-[11px] text-slate-500 leading-relaxed font-bold text-center italic">
-                   &quot;Complete daily tasks to unlock spiritual reflections.&quot;
+                   {energy >= 100 ? "Amazing! Tomorrow morning, you'll unlock a new reflection." : "Complete daily tasks to unlock spiritual reflections."}
                 </p>
               </div>
             </div>

@@ -37,7 +37,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from './auth/useAuth';
 import LoginButton from './auth/LoginButton';
-import { getStreaks } from './api/streaks';
+import { getStreaks, addStreak } from './api/streaks';
 import { addBookmark, getBookmarks } from './api/bookmarks';
 import CatSVG from './components/CatSVG';
 import Onboarding from './components/Onboarding';
@@ -175,7 +175,7 @@ const BottomNavButton = ({ active, onClick, icon: Icon, label }) => (
 );
 
 function MuezzaApp() {
-  const { accessToken } = useAuth();
+  const { accessToken, user, logout } = useAuth();
   const audioPlayerRef = useRef(null);
 
   const [activeTab, setActiveTab] = useState('home');
@@ -205,6 +205,7 @@ function MuezzaApp() {
   const [journeyResult, setJourneyResult] = useState(null);
   const [journeyError, setJourneyError] = useState(null);
   const [pendingWisdom, setPendingWisdom] = useLocalStorage('muezza_pending_wisdom', null);
+  const [pendingReflection, setPendingReflection] = useLocalStorage('muezza_pending_reflection', false);
   const [showHearts, setShowHearts] = useState(false);
 
   const [showAddHabit, setShowAddHabit] = useState(false);
@@ -406,9 +407,29 @@ function MuezzaApp() {
     const syncDayBoundary = () => {
       const today = getTodayKey();
       if (lastResetDate !== today) {
-        // DETECT MISSED DAY: If zero prayers were done yesterday
+        if (lastResetDate) {
+          // Calculate yesterday's energy BEFORE resetting
+          const habitEnergy = habits
+            .filter((habit) => habit.completed)
+            .reduce((sum, habit) => sum + habit.energyReward, 0);
+          const prayerEnergy = prayers
+            .filter((prayer) => prayer.completed)
+            .reduce((sum, prayer) => sum + prayer.energyReward, 0);
+          const energyYesterday = Math.min(habitEnergy + prayerEnergy, 100);
+
+          if (energyYesterday >= 100) {
+            setStreakLocal((current) => current + 1);
+            setPendingReflection(true);
+            if (accessToken) {
+              addStreak(accessToken).catch(() => {});
+            }
+          } else {
+            setStreakLocal(0);
+          }
+        }
+
         const missedAllPrayers = prayers.every((p) => !p.completed);
-        if (missedAllPrayers) {
+        if (missedAllPrayers && lastResetDate) {
           const randomIndex = Math.floor(Math.random() * WISDOM_COLLECTION.length);
           setPendingWisdom(WISDOM_COLLECTION[randomIndex]);
         }
@@ -423,6 +444,7 @@ function MuezzaApp() {
     const intervalId = window.setInterval(syncDayBoundary, 60_000);
     return () => window.clearInterval(intervalId);
   }, [
+    accessToken,
     dinar,
     habits,
     hasCompletedOnboarding,
@@ -797,10 +819,7 @@ function MuezzaApp() {
     setJourneyResult(null);
 
     if (journeyMode === 'daily') {
-      setHabits((currentHabits) => resetHabitProgress(currentHabits));
-      setPrayers((currentPrayers) => resetPrayerProgress(currentPrayers));
-      setStreakLocal((currentStreak) => currentStreak + 1);
-      setLastResetDate(getTodayKey());
+      setPendingReflection(false);
     }
   };
 
@@ -1021,6 +1040,17 @@ function MuezzaApp() {
                 <span className="text-xs font-bold text-slate-500">Streak</span>
                 <span className="text-xs font-black text-emerald-600">⚡ {streakLocal} Days</span>
              </div>
+             <div className="flex items-center justify-between">
+                <span className="text-xs font-bold text-slate-500">Sync</span>
+                {user ? (
+                  <span className="text-[10px] font-black text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-lg border border-emerald-100 flex items-center space-x-1">
+                    <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span>
+                    <span>Connected</span>
+                  </span>
+                ) : (
+                  <span className="text-[10px] font-black text-slate-400 bg-slate-50 px-2 py-0.5 rounded-lg border border-slate-100">Offline</span>
+                )}
+             </div>
           </div>
         </div>
       </aside>
@@ -1030,35 +1060,57 @@ function MuezzaApp() {
         <div className="flex-1 overflow-y-auto scrollbar-hide">
           <div className="w-full max-w-6xl mx-auto min-h-full flex flex-col">
             {/* Top Navigation Bar (Header) */}
-            <header className="flex justify-between items-center px-6 py-6 bg-white/80 backdrop-blur-md z-40 sticky top-0 border-b border-slate-100/50">
-              <div className="flex items-center space-x-4">
+            <header className="flex justify-between items-center px-4 sm:px-6 py-3 sm:py-6 bg-white/80 backdrop-blur-md z-40 sticky top-0 border-b border-slate-100/50">
+              <div className="flex items-center space-x-2 sm:space-x-4">
                 <button
                   onClick={() => setActiveTab('noor')}
-                  className="flex items-center space-x-2.5 px-4 py-2.5 rounded-2xl bg-emerald-50 border border-emerald-100/50 active:scale-95 transition-all group"
+                  className="flex items-center space-x-1.5 sm:space-x-2.5 px-2.5 sm:px-4 py-2 sm:py-2.5 rounded-xl sm:rounded-2xl bg-emerald-50 border border-emerald-100/50 active:scale-95 transition-all group"
                 >
-                  <Zap className={`w-4 h-4 ${streakLocal > 0 ? 'text-amber-500 fill-amber-500 animate-pulse' : 'text-slate-400'}`} />
-                  <div className="text-left">
-                    <span className="block text-[11px] font-black text-emerald-900 leading-none lowercase tracking-tighter">{streakLocal} NOOR STREAK</span>
-                  </div>
+                  <Zap className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${streakLocal > 0 ? 'text-amber-500 fill-amber-500 animate-pulse' : 'text-slate-400'}`} />
+                  <span className="text-[10px] sm:text-[11px] font-black text-emerald-900 leading-none lowercase tracking-tighter">{streakLocal}<span className="hidden sm:inline"> NOOR STREAK</span></span>
                 </button>
 
                 <button 
                   onClick={() => setIsLocationModalOpen(true)}
-                  className="flex items-center space-x-2 bg-slate-50 px-4 py-2.5 rounded-2xl border border-slate-100 shadow-sm active:scale-95 transition-all group"
+                  className="flex items-center space-x-1.5 sm:space-x-2 bg-slate-50 px-2.5 sm:px-4 py-2 sm:py-2.5 rounded-xl sm:rounded-2xl border border-slate-100 shadow-sm active:scale-95 transition-all group"
                 >
                   <MapPin className="w-3.5 h-3.5 text-emerald-600 group-hover:animate-bounce" />
-                  <span className="text-[11px] font-black text-slate-800 tracking-tight">{formatLocationLabel(savedLocation)}</span>
+                  <span className="hidden sm:inline text-[11px] font-black text-slate-800 tracking-tight">{formatLocationLabel(savedLocation)}</span>
                 </button>
               </div>
 
-              <div className="flex items-center space-x-3">
+              <div className="flex items-center space-x-1.5 sm:space-x-3">
                 <div className="hidden sm:flex items-center space-x-2 bg-amber-50/80 px-4 py-2.5 rounded-2xl border border-amber-100 shadow-sm">
                   <span className="text-amber-500 text-sm">🪙</span>
                   <span className="font-mono text-xs font-black text-amber-900 tracking-tighter">{dinar} DINAR</span>
                 </div>
+                {user ? (
+                  <button
+                    onClick={() => setActiveTab('noor')}
+                    className="flex items-center space-x-1.5 sm:space-x-2 px-2 py-1.5 sm:px-4 sm:py-2.5 rounded-xl sm:rounded-2xl bg-emerald-50 border border-emerald-100 shadow-sm active:scale-95 transition-all group"
+                    title={`Synced as ${user.first_name || user.email || 'User'}`}
+                  >
+                    <div className="relative">
+                      <div className="w-6 h-6 sm:w-7 sm:h-7 bg-emerald-600 rounded-full flex items-center justify-center text-white text-[10px] sm:text-xs font-black shadow-sm">
+                        {(user.first_name || user.email || 'U').charAt(0).toUpperCase()}
+                      </div>
+                      <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-emerald-500 rounded-full border-2 border-white"></div>
+                    </div>
+                    <span className="hidden sm:block text-[10px] font-black text-emerald-800 uppercase tracking-wider">Synced</span>
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => setActiveTab('noor')}
+                    className="flex items-center px-2 py-1.5 sm:px-4 sm:py-2.5 rounded-xl sm:rounded-2xl bg-slate-50 border border-slate-100 shadow-sm active:scale-95 transition-all group hover:border-emerald-200"
+                  >
+                    <div className="w-6 h-6 sm:w-7 sm:h-7 bg-slate-200 rounded-full flex items-center justify-center">
+                      <CloudOff className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-slate-400" />
+                    </div>
+                  </button>
+                )}
                 <button 
                   onClick={() => setShowInfoModal(true)}
-                  className="p-3 rounded-2xl bg-white border border-slate-100 text-slate-400 hover:text-emerald-600 hover:border-emerald-200 transition-all shadow-sm"
+                  className="hidden sm:flex p-3 rounded-2xl bg-white border border-slate-100 text-slate-400 hover:text-emerald-600 hover:border-emerald-200 transition-all shadow-sm"
                 >
                   <Info className="w-5 h-5" />
                 </button>
@@ -1069,6 +1121,7 @@ function MuezzaApp() {
           {activeTab === 'home' && (
             <HomeTab 
               energy={energy}
+              canReflect={pendingReflection}
               prayers={prayers}
               habits={habits}
               onPet={handlePetCat}
@@ -1125,11 +1178,13 @@ function MuezzaApp() {
           {activeTab === 'noor' && (
             <NoorTab 
               streak={streakLocal}
-              user={accessToken ? { name: "Warrior" } : null}
+              user={user}
               onRefresh={() => {}} 
               isSyncing={false}
               bookmarks={userBookmarks}
               onOpenSurahByBookmark={(bm) => openSurah({ id: bm.surah_id, name_simple: bm.surah_name })}
+              onLogout={logout}
+              onLogin={() => {}}
             />
           )}
 

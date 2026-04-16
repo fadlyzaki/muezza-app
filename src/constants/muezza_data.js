@@ -61,6 +61,10 @@ export const SHOP_ITEMS = [
   { id: 'kufi_green', name: 'Emerald Kufi', price: 100, type: 'hat', icon: '🧢', desc: 'Keep Muezza looking sharp.' },
   { id: 'glasses_smart', name: 'Scholarly Glasses', price: 150, type: 'accessory', icon: '👓', desc: 'For deep Tafsir reading.' },
   { id: 'turban_cream', name: 'Cream Turban', price: 160, type: 'hat', icon: '🤍', desc: 'A classic wrap for a scholarly look.' },
+  { id: 'tasbih_amber', name: 'Amber Tasbih', price: 120, type: 'accessory', icon: '📿', desc: 'A string of amber prayer beads for dhikr.' },
+  { id: 'scarf_sky', name: 'Sky Scarf', price: 140, type: 'accessory', icon: '🧣', desc: 'A light blue scarf for a refined look.' },
+  { id: 'sunglasses_rose', name: 'Rose Sunglasses', price: 180, type: 'accessory', icon: '🕶️', desc: 'Stylish rose-tinted shades.' },
+  { id: 'bow_lilac', name: 'Lilac Bow', price: 90, type: 'accessory', icon: '🎀', desc: 'A dainty lilac bow for the ear.' },
   { id: 'lantern_gold', name: 'Golden Fanoos', price: 200, type: 'decor', icon: '🏮', desc: 'Illuminates the room.' },
   { id: 'sajjadah_midnight', name: 'Midnight Sajjadah', price: 220, type: 'rug', icon: '🌌', desc: 'A deep-blue rug with moonlit accents.' },
   
