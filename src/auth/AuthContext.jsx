@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { generateRandomString, generateCodeChallenge } from './pkce';
 import { AuthContext } from './auth-context';
 import { getQuranAuthBaseUrl } from '../lib/quranFoundation';
+import { decodeJwtPayload } from './jwt';
 
 export function AuthProvider({ children }) {
   const [accessToken, setAccessToken] = useState(() => localStorage.getItem('qf_access_token'));
@@ -10,7 +11,7 @@ export function AuthProvider({ children }) {
     if (!idToken) return null;
 
     try {
-      return JSON.parse(atob(idToken.split('.')[1]));
+      return decodeJwtPayload(idToken);
     } catch (error) {
       console.error('Failed to parse id_token', error);
       return null;
@@ -43,7 +44,7 @@ export function AuthProvider({ children }) {
     authUrl.searchParams.append('nonce', nonce);
     authUrl.searchParams.append('code_challenge', codeChallenge);
     authUrl.searchParams.append('code_challenge_method', 'S256');
-    authUrl.searchParams.append('scope', 'openid offline_access user collection');
+    authUrl.searchParams.append('scope', 'openid offline_access user bookmark collection streak activity_day');
 
     window.location.href = authUrl.toString();
   };

@@ -1,15 +1,26 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useAuth } from './useAuth';
+import { decodeJwtPayload } from './jwt';
+
+const CALLBACK_CODE_PREFIX = 'qf_callback_code_status:';
 
 export default function Callback() {
   const { setAccessToken, setUser } = useAuth();
   const [error, setError] = useState(null);
+  const hasProcessedCallbackRef = useRef(false);
 
   useEffect(() => {
     const processCallback = async () => {
+      if (hasProcessedCallbackRef.current) {
+        return;
+      }
+
+      hasProcessedCallbackRef.current = true;
+
       const urlParams = new URLSearchParams(window.location.search);
       const code = urlParams.get('code');
       const state = urlParams.get('state');
+      const callbackStatusKey = code ? `${CALLBACK_CODE_PREFIX}${code}` : null;
       
       const savedState = localStorage.getItem('oauth_state');
       const codeVerifier = localStorage.getItem('pkce_code_verifier');
@@ -18,6 +29,21 @@ export default function Callback() {
         setError('Invalid state or missing auth code parameter.');
         return;
       }
+
+      if (!codeVerifier) {
+        setError('Missing sign-in verifier. Please return to the app and sign in again.');
+        return;
+      }
+
+      if (callbackStatusKey && sessionStorage.getItem(callbackStatusKey)) {
+        setError('This sign-in link was already used. Please return to the app and sign in again.');
+        return;
+      }
+
+      if (callbackStatusKey) {
+        sessionStorage.setItem(callbackStatusKey, 'processing');
+      }
+      window.history.replaceState(null, '', '/callback');
 
       try {
         const res = await fetch('/api/token', {
@@ -33,26 +59,30 @@ export default function Callback() {
 
         const data = await res.json();
         
-        if (!res.ok) throw new Error(data.error || 'Token exchange failed. Please try again.');
+        if (!res.ok) {
+          throw new Error(data.error_description || data.error || 'Token exchange failed. Please try again.');
+        }
+        if (!data.access_token) throw new Error('Token exchange did not return an access token.');
 
-        localStorage.setItem('qf_access_token', data.access_token);
+        let userPayload = null;
         if (data.id_token) {
-          localStorage.setItem('qf_id_token', data.id_token);
-          const payload = JSON.parse(atob(data.id_token.split('.')[1]));
+          userPayload = decodeJwtPayload(data.id_token);
           
           // Verify nonce if it was stored
           const savedNonce = localStorage.getItem('oauth_nonce');
-          if (savedNonce && payload.nonce !== savedNonce) {
+          if (savedNonce && userPayload.nonce !== savedNonce) {
             throw new Error('Identity verification failed (nonce mismatch).');
           }
-          
-          setUser(payload);
         }
+
+        localStorage.setItem('qf_access_token', data.access_token);
+        if (data.id_token) localStorage.setItem('qf_id_token', data.id_token);
         if (data.refresh_token) {
            localStorage.setItem('qf_refresh_token', data.refresh_token);
         }
         
         setAccessToken(data.access_token);
+        setUser(userPayload);
         
         // Clean up
         localStorage.removeItem('oauth_state');

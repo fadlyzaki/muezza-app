@@ -2,27 +2,63 @@ let cachedToken = null;
 let cachedTokenExpiry = 0;
 let cachedTafsirId = null;
 
-function inferEnvironment(authBase) {
-  return authBase.includes('prelive') ? 'prelive' : 'production';
+const PRELIVE_AUTH_BASE_URL = 'https://prelive-oauth2.quran.foundation';
+const PRODUCTION_AUTH_BASE_URL = 'https://oauth2.quran.foundation';
+const PRELIVE_USER_API_BASE_URL = 'https://apis-prelive.quran.foundation';
+const PRODUCTION_USER_API_BASE_URL = 'https://apis.quran.foundation';
+
+function inferQuranEnvironment() {
+  if (process.env.QF_ENV || process.env.VITE_QF_ENV) {
+    return process.env.QF_ENV || process.env.VITE_QF_ENV;
+  }
+
+  const configuredBase =
+    process.env.QF_AUTH_BASE ||
+    process.env.VITE_QURAN_AUTH_BASE ||
+    process.env.QF_USER_API_BASE ||
+    process.env.VITE_QURAN_USER_API_BASE ||
+    process.env.VITE_QURAN_API_BASE ||
+    '';
+
+  return configuredBase.includes('prelive') ? 'prelive' : 'production';
+}
+
+function resolveAuthBaseUrl(env) {
+  if (process.env.QF_AUTH_BASE || process.env.VITE_QURAN_AUTH_BASE) {
+    return process.env.QF_AUTH_BASE || process.env.VITE_QURAN_AUTH_BASE;
+  }
+
+  if (process.env.VITE_QURAN_API_BASE?.includes('oauth2.quran.foundation')) {
+    return process.env.VITE_QURAN_API_BASE;
+  }
+
+  return env === 'prelive' ? PRELIVE_AUTH_BASE_URL : PRODUCTION_AUTH_BASE_URL;
+}
+
+function resolveUserApiBaseUrl(env) {
+  if (process.env.QF_USER_API_BASE || process.env.VITE_QURAN_USER_API_BASE) {
+    return process.env.QF_USER_API_BASE || process.env.VITE_QURAN_USER_API_BASE;
+  }
+
+  if (process.env.VITE_QURAN_API_BASE) {
+    if (process.env.VITE_QURAN_API_BASE.includes('apis')) {
+      return process.env.VITE_QURAN_API_BASE;
+    }
+
+    if (process.env.VITE_QURAN_API_BASE.includes('oauth2.quran.foundation')) {
+      return process.env.VITE_QURAN_API_BASE.includes('prelive')
+        ? PRELIVE_USER_API_BASE_URL
+        : PRODUCTION_USER_API_BASE_URL;
+    }
+  }
+
+  return env === 'prelive' ? PRELIVE_USER_API_BASE_URL : PRODUCTION_USER_API_BASE_URL;
 }
 
 export function getQuranFoundationConfig() {
-  const env = process.env.QF_ENV || process.env.VITE_QF_ENV || 'production';
-  const isPreLive = env === 'prelive';
-
-  const authBaseUrl =
-    process.env.QF_AUTH_BASE ||
-    process.env.VITE_QURAN_AUTH_BASE ||
-    (isPreLive
-      ? 'https://prelive-oauth2.quran.foundation'
-      : 'https://oauth2.quran.foundation');
-
-  const apiBaseUrl =
-    process.env.QF_USER_API_BASE ||
-    process.env.VITE_QURAN_USER_API_BASE ||
-    (isPreLive
-      ? 'https://apis-prelive.quran.foundation'
-      : 'https://apis.quran.foundation');
+  const env = inferQuranEnvironment();
+  const authBaseUrl = resolveAuthBaseUrl(env);
+  const apiBaseUrl = resolveUserApiBaseUrl(env);
 
   // Client ID can be shared between frontend/backend
   const clientId = process.env.QF_CLIENT_ID || process.env.VITE_QURAN_CLIENT_ID;

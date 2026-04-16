@@ -301,8 +301,8 @@ function MuezzaApp() {
         getBookmarks(accessToken),
       ]);
 
-      if (streaksData?.streak) {
-        setStreakServer(streaksData.streak);
+      if (Number.isFinite(streaksData)) {
+        setStreakServer(streaksData);
       } else {
         setStreakServer(null);
       }
@@ -926,7 +926,15 @@ function MuezzaApp() {
 
     const success = await addBookmark(accessToken, verse.verse_key);
     if (success) {
-      setUserBookmarks((currentBookmarks) => [...currentBookmarks, { verse_key: verse.verse_key }]);
+      const [surahId] = verse.verse_key.split(':').map(Number);
+      setUserBookmarks((currentBookmarks) => [
+        ...currentBookmarks,
+        {
+          verse_key: verse.verse_key,
+          surah_id: selectedSurah?.id || surahId,
+          surah_name: selectedSurah?.name_simple || (surahId ? `Surah ${surahId}` : 'Saved Ayah'),
+        },
+      ]);
     }
   };
 

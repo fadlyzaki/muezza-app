@@ -1,12 +1,51 @@
 import { getQuranUserApiBaseUrl } from '../lib/quranFoundation';
 
 const API_BASE = `${getQuranUserApiBaseUrl()}/auth/v1`;
+const MUSHAF_ID = 4;
 
 function normalizeBookmarksResponse(payload) {
-  if (Array.isArray(payload)) return payload;
-  if (Array.isArray(payload?.bookmarks)) return payload.bookmarks;
-  if (Array.isArray(payload?.data)) return payload.data;
-  return [];
+  const bookmarks = Array.isArray(payload)
+    ? payload
+    : payload?.bookmarks || payload?.data || [];
+
+  if (!Array.isArray(bookmarks)) return [];
+
+  return bookmarks
+    .map(normalizeBookmark)
+    .filter((bookmark) => bookmark.verse_key);
+}
+
+function normalizeBookmark(bookmark) {
+  const surahId = Number(
+    bookmark?.surah_id ||
+    bookmark?.surahId ||
+    bookmark?.chapter_id ||
+    bookmark?.chapterId ||
+    bookmark?.key,
+  );
+  const ayahNumber = Number(
+    bookmark?.ayah_number ||
+    bookmark?.ayahNumber ||
+    bookmark?.verse_number ||
+    bookmark?.verseNumber,
+  );
+  const verseKey =
+    bookmark?.verse_key ||
+    bookmark?.verseKey ||
+    bookmark?.ayah_key ||
+    (surahId && ayahNumber ? `${surahId}:${ayahNumber}` : null);
+
+  return {
+    ...bookmark,
+    verse_key: verseKey,
+    surah_id: surahId || bookmark?.surah_id,
+    surah_name:
+      bookmark?.surah_name ||
+      bookmark?.surahName ||
+      bookmark?.chapter_name ||
+      bookmark?.chapterName ||
+      (surahId ? `Surah ${surahId}` : 'Saved Ayah'),
+  };
 }
 
 export async function getBookmarks(accessToken) {
@@ -14,7 +53,12 @@ export async function getBookmarks(accessToken) {
   if (!accessToken || !clientId) return [];
   
   try {
-    const res = await fetch(`${API_BASE}/bookmarks`, {
+    const url = new URL(`${API_BASE}/bookmarks`);
+    url.searchParams.set('type', 'ayah');
+    url.searchParams.set('mushafId', String(MUSHAF_ID));
+    url.searchParams.set('first', '20');
+
+    const res = await fetch(url.toString(), {
       headers: {
         'x-auth-token': accessToken,
         'x-client-id': clientId
@@ -23,8 +67,10 @@ export async function getBookmarks(accessToken) {
     if (res.status === 401 || res.status === 403) {
       window.dispatchEvent(new CustomEvent('qf_unauthorized'));
     }
-    if (!res.ok) throw new Error('Failed to fetch bookmarks');
     const data = await res.json();
+    if (!res.ok) {
+      throw new Error(data?.message || data?.error || 'Failed to fetch bookmarks');
+    }
     return normalizeBookmarksResponse(data);
   } catch (error) {
     console.error("Error fetching bookmarks:", error);
@@ -55,7 +101,8 @@ export async function addBookmark(accessToken, verseKey) {
        body: JSON.stringify({ 
          type: 'ayah',
          key: surahNum,
-         verseNumber: ayahNum
+         verseNumber: ayahNum,
+         mushaf: MUSHAF_ID
        })
      });
      if (res.status === 401 || res.status === 403) {

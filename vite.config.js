@@ -1,6 +1,31 @@
 import { defineConfig, loadEnv } from 'vite'
+import { Buffer } from 'node:buffer'
+import process from 'node:process'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
+
+const PRELIVE_AUTH_BASE_URL = 'https://prelive-oauth2.quran.foundation';
+const PRODUCTION_AUTH_BASE_URL = 'https://oauth2.quran.foundation';
+
+function getLocalQuranAuthBaseUrl(env) {
+  if (env.VITE_QURAN_AUTH_BASE) {
+    return env.VITE_QURAN_AUTH_BASE;
+  }
+
+  if (env.VITE_QURAN_API_BASE?.includes('oauth2.quran.foundation')) {
+    return env.VITE_QURAN_API_BASE;
+  }
+
+  const inferredEnv =
+    env.VITE_QF_ENV ||
+    ([
+      env.VITE_QURAN_AUTH_BASE,
+      env.VITE_QURAN_USER_API_BASE,
+      env.VITE_QURAN_API_BASE,
+    ].some((value) => value?.includes('prelive')) ? 'prelive' : 'production');
+
+  return inferredEnv === 'prelive' ? PRELIVE_AUTH_BASE_URL : PRODUCTION_AUTH_BASE_URL;
+}
 
 // Middleware to mock the Vercel Serverless Function locally
 const localTokenApiPlugin = () => ({
@@ -15,7 +40,7 @@ const localTokenApiPlugin = () => ({
             const data = JSON.parse(body);
             // Load variables from .env.local natively
             const env = loadEnv('', process.cwd(), '');
-            const authBaseUrl = env.VITE_QURAN_AUTH_BASE || env.VITE_QURAN_API_BASE || 'https://oauth2.quran.foundation';
+            const authBaseUrl = getLocalQuranAuthBaseUrl(env);
             const clientId = env.VITE_QURAN_CLIENT_ID;
             const clientSecret = env.QURAN_CLIENT_SECRET;
             
@@ -35,7 +60,6 @@ const localTokenApiPlugin = () => ({
               }),
             });
             const payload = await tokenResponse.json();
-            console.log("QURAN FOUNDATION TOKEN EXCHANGE PAYLOAD:", payload);
             
             res.setHeader('Content-Type', 'application/json');
             res.statusCode = tokenResponse.status;
