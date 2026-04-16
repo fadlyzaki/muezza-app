@@ -752,18 +752,16 @@ function MuezzaApp() {
         };
         return [...currentHabits, bonusHabit];
       });
-      
-      // Auto-remove the temporary sustenance habit after energy calculation?
-      // Actually, adding it to habits ensures it's counted in the useMemo 'energy'.
-      // But we don't want a long list of "Consumed" items.
-      // Better way: Adjust energy calculation or use a separate state?
-      // Let's use a simpler one-time 'bonusEnergy' state that decays or resets daily.
     } else {
       // PERMANENT EQUIPMENT
       if (!inventory.includes(item.id)) {
         setDinar((currentDinar) => currentDinar - item.price);
-        setInventory([...inventory, item.id]);
       }
+    }
+    
+    // Always add to inventory to unlock the permanent visual decoration in CatSVG
+    if (!inventory.includes(item.id)) {
+      setInventory((prev) => [...prev, item.id]);
     }
   };
 

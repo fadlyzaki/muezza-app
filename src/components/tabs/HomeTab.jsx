@@ -1,5 +1,5 @@
 import React from 'react';
-import { Sparkles, MapPin, Search, CheckCircle2, Circle, Pencil, Plus, Trash2, X, Activity, ArrowRight } from 'lucide-react';
+import { Sparkles, MapPin, Search, CheckCircle2, Circle, Pencil, Plus, Trash2, X, Activity, ArrowRight, BookOpen } from 'lucide-react';
 import CatSVG from '../CatSVG';
 import { PRAYER_ICONS } from '../../constants/muezza_data';
 

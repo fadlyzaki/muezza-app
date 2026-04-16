@@ -85,6 +85,73 @@ const CatSVG = ({ awake, equipped, isPetting, onPet, stage = 'adult', className 
           </g>
         )}
 
+        {/* Consumable Sustenance Decorations */}
+        {equipped?.includes('zamzam_water') && (
+          <g transform="translate(130, 130)">
+            {/* Clay Cup */}
+            <path d="M0 0 Q5 15 15 15 Q25 15 30 0 Z" fill="#d4a373" />
+            {/* Water inside */}
+            <ellipse cx="15" cy="0" rx="15" ry="4" fill="#48cae4" />
+            <path d="M2 0 Q15 6 28 0" stroke="#0077b6" strokeWidth="1" fill="none" opacity="0.5" />
+            <circle cx="15" cy="-8" r="2" fill="#ade8f4" className="animate-ping" style={{ animationDuration: '3s' }} />
+          </g>
+        )}
+        
+        {equipped?.includes('fish_bosphorus') && (
+          <g transform="translate(100, 138)">
+            {/* Anchovy Fish Body */}
+            <path d="M5 2 Q10 -2 15 2 Q22 6 25 2 L28 0 L26 5 L28 9 L24 4 Q15 10 5 2 Q0 -2 5 2 Z" fill="#94a3b8" />
+            {/* Fish Eye */}
+            <circle cx="8" cy="2" r="1.5" fill="#1e293b" />
+          </g>
+        )}
+
+        {equipped?.includes('meat_halal') && (
+          <g transform="translate(68, 135)">
+            {/* Bone */}
+            <path d="M5 10 L15 2" stroke="#fff1e6" strokeWidth="4" strokeLinecap="round" />
+            <circle cx="15" cy="0" r="3" fill="#fff1e6" />
+            <circle cx="18" cy="3" r="3" fill="#fff1e6" />
+            {/* Meat */}
+            <path d="M0 5 Q-5 15 5 18 Q15 15 10 5 Z" fill="#e07a5f" />
+          </g>
+        )}
+
+        {equipped?.includes('milk_camel') && (
+          <g transform="translate(35, 132)">
+            {/* Brass Bowl */}
+            <path d="M0 0 Q5 12 15 12 Q25 12 30 0 Z" fill="#e9c46a" />
+            {/* Milk inside */}
+            <ellipse cx="15" cy="0" rx="15" ry="3.5" fill="#fdfcdc" />
+            {/* Bubble */}
+            <circle cx="10" cy="1" r="1.5" fill="#ffffff" />
+            <circle cx="20" cy="0" r="1" fill="#ffffff" />
+          </g>
+        )}
+
+        {equipped?.includes('catnip_madinah') && (
+          <g transform="translate(115, 142)">
+            {/* Catnip Herbs */}
+            <path d="M10 5 Q5 0 0 5 Q5 10 10 5 Z" fill="#2a9d8f" transform="rotate(-30 5 5)" />
+            <path d="M10 5 Q5 0 0 5 Q5 10 10 5 Z" fill="#40916c" transform="rotate(30 5 5)" />
+            <path d="M10 5 Q5 0 0 5 Q5 10 10 5 Z" fill="#52b788" transform="rotate(-10 5 5)" />
+          </g>
+        )}
+
+        {equipped?.includes('olives_green') && (
+          <g transform="translate(80, 145)">
+            {/* Little wooden cup */}
+            <path d="M0 0 Q5 8 10 8 Q15 8 20 0 Z" fill="#8b5a2b" />
+            {/* Olives */}
+            <ellipse cx="6" cy="0" rx="3" ry="4" fill="#a5be00" transform="rotate(-20 6 0)" />
+            <circle cx="6" cy="0" r="1" fill="#e63946" /> {/* Pimento */}
+            <ellipse cx="14" cy="1" rx="3" ry="4" fill="#a5be00" transform="rotate(20 14 1)" />
+            <circle cx="14" cy="1" r="1" fill="#e63946" />
+            <ellipse cx="10" cy="-2" rx="3" ry="4" fill="#a5be00" />
+            <circle cx="10" cy="-2" r="1" fill="#e63946" />
+          </g>
+        )}
+
         {/* Face */}
         {awake ? (
           <>

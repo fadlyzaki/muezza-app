@@ -69,10 +69,13 @@ export const SHOP_ITEMS = [
   { id: 'sajjadah_midnight', name: 'Midnight Sajjadah', price: 220, type: 'rug', icon: '🌌', desc: 'A deep-blue rug with moonlit accents.' },
   
   // Food & Sustenance
-  { id: 'dates_ajwa', name: 'Ajwa Dates', price: 30, type: 'food', icon: '🌴', desc: 'Sun-ripened dates from Madinah.' },
-  { id: 'zamzam_water', name: 'Zamzam Water', price: 45, type: 'food', icon: '💧', desc: 'Sacred water for spiritual vitality.' },
-  { id: 'honey_sidr', name: 'Yemeni Honey', price: 80, type: 'food', icon: '🍯', desc: 'Pure Sidr honey for energy restoration.' },
-  { id: 'milk_camel', name: 'Camel Milk', price: 50, type: 'food', icon: '🥛', desc: 'Fresh, nutrient-rich desert milk.' },
+  // Food & Sustenance
+  { id: 'zamzam_water', name: 'Zamzam Water', price: 45, type: 'food', icon: '💧', desc: 'Sacred water from Makkah to keep Muezza hydrated.' },
+  { id: 'milk_camel', name: 'Camel Milk', price: 50, type: 'food', icon: '🥛', desc: 'Fresh desert milk, exactly how traditional cats like it.' },
+  { id: 'fish_bosphorus', name: 'Bosphorus Anchovy', price: 65, type: 'food', icon: '🐟', desc: 'A fresh catch favored by the beloved street cats of Istanbul.' },
+  { id: 'meat_halal', name: 'Halal Chicken Cut', price: 80, type: 'food', icon: '🍗', desc: 'Premium halal-certified poultry for your carnivorous friend.' },
+  { id: 'catnip_madinah', name: 'Madinah Catnip', price: 30, type: 'food', icon: '🌿', desc: 'A natural, soothing herb grown in the blessed city.' },
+  { id: 'olives_green', name: 'Blessed Olives', price: 40, type: 'food', icon: '🫒', desc: 'From a blessed tree. Cats famously go crazy for their scent!' },
 ];
 
 export const DAILY_INSIGHTS = [
