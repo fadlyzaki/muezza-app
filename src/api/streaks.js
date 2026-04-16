@@ -9,7 +9,7 @@ export async function getStreaks(accessToken) {
   try {
     const res = await fetch(`${API_BASE}/streaks`, {
       headers: {
-        'x-auth-token': accessToken,
+        'Authorization': `Bearer ${accessToken}`,
         'x-client-id': clientId
       }
     });

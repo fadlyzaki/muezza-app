@@ -16,7 +16,7 @@ export async function getBookmarks(accessToken) {
   try {
     const res = await fetch(`${API_BASE}/bookmarks`, {
       headers: {
-        'x-auth-token': accessToken,
+        'Authorization': `Bearer ${accessToken}`,
         'x-client-id': clientId
       }
     });
@@ -38,7 +38,7 @@ export async function addBookmark(accessToken, verseKey) {
        method: 'POST',
        headers: {
          'Content-Type': 'application/json',
-         'x-auth-token': accessToken,
+         'Authorization': `Bearer ${accessToken}`,
          'x-client-id': clientId
        },
        // Adjust payload per specific Quran.com API signature
