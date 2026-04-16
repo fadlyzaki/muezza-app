@@ -3,7 +3,7 @@ import { Sparkles, MessageSquare, Quote, BookOpen, Star, Heart, History, Trendin
 import CatSVG from '../CatSVG';
 import { ADVISOR_MOODS, MOOD_RESPONSES } from '../../constants/muezza_data';
 
-export function AdvisorTab({ onSeekAdvice, adviceResult, isThinking, onResetAdvice, inventory, catStage }) {
+export function AdvisorTab({ onSeekAdvice, adviceResult, isThinking, onResetAdvice, inventory, catStage, advisorLogs = [] }) {
   const [selectedMood, setSelectedMood] = useState(null);
 
   return (
@@ -173,24 +173,27 @@ export function AdvisorTab({ onSeekAdvice, adviceResult, isThinking, onResetAdvi
                </div>
             </div>
 
-            {selectedMood && (
-              <div className="bg-white rounded-2xl sm:rounded-[2.5rem] p-4 sm:p-6 border border-emerald-100 shadow-sm flex items-center justify-between animate-in zoom-in duration-300">
-                <div className="flex items-center space-x-3 sm:space-x-4">
-                    <div className="p-2.5 sm:p-3 bg-emerald-50 rounded-xl sm:rounded-2xl">
-                       <History className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-600" />
-                    </div>
-                    <div>
-                      <p className="text-[9px] sm:text-[10px] font-black text-emerald-500 uppercase tracking-widest mb-0.5 sm:mb-1">Emotion Logged</p>
-                      <p className="text-xs sm:text-sm font-black text-slate-800 uppercase tracking-tight">
-                        {ADVISOR_MOODS.find(m => m.id === selectedMood)?.label}
-                      </p>
-                    </div>
+            {advisorLogs.map((log) => {
+              const mood = ADVISOR_MOODS.find(m => m.id === log.moodId);
+              return (
+                <div key={log.id} className="bg-white rounded-2xl sm:rounded-[2.5rem] p-4 sm:p-6 border border-slate-100 shadow-sm flex items-center justify-between animate-in slide-in-from-right-4 duration-300">
+                  <div className="flex items-center space-x-3 sm:space-x-4">
+                      <div className="p-2.5 sm:p-3 bg-slate-50 rounded-xl sm:rounded-2xl">
+                         <History className="w-4 h-4 sm:w-5 sm:h-5 text-slate-400" />
+                      </div>
+                      <div>
+                        <p className="text-[9px] sm:text-[10px] font-black text-slate-400 uppercase tracking-widest mb-0.5 sm:mb-1">Session Logged</p>
+                        <p className="text-xs sm:text-sm font-black text-slate-800 uppercase tracking-tight">
+                          {mood?.label || 'Reflected'}
+                        </p>
+                      </div>
+                  </div>
+                  <div className="px-3 sm:px-4 py-1.5 sm:py-2 bg-slate-50 text-slate-400 rounded-lg sm:rounded-xl text-[8px] sm:text-[9px] font-black uppercase tracking-widest">
+                     {new Date(log.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                  </div>
                 </div>
-                <div className="px-3 sm:px-4 py-1.5 sm:py-2 bg-emerald-600 text-white rounded-lg sm:rounded-xl text-[8px] sm:text-[9px] font-black uppercase tracking-widest shadow-lg shadow-emerald-500/20">
-                   Buffered
-                </div>
-              </div>
-            )}
+              );
+            })}
           </div>
       </div>
     </div>

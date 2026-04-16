@@ -235,7 +235,7 @@ export function HomeTab({
                   </h4>
                 </div>
               </div>
-              <div className="flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
+              <div className="flex items-center space-x-1 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
                 <button
                   onClick={() => onEditHabit(habit)}
                   className="p-2.5 text-slate-400 hover:text-emerald-600 transition-colors bg-slate-50 rounded-xl border border-slate-100"

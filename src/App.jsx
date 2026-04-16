@@ -237,6 +237,7 @@ function MuezzaApp() {
   // Advisor States
   const [adviceResult, setAdviceResult] = useState(null);
   const [isAdvisorThinking, setIsAdvisorThinking] = useState(false);
+  const [advisorLogs, setAdvisorLogs] = useLocalStorage('muezza_advisor_logs', []);
 
   // Cat Evolution Stage
   const catStage = useMemo(() => {
@@ -832,6 +833,12 @@ function MuezzaApp() {
   const handleSeekAdvice = (moodId) => {
     setIsAdvisorThinking(true);
     setAdviceResult(null);
+
+    setAdvisorLogs((prev) => [
+      { id: Date.now(), moodId, timestamp: new Date().toISOString() },
+      ...prev
+    ].slice(0, 10));
+
     setTimeout(() => {
       setAdviceResult(MOOD_RESPONSES[moodId] || MOOD_RESPONSES.grateful);
       setIsAdvisorThinking(false);
@@ -1211,6 +1218,7 @@ function MuezzaApp() {
               onResetAdvice={resetAdvice}
               inventory={inventory}
               catStage={streakLocal >= 30 ? 'majestic' : streakLocal >= 7 ? 'adult' : 'kitten'}
+              advisorLogs={advisorLogs}
             />
           )}
             </main>

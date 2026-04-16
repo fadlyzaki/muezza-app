@@ -28,6 +28,7 @@ Muezza is a high-fidelity digital companion designed to transmute abstract spiri
 *   **Cloud Boundary**: Transactional synchronization of **Bookmarks** and **Noor Streaks**, ensuring spiritual continuity across any device.
 
 ### III. The Habit Engine
+*   **Deep-Linked Foundations**: Quran translation/reading habits are natively injected in onboarding and feature contextual bridges to jump directly to the user's latest synced Ayah.
 *   **Energy Memoization**: A derived reactive state aggregating 5 obligatory prayers and customizable Sunnah/Niyyah checklists into a 0–100% daily energy state.
 *   **Evolution Logic**: Visual pet aging (Kitten → Adult → Majestic) computationally derived from historical streak length retrieved from the QF Streaks API.
 
@@ -37,11 +38,11 @@ Muezza is a high-fidelity digital companion designed to transmute abstract spiri
 
 Muezza operates on a continuous, self-reinforcing grounding loop:
 
-1.  **Check-in**: System initializes state, resetting daily energy and surfacing contextual prayer timings. If a missed day is detected, the **Niyyah Protocol** triggers a Morning Reflection (Daily Wisdom).
+1.  **Check-in & Compassion**: System initializes state, surfacing contextual prayer timings. If a missed day is detected, the protocol triggers a **Morning Reflection** (compassionate delay); if energy hits 100%, it yields **Muezza's Counsel** (positive reinforcement).
 2.  **Convergence**: The user completes obligatory and sunnah tasks, yielding **Dinar** (virtual currency) and filling the global energy gauge.
-3.  **Immersion**: Native Quran Reader allows for deep reading, audio streaming, and "Ask Muezza" (Tafsir Insight) interactions.
+3.  **Immersion**: Native Quran Reader allows for deep reading, audio streaming, and "Ask Muezza" (Tafsir Insight) interactions seamlessly linked from the Home Tab.
 4.  **Preservation**: Bookmarks and Streaks are committed to the Quran Foundation cloud, hardening the user's spiritual profile.
-5.  **Delight**: Dinar is liquidated in the **Souq** to acquire equippable SVG assets for the mascot character.
+5.  **Delight**: Dinar is liquidated in the **Bifurcated Souq** to acquire permanent *Spiritual Equipment* or infinitely refillable *Sustenance* (biologically-accurate feline treats rooted in Islamic lore).
 
 ---
 
