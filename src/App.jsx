@@ -205,7 +205,6 @@ function MuezzaApp() {
   const [journeyResult, setJourneyResult] = useState(null);
   const [journeyError, setJourneyError] = useState(null);
   const [pendingWisdom, setPendingWisdom] = useLocalStorage('muezza_pending_wisdom', null);
-  const [pendingReflection, setPendingReflection] = useLocalStorage('muezza_pending_reflection', false);
   const [showHearts, setShowHearts] = useState(false);
 
   const [showAddHabit, setShowAddHabit] = useState(false);
@@ -419,7 +418,6 @@ function MuezzaApp() {
 
           if (energyYesterday >= 100) {
             setStreakLocal((current) => current + 1);
-            setPendingReflection(true);
             if (accessToken) {
               addStreak(accessToken).catch(() => {});
             }
@@ -814,13 +812,23 @@ function MuezzaApp() {
     }
   };
 
+  const startMorningReflection = () => {
+    if (pendingWisdom) {
+      setJourneyMode('reflection');
+      setJourneyError(null);
+      setJourneyResult({
+        verse: pendingWisdom.text, // WISDOM_COLLECTION format
+        reference: pendingWisdom.source,
+        tafsir: "Muezza senses your absence. Even in silence, the path remains open. Begin again today."
+      });
+      setIsJourneying(true);
+      setPendingWisdom(null);
+    }
+  };
+
   const completeJourney = () => {
     setJourneyError(null);
     setJourneyResult(null);
-
-    if (journeyMode === 'daily') {
-      setPendingReflection(false);
-    }
   };
 
   const handleSeekAdvice = (moodId) => {
@@ -1121,7 +1129,8 @@ function MuezzaApp() {
           {activeTab === 'home' && (
             <HomeTab 
               energy={energy}
-              canReflect={pendingReflection}
+              pendingWisdom={!!pendingWisdom}
+              onStartMorningReflection={startMorningReflection}
               prayers={prayers}
               habits={habits}
               onPet={handlePetCat}
@@ -1137,6 +1146,14 @@ function MuezzaApp() {
               onStartJourney={startJourney}
               onOpenInfoModal={() => setShowInfoModal(true)}
               prayerTimes={prayerTimes}
+              onOpenQuran={() => {
+                setActiveTab('quran');
+                if (userBookmarks && userBookmarks.length > 0) {
+                  setTimeout(() => {
+                    openSurah({ id: userBookmarks[0].surah_id, name_simple: userBookmarks[0].surah_name });
+                  }, 100);
+                }
+              }}
             />
           )}
 

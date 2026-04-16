@@ -5,7 +5,8 @@ import { PRAYER_ICONS } from '../../constants/muezza_data';
 
 export function HomeTab({ 
   energy, 
-  canReflect,
+  pendingWisdom,
+  onStartMorningReflection,
   prayers, 
   habits, 
   onPet,
@@ -20,7 +21,8 @@ export function HomeTab({
   onAddHabitClick,
   onStartJourney,
   onOpenInfoModal,
-  prayerTimes
+  prayerTimes,
+  onOpenQuran
 }) {
   return (
     <div className="px-6 py-6 pb-32 animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -59,24 +61,35 @@ export function HomeTab({
             </div>
           </div>
 
-          {canReflect ? (
-             <button 
-              onClick={onStartJourney}
-              className="w-full bg-slate-900 text-white font-black py-5 rounded-[2rem] shadow-xl shadow-slate-900/20 hover:bg-slate-800 transition-all active:scale-[0.98] flex items-center justify-center space-x-3 group"
-             >
-                <Sparkles className="w-5 h-5 text-amber-400 animate-pulse" />
-                <span className="text-lg tracking-tight">Morning Reflection</span>
-                <ArrowRight className="w-5 h-5 group-hover:translate-x-1.5 transition-transform" />
-             </button>
-          ) : (
-            <div className="flex flex-col items-center">
-              <div className="flex items-center space-x-3 bg-slate-50/80 px-5 py-3.5 rounded-2xl border border-slate-100 w-full justify-center">
-                <p className="text-[11px] text-slate-500 leading-relaxed font-bold text-center italic">
-                   {energy >= 100 ? "Amazing! Tomorrow morning, you'll unlock a new reflection." : "Complete daily tasks to unlock spiritual reflections."}
-                </p>
+          <div className="mt-8 w-full">
+            {pendingWisdom ? (
+               <button 
+                onClick={onStartMorningReflection}
+                className="w-full bg-indigo-900 text-white font-black py-5 rounded-[2rem] shadow-xl shadow-indigo-900/20 hover:bg-indigo-800 transition-all active:scale-[0.98] flex items-center justify-center space-x-3 group animate-pulse"
+               >
+                  <Sparkles className="w-5 h-5 text-indigo-400" />
+                  <span className="text-lg tracking-tight">Morning Reflection</span>
+                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1.5 transition-transform" />
+               </button>
+            ) : energy >= 100 ? (
+               <button 
+                onClick={onStartJourney}
+                className="w-full bg-amber-500 text-white font-black py-5 rounded-[2rem] shadow-xl shadow-amber-500/30 hover:bg-amber-600 transition-all active:scale-[0.98] flex items-center justify-center space-x-3 group"
+               >
+                  <Sparkles className="w-5 h-5 text-amber-100 animate-pulse" />
+                  <span className="text-lg tracking-tight text-white drop-shadow-sm">Muezza's Counsel</span>
+                  <ArrowRight className="w-5 h-5 text-amber-100 group-hover:translate-x-1.5 transition-transform" />
+               </button>
+            ) : (
+              <div className="flex flex-col items-center">
+                <div className="flex items-center space-x-3 bg-slate-50/80 px-5 py-3.5 rounded-2xl border border-slate-100 w-full justify-center">
+                  <p className="text-[11px] text-slate-500 leading-relaxed font-bold text-center italic">
+                     &quot;Complete daily tasks to unlock spiritual reflections.&quot;
+                  </p>
+                </div>
               </div>
-            </div>
-          )}
+            )}
+          </div>
         </div>
 
       <div className="mb-14 space-y-6">
@@ -207,6 +220,15 @@ export function HomeTab({
                     }`}>
                       {habit.category}
                     </span>
+                    {habit.kind === 'quran_reading' && (
+                      <button 
+                        onClick={(e) => { e.stopPropagation(); onOpenQuran(); }}
+                        className="flex items-center justify-center bg-emerald-50 border border-emerald-100 text-emerald-600 text-[8px] font-black uppercase tracking-widest px-2 py-0.5 rounded-md hover:bg-emerald-500 hover:text-white transition-all active:scale-95 group/quran"
+                        title="Resume Reading"
+                      >
+                         <BookOpen className="w-2 h-2 mr-1 group-hover/quran:animate-pulse" /> Read
+                      </button>
+                    )}
                   </div>
                   <h4 className={`text-sm font-black tracking-tight ${habit.completed ? 'text-slate-400 line-through' : 'text-slate-800 font-bold'}`}>
                     {habit.title}
