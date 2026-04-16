@@ -42,7 +42,11 @@ const localTokenApiPlugin = () => ({
             const env = loadEnv('', process.cwd(), '');
             const authBaseUrl = getLocalQuranAuthBaseUrl(env);
             const clientId = env.VITE_QURAN_CLIENT_ID;
-            const clientSecret = env.QURAN_CLIENT_SECRET;
+            const clientSecret = env.QF_CLIENT_SECRET || env.QURAN_CLIENT_SECRET;
+
+            if (!clientId || !clientSecret) {
+              throw new Error('Missing Quran Foundation client ID or server-side client secret.');
+            }
             
             const authHeader = `Basic ${Buffer.from(`${clientId}:${clientSecret}`).toString('base64')}`;
             

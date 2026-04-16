@@ -58,9 +58,8 @@ Muezza operates on a continuous, self-reinforcing grounding loop:
 npm install
 
 # 2. Configure environment substrate
-# Create .env.local and populate with Quran Foundation Developer keys:
-# VITE_QURAN_CLIENT_ID="[Your Client ID]"
-# VITE_QURAN_CLIENT_SECRET="[Your Client Secret]"
+# Copy .env.example to .env.local and populate Quran Foundation prelive keys.
+# Keep the client secret server-side only as QF_CLIENT_SECRET.
 
 # 3. Boot development server
 npm run dev
@@ -79,6 +78,7 @@ Before merging any architectural changes, ensure the following convergence check
 The system is optimized for **Vercel Edge Runtime**. 
 - Serverless functions handle secure `/api/token` and `/api/tafsir` orchestration.
 - Deployment is automated via Git-trigger on the `main` branch.
+- Production launch instructions live in [`DEPLOYMENT.md`](./DEPLOYMENT.md), including the required Quran Foundation production scopes and Vercel environment variables.
 
 **Live Application:** [muezza-app.vercel.app](https://muezza-app.vercel.app/)
 
