@@ -60,8 +60,10 @@ export function QuranTab({
                 <ChevronLeft className="w-5 h-5 text-slate-800" />
               </button>
               <div>
-                <h3 className="font-black text-slate-900 tracking-tight">{selectedSurah.name_simple}</h3>
-                <p className="text-[10px] font-black text-emerald-600 uppercase tracking-widest">{selectedSurah.translated_name.name}</p>
+                <h3 className="font-black text-slate-900 tracking-tight">{selectedSurah.name_simple || `Surah ${selectedSurah.id}`}</h3>
+                <p className="text-[10px] font-black text-emerald-600 uppercase tracking-widest">
+                  {selectedSurah.translated_name?.name || selectedSurah.name_simple || 'Quran'}
+                </p>
               </div>
             </div>
             <div className="w-10 h-10 bg-emerald-50 rounded-xl flex items-center justify-center text-emerald-700 font-black text-sm border border-emerald-100/50">

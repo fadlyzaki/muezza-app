@@ -865,7 +865,14 @@ function MuezzaApp() {
     }
   };
 
+  const createSurahFromBookmark = (bookmark) => ({
+    id: Number(bookmark?.surah_id),
+    name_simple: bookmark?.surah_name || (bookmark?.surah_id ? `Surah ${bookmark.surah_id}` : 'Saved Surah'),
+    translated_name: bookmark?.translated_name || { name: bookmark?.surah_name || 'Saved Surah' },
+  });
+
   const openSurah = (surah) => {
+    if (!surah?.id) return;
     fetchSurahPage(surah, 1, { scrollTop: true });
   };
 
@@ -1179,7 +1186,7 @@ function MuezzaApp() {
                 setActiveTab('quran');
                 if (userBookmarks && userBookmarks.length > 0) {
                   setTimeout(() => {
-                    openSurah({ id: userBookmarks[0].surah_id, name_simple: userBookmarks[0].surah_name });
+                    openSurah(createSurahFromBookmark(userBookmarks[0]));
                   }, 100);
                 }
               }}
@@ -1228,7 +1235,7 @@ function MuezzaApp() {
               onRefresh={() => {}} 
               isSyncing={false}
               bookmarks={userBookmarks}
-              onOpenSurahByBookmark={(bm) => openSurah({ id: bm.surah_id, name_simple: bm.surah_name })}
+              onOpenSurahByBookmark={(bm) => openSurah(createSurahFromBookmark(bm))}
               onLogout={logout}
               onLogin={() => {}}
             />

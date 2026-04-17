@@ -57,6 +57,7 @@ function normalizeBookmark(bookmark) {
       bookmark?.chapterName ||
       SURAH_NAMES_SIMPLE[surahId] ||
       (surahId ? `Surah ${surahId}` : 'Saved Ayah'),
+    translated_name: bookmark?.translated_name || bookmark?.translatedName || null,
     ayah_number: ayahNumber || bookmark?.ayah_number,
     created_at: createdAt,
   };
