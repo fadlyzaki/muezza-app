@@ -3,6 +3,11 @@ import { useAuth } from './useAuth';
 import { decodeJwtPayload } from './jwt';
 
 const CALLBACK_CODE_PREFIX = 'qf_callback_code_status:';
+const FALLBACK_USER = {
+  first_name: 'Quran.com',
+  email: null,
+  source: 'oauth_access_token',
+};
 
 export default function Callback() {
   const { setAccessToken, setUser } = useAuth();
@@ -18,6 +23,14 @@ export default function Callback() {
       hasProcessedCallbackRef.current = true;
 
       const urlParams = new URLSearchParams(window.location.search);
+      const oauthError = urlParams.get('error');
+      const oauthErrorDescription = urlParams.get('error_description');
+      if (oauthError) {
+        setError(oauthErrorDescription || oauthError);
+        window.history.replaceState(null, '', '/callback');
+        return;
+      }
+
       const code = urlParams.get('code');
       const state = urlParams.get('state');
       const callbackStatusKey = code ? `${CALLBACK_CODE_PREFIX}${code}` : null;
@@ -64,7 +77,7 @@ export default function Callback() {
         }
         if (!data.access_token) throw new Error('Token exchange did not return an access token.');
 
-        let userPayload = null;
+        let userPayload = FALLBACK_USER;
         if (data.id_token) {
           userPayload = decodeJwtPayload(data.id_token);
           
@@ -77,6 +90,7 @@ export default function Callback() {
 
         localStorage.setItem('qf_access_token', data.access_token);
         if (data.id_token) localStorage.setItem('qf_id_token', data.id_token);
+        localStorage.setItem('qf_user', JSON.stringify(userPayload));
         if (data.refresh_token) {
            localStorage.setItem('qf_refresh_token', data.refresh_token);
         }

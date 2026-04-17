@@ -2,6 +2,11 @@ const PRELIVE_AUTH_BASE_URL = 'https://prelive-oauth2.quran.foundation';
 const PRODUCTION_AUTH_BASE_URL = 'https://oauth2.quran.foundation';
 const PRELIVE_USER_API_BASE_URL = 'https://apis-prelive.quran.foundation';
 const PRODUCTION_USER_API_BASE_URL = 'https://apis.quran.foundation';
+const FULL_USER_AUTH_SCOPES = 'openid offline_access user bookmark collection streak activity_day';
+const DEFAULT_AUTH_SCOPES = {
+  prelive: FULL_USER_AUTH_SCOPES,
+  production: FULL_USER_AUTH_SCOPES,
+};
 
 function inferQuranEnvironment() {
   if (import.meta.env.VITE_QF_ENV) {
@@ -36,6 +41,11 @@ export function getQuranAuthBaseUrl() {
   return env === 'prelive'
     ? PRELIVE_AUTH_BASE_URL
     : PRODUCTION_AUTH_BASE_URL;
+}
+
+export function getQuranAuthScopes() {
+  const env = inferQuranEnvironment();
+  return import.meta.env.VITE_QURAN_AUTH_SCOPES || DEFAULT_AUTH_SCOPES[env] || DEFAULT_AUTH_SCOPES.production;
 }
 
 export function getQuranUserApiBaseUrl() {

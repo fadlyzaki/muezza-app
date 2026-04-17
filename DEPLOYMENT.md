@@ -13,6 +13,9 @@ Before launch, request/confirm a Quran Foundation production OAuth app with thes
 - Scopes: `openid`, `offline_access`, `user`, `bookmark`, `collection`, `streak`, `activity_day`
 - Production client ID and production client secret
 
+> [!IMPORTANT]
+> Production must be allowed to request the same scopes as prelive. If Quran Foundation redirects back with `invalid_scope` for `openid`, the production OAuth client has not been granted OIDC access yet and must be updated by Quran Foundation.
+
 ## 2. Environment Variables
 
 Configure the following variables in your deployment platform. In Vercel, add them under **Project Settings → Environment Variables** for the **Production** environment.
@@ -22,6 +25,7 @@ Configure the following variables in your deployment platform. In Vercel, add th
 |---|---|
 | `VITE_APP_URL` | `https://muezza-app.vercel.app` |
 | `VITE_QURAN_CLIENT_ID` | `f5f9b40f-0419-4b3b-be9a-7dd290c643a6` |
+| `VITE_QURAN_AUTH_SCOPES` | `openid offline_access user bookmark collection streak activity_day` |
 | `QF_CLIENT_SECRET` | Your Quran Foundation production Client Secret |
 
 > [!IMPORTANT]
@@ -64,6 +68,7 @@ In your Quran Foundation Developer Dashboard, ensure the following Redirect URIs
    - `VITE_APP_URL=https://muezza-app.vercel.app`
    - `VITE_QF_ENV=production`
    - `VITE_QURAN_CLIENT_ID=f5f9b40f-0419-4b3b-be9a-7dd290c643a6`
+   - `VITE_QURAN_AUTH_SCOPES=openid offline_access user bookmark collection streak activity_day`
    - `QF_CLIENT_SECRET=<production client secret>`
 2. **Remove prelive-only overrides** from the production environment:
    - `VITE_QURAN_API_BASE=https://prelive-oauth2.quran.foundation`
