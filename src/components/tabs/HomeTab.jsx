@@ -1,5 +1,4 @@
-import React from 'react';
-import { Sparkles, MapPin, Search, CheckCircle2, Circle, Pencil, Plus, Trash2, X, Activity, ArrowRight, BookOpen } from 'lucide-react';
+import { Sparkles, CheckCircle2, Circle, Pencil, Plus, Trash2, X, Activity, ArrowRight, BookOpen } from 'lucide-react';
 import CatSVG from '../CatSVG';
 import { PRAYER_ICONS } from '../../constants/muezza_data';
 
@@ -25,31 +24,31 @@ export function HomeTab({
   onOpenQuran
 }) {
   return (
-    <div className="px-6 py-6 pb-32 animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <div className="bg-white rounded-[4rem] p-12 mb-12 shadow-xl shadow-emerald-900/5 border border-emerald-50 relative overflow-hidden group">
-        <div className="absolute top-0 right-0 w-80 h-80 bg-emerald-500/5 rounded-full -translate-y-40 translate-x-40 blur-3xl group-hover:bg-emerald-500/10 transition-colors duration-700"></div>
-        <div className="absolute bottom-0 left-0 w-80 h-80 bg-amber-500/5 rounded-full translate-y-40 -translate-x-40 blur-3xl group-hover:bg-amber-500/10 transition-colors duration-700"></div>
+    <div className="px-4 pt-4 pb-32 sm:px-6 sm:py-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+      <div className="bg-white rounded-[2rem] sm:rounded-[4rem] p-4 sm:p-12 mb-6 sm:mb-12 shadow-xl shadow-emerald-900/5 border border-emerald-50 relative overflow-hidden group">
+        <div className="absolute top-0 right-0 w-40 h-40 sm:w-80 sm:h-80 bg-emerald-500/5 rounded-full -translate-y-20 translate-x-20 sm:-translate-y-40 sm:translate-x-40 blur-3xl group-hover:bg-emerald-500/10 transition-colors duration-700"></div>
+        <div className="absolute bottom-0 left-0 w-40 h-40 sm:w-80 sm:h-80 bg-amber-500/5 rounded-full translate-y-20 -translate-x-20 sm:translate-y-40 sm:-translate-x-40 blur-3xl group-hover:bg-amber-500/10 transition-colors duration-700"></div>
 
-        <div className="flex flex-col items-center relative z-10">
-          <div className="relative cursor-pointer select-none group/mascot" onClick={onPet}>
+        <div className="grid grid-cols-[6rem_1fr] sm:grid-cols-1 items-center gap-4 sm:gap-0 relative z-10">
+          <div className="relative cursor-pointer select-none group/mascot justify-self-center" onClick={onPet}>
             <div className={`absolute inset-0 bg-emerald-400/10 blur-3xl rounded-full scale-110 transition-all duration-1000 ${isPetting ? 'opacity-100 scale-125' : 'opacity-0'}`}></div>
             <CatSVG 
               awake={energy > 0} 
-              className={`w-48 h-48 transition-all duration-500 relative z-10 drop-shadow-[0_15px_15px_rgba(0,0,0,0.1)] group-hover/mascot:drop-shadow-[0_20px_20px_rgba(0,0,0,0.15)] group-hover/mascot:-translate-y-2 ${isPetting ? 'scale-110' : ''}`}
+              className={`w-24 h-24 sm:w-48 sm:h-48 transition-all duration-500 relative z-10 drop-shadow-[0_10px_12px_rgba(0,0,0,0.1)] sm:drop-shadow-[0_15px_15px_rgba(0,0,0,0.1)] group-hover/mascot:drop-shadow-[0_20px_20px_rgba(0,0,0,0.15)] group-hover/mascot:-translate-y-1 sm:group-hover/mascot:-translate-y-2 ${isPetting ? 'scale-110' : ''}`}
               isPetting={isPetting} 
               equipped={inventory} 
               stage={catStage}
             />
           </div>
           
-          <div className="mt-8 w-full max-w-[220px]">
-            <div className="flex justify-between items-center mb-2.5 px-1">
+          <div className="w-full min-w-0 sm:mt-8 sm:max-w-[220px] sm:mx-auto">
+            <div className="flex justify-between items-center mb-2 px-1 sm:mb-2.5">
               <div className="flex items-center space-x-2">
-                <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Energy Matrix</p>
+                <p className="text-[9px] sm:text-[10px] font-black text-slate-400 uppercase tracking-[0.16em] sm:tracking-[0.2em]">Energy Matrix</p>
               </div>
               <span className="text-[10px] font-black text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-lg border border-emerald-100">{energy}%</span>
             </div>
-            <div className="h-4 w-full bg-slate-50 rounded-full overflow-hidden border border-slate-100 p-0.5 shadow-inner">
+            <div className="h-3 sm:h-4 w-full bg-slate-50 rounded-full overflow-hidden border border-slate-100 p-0.5 shadow-inner">
               <div
                 className="h-full bg-gradient-to-r from-emerald-400 to-emerald-500 rounded-full transition-all duration-1000 shadow-[0_0_10px_rgba(16,185,129,0.3)] relative"
                 style={{ width: `${energy}%` }}
@@ -57,33 +56,31 @@ export function HomeTab({
                 <div className="absolute inset-0 bg-[linear-gradient(45deg,rgba(255,255,255,0.2)_25%,transparent_25%,transparent_50%,rgba(255,255,255,0.2)_50%,rgba(255,255,255,0.2)_75%,transparent_75%,transparent)] bg-[length:20px_20px] animate-shimmer"></div>
               </div>
             </div>
-            
-            </div>
           </div>
 
-          <div className="mt-8 w-full">
+          <div className="col-span-2 sm:col-span-1 mt-1 sm:mt-8 w-full">
             {pendingWisdom ? (
                <button 
                 onClick={onStartMorningReflection}
-                className="w-full bg-indigo-900 text-white font-black py-5 rounded-[2rem] shadow-xl shadow-indigo-900/20 hover:bg-indigo-800 transition-all active:scale-[0.98] flex items-center justify-center space-x-3 group animate-pulse"
+                className="w-full bg-indigo-900 text-white font-black py-3.5 sm:py-5 rounded-2xl sm:rounded-[2rem] shadow-xl shadow-indigo-900/20 hover:bg-indigo-800 transition-all active:scale-[0.98] flex items-center justify-center space-x-3 group animate-pulse"
                >
-                  <Sparkles className="w-5 h-5 text-indigo-400" />
-                  <span className="text-lg tracking-tight">Morning Reflection</span>
-                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1.5 transition-transform" />
+                  <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-indigo-400" />
+                  <span className="text-sm sm:text-lg tracking-tight">Morning Reflection</span>
+                  <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1.5 transition-transform" />
                </button>
             ) : energy >= 100 ? (
                <button 
                 onClick={onStartJourney}
-                className="w-full bg-amber-500 text-white font-black py-5 rounded-[2rem] shadow-xl shadow-amber-500/30 hover:bg-amber-600 transition-all active:scale-[0.98] flex items-center justify-center space-x-3 group"
+                className="w-full bg-amber-500 text-white font-black py-3.5 sm:py-5 rounded-2xl sm:rounded-[2rem] shadow-xl shadow-amber-500/30 hover:bg-amber-600 transition-all active:scale-[0.98] flex items-center justify-center space-x-3 group"
                >
-                  <Sparkles className="w-5 h-5 text-amber-100 animate-pulse" />
-                  <span className="text-lg tracking-tight text-white drop-shadow-sm">Muezza's Counsel</span>
-                  <ArrowRight className="w-5 h-5 text-amber-100 group-hover:translate-x-1.5 transition-transform" />
+                  <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-amber-100 animate-pulse" />
+                  <span className="text-sm sm:text-lg tracking-tight text-white drop-shadow-sm">Muezza's Counsel</span>
+                  <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 text-amber-100 group-hover:translate-x-1.5 transition-transform" />
                </button>
             ) : (
               <div className="flex flex-col items-center">
-                <div className="flex items-center space-x-3 bg-slate-50/80 px-5 py-3.5 rounded-2xl border border-slate-100 w-full justify-center">
-                  <p className="text-[11px] text-slate-500 leading-relaxed font-bold text-center italic">
+                <div className="flex items-center space-x-3 bg-slate-50/80 px-4 py-2.5 sm:px-5 sm:py-3.5 rounded-2xl border border-slate-100 w-full justify-center">
+                  <p className="text-[10px] sm:text-[11px] text-slate-500 leading-relaxed font-bold text-center italic">
                      &quot;Complete daily tasks to unlock spiritual reflections.&quot;
                   </p>
                 </div>
@@ -91,8 +88,9 @@ export function HomeTab({
             )}
           </div>
         </div>
+      </div>
 
-      <div className="mb-14 space-y-6">
+      <div className="mb-10 sm:mb-14 space-y-4 sm:space-y-6">
         <div className="flex items-center justify-between px-2">
           <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.4em]">Obligatory Rituals</h4>
           <span className="text-[9px] font-bold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-100">Live Timing</span>
