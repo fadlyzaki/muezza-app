@@ -8,8 +8,8 @@ Muezza is currently wired for Quran Foundation **prelive** locally and can be sw
 
 Before launch, request/confirm a Quran Foundation production OAuth app with these settings:
 
-- Redirect URI: `https://your-production-domain.com/callback`
-- Allowed origin: `https://your-production-domain.com`
+- Redirect URI: `https://muezza-app.vercel.app/callback`
+- Allowed origin: `https://muezza-app.vercel.app`
 - Scopes: `openid`, `offline_access`, `user`, `bookmark`, `collection`, `streak`, `activity_day`
 - Production client ID and production client secret
 
@@ -20,8 +20,8 @@ Configure the following variables in your deployment platform. In Vercel, add th
 ### Common Variables
 | Variable | Value |
 |---|---|
-| `VITE_APP_URL` | `https://your-production-domain.com` |
-| `VITE_QURAN_CLIENT_ID` | Your Quran Foundation production Client ID |
+| `VITE_APP_URL` | `https://muezza-app.vercel.app` |
+| `VITE_QURAN_CLIENT_ID` | `f5f9b40f-0419-4b3b-be9a-7dd290c643a6` |
 | `QF_CLIENT_SECRET` | Your Quran Foundation production Client Secret |
 
 > [!IMPORTANT]
@@ -56,14 +56,14 @@ Leave these unset unless Quran Foundation provides custom hosts:
 In your Quran Foundation Developer Dashboard, ensure the following Redirect URIs are explicitly whitelisted:
 
 - `http://localhost:5173/callback` (for local development)
-- `https://your-production-domain.com/callback` (for production)
+- `https://muezza-app.vercel.app/callback` (for production)
 
 ## 4. Deployment Steps
 
 1. **Set production variables** in Vercel:
-   - `VITE_APP_URL=https://your-production-domain.com`
+   - `VITE_APP_URL=https://muezza-app.vercel.app`
    - `VITE_QF_ENV=production`
-   - `VITE_QURAN_CLIENT_ID=<production client id>`
+   - `VITE_QURAN_CLIENT_ID=f5f9b40f-0419-4b3b-be9a-7dd290c643a6`
    - `QF_CLIENT_SECRET=<production client secret>`
 2. **Remove prelive-only overrides** from the production environment:
    - `VITE_QURAN_API_BASE=https://prelive-oauth2.quran.foundation`
@@ -77,7 +77,7 @@ In your Quran Foundation Developer Dashboard, ensure the following Redirect URIs
 After deployment, verify:
 
 - Login redirects to Quran Foundation production OAuth, not prelive.
-- Callback returns to `https://your-production-domain.com/callback`.
+- Callback returns to `https://muezza-app.vercel.app/callback`.
 - UserAPI requests go to `https://apis.quran.foundation`, not `https://apis-prelive.quran.foundation`.
 - Streak request uses `/auth/v1/streaks?type=QURAN&first=20`.
 - Bookmark request uses `/auth/v1/bookmarks?type=ayah&mushafId=4&first=20`.
