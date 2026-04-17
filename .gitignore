@@ -25,5 +25,5 @@ dist-ssr
 .vercel
 
 # Product Docs
-docs/PRD.md
+PRD.md
 docs/submission.md

@@ -25,7 +25,7 @@ Muezza is a mobile-first web app designed to bridge the gap between abstract spi
 | **Ritual Engine**    | ✅ Shipped | **Auto-Skip Automation**: Rituals mark as missed 15m before next prayer. |
 | **Responsive UI**    | ✅ Shipped | **Responsive Pro**: Sidebar Dashboard for Desktop, Bottom Nav for Mobile. |
 | **Advisor Hub**      | ✅ Shipped | **8 Emotional Archetypes**: Expanded scholarly counsel with Session Analytics. |
-| **Souq (Shop)**      | ✅ Shipped | **Sustenance Added**: Ajwa Dates, Zamzam, Honey, Milk. |
+| **Souq (Shop)**      | ✅ Shipped | **Refillable Sustenance**: Zamzam, Camel Milk, Madinah Catnip, Blessed Olives. |
 | **Habit Engine**     | ✅ Shipped | **Stable Lifecycle**: Full Add/Edit/Delete habit management. |
 | **Location Engine**  | ✅ Shipped | **Precise Resolution**: Manual search + Geolocation reverse geocoding. |
 
@@ -37,6 +37,7 @@ Muezza is a mobile-first web app designed to bridge the gap between abstract spi
 Muezza is a reactive SVG cat whose visual state is computationally derived from the user's daily progress.
 - **Energy System:** Completing habits and prayers fills a 0–100% daily energy bar.
 - **Interactivity:** Tapping Muezza triggers petting animations; sleeps when idle (0% energy).
+- **Growth Stages:** Kitten (0-7 days), Adult (8-30 days), Majestic (31+ days) based on Noor Streaks.
 - **The Journey (Rihla):** At 100% energy, users can "Send on a Journey" to retrieve grounded reflections.
 - **Dynamic Equipment:** Items purchased in the Souq (hats, glasses, rugs) are overlaid on the vector graphics.
 

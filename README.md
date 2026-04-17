@@ -21,7 +21,8 @@ Muezza is a high-fidelity digital companion designed to transmute abstract spiri
 ### II. The Ritual Substrate
 *   **Auto-Skip Automation**: Background logic engine that automatically marks rituals as "Missed" 15 minutes before the next prayer window opens.
 *   **Rose Visual State**: High-fidelity feedback for missed obligations, maintaining spiritual honesty and accountability.
-*   **Geolocation Engine**: High-precision location resolution via browser Geolocation + Reverse Geocoding for accurate prayer timings.
+*   **Geolocation Engine**: High-precision location resolution via browser Geolocation + Reverse Geocoding via Nominatim API for accurate prayer timings.
+*   **Advisor Hub**: 8 Emotional Archetypes Providing scholarly counsel (grateful, anxious, tired, searching, impatient, lonely, joyful, confident) grounded in Quranic Tafsir.
 
 ### II. Identity & Continuity
 *   **OAuth2 PKCE Flow**: Secure, stateless authentication bridging Muezza with the global Quran.com user profile.
@@ -30,7 +31,7 @@ Muezza is a high-fidelity digital companion designed to transmute abstract spiri
 ### III. The Habit Engine
 *   **Deep-Linked Foundations**: Quran translation/reading habits are natively injected in onboarding and feature contextual bridges to jump directly to the user's latest synced Ayah.
 *   **Energy Memoization**: A derived reactive state aggregating 5 obligatory prayers and customizable Sunnah/Niyyah checklists into a 0–100% daily energy state.
-*   **Evolution Logic**: Visual pet aging (Kitten → Adult → Majestic) computationally derived from historical streak length retrieved from the QF Streaks API.
+*   **Evolution Logic**: Visual pet evolution computational derived from historical streak length (Kitten: 0–7 days, Adult: 8–30 days, Majestic: 31+ days).
 
 ---
 
@@ -42,7 +43,7 @@ Muezza operates on a continuous, self-reinforcing grounding loop:
 2.  **Convergence**: The user completes obligatory and sunnah tasks, yielding **Dinar** (virtual currency) and filling the global energy gauge.
 3.  **Immersion**: Native Quran Reader allows for deep reading, audio streaming, and "Ask Muezza" (Tafsir Insight) interactions seamlessly linked from the Home Tab.
 4.  **Preservation**: Bookmarks and Streaks are committed to the Quran Foundation cloud, hardening the user's spiritual profile.
-5.  **Delight**: Dinar is liquidated in the **Bifurcated Souq** to acquire permanent *Spiritual Equipment* or infinitely refillable *Sustenance* (biologically-accurate feline treats rooted in Islamic lore).
+5.  **Delight**: Dinar is liquidated in the **Bifurcated Souq** to acquire permanent *Spiritual Equipment* (turban, sajjadah, glasses) or refillable *Sustenance* (Zamzam, camel milk, Madinah catnip, blessed olives) rooted in Islamic lore.
 
 ---
 
