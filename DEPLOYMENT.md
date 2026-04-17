@@ -10,11 +10,12 @@ Before launch, request/confirm a Quran Foundation production OAuth app with thes
 
 - Redirect URI: `https://muezza-app.vercel.app/callback`
 - Allowed origin: `https://muezza-app.vercel.app`
-- Scopes: `user`, `bookmark`, `collection`, `streak`, `activity_day`
+- Scopes currently accepted by production: `bookmark`, `collection`, `streak`, `activity_day`
+- Scopes needed for prelive parity: `openid`, `offline_access`, `user`, `bookmark`, `collection`, `streak`, `activity_day`
 - Production client ID and production client secret
 
 > [!IMPORTANT]
-> The current production OAuth client rejects `openid`, so production uses OAuth access-token sync without OIDC identity claims. To make production exactly match prelive, ask Quran Foundation to enable `openid` and `offline_access` on the production client, then update `VITE_QURAN_AUTH_SCOPES` to match prelive.
+> The current production OAuth client rejects `openid` and `user`, so production uses the narrower approved UserAPI scopes for now. To make production exactly match prelive, ask Quran Foundation to enable `openid`, `offline_access`, and `user` on the production client, then update `VITE_QURAN_AUTH_SCOPES` to match prelive.
 
 ## 2. Environment Variables
 
@@ -25,7 +26,7 @@ Configure the following variables in your deployment platform. In Vercel, add th
 |---|---|
 | `VITE_APP_URL` | `https://muezza-app.vercel.app` |
 | `VITE_QURAN_CLIENT_ID` | `f5f9b40f-0419-4b3b-be9a-7dd290c643a6` |
-| `VITE_QURAN_AUTH_SCOPES` | `user bookmark collection streak activity_day` |
+| `VITE_QURAN_AUTH_SCOPES` | `bookmark collection streak activity_day` |
 | `QF_CLIENT_SECRET` | Your Quran Foundation production Client Secret |
 
 > [!IMPORTANT]
@@ -68,7 +69,7 @@ In your Quran Foundation Developer Dashboard, ensure the following Redirect URIs
    - `VITE_APP_URL=https://muezza-app.vercel.app`
    - `VITE_QF_ENV=production`
    - `VITE_QURAN_CLIENT_ID=f5f9b40f-0419-4b3b-be9a-7dd290c643a6`
-   - `VITE_QURAN_AUTH_SCOPES=user bookmark collection streak activity_day`
+   - `VITE_QURAN_AUTH_SCOPES=bookmark collection streak activity_day`
    - `QF_CLIENT_SECRET=<production client secret>`
 2. **Remove prelive-only overrides** from the production environment:
    - `VITE_QURAN_API_BASE=https://prelive-oauth2.quran.foundation`

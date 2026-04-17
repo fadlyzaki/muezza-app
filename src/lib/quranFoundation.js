@@ -3,7 +3,7 @@ const PRODUCTION_AUTH_BASE_URL = 'https://oauth2.quran.foundation';
 const PRELIVE_USER_API_BASE_URL = 'https://apis-prelive.quran.foundation';
 const PRODUCTION_USER_API_BASE_URL = 'https://apis.quran.foundation';
 const FULL_USER_AUTH_SCOPES = 'openid offline_access user bookmark collection streak activity_day';
-const PRODUCTION_USER_AUTH_SCOPES = 'user bookmark collection streak activity_day';
+const PRODUCTION_USER_AUTH_SCOPES = 'bookmark collection streak activity_day';
 const DEFAULT_AUTH_SCOPES = {
   prelive: FULL_USER_AUTH_SCOPES,
   production: PRODUCTION_USER_AUTH_SCOPES,
