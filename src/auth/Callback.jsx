@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useAuth } from './useAuth';
 import { decodeJwtPayload } from './jwt';
+import { getUserProfile } from '../api/user';
 
 const CALLBACK_CODE_PREFIX = 'qf_callback_code_status:';
 const FALLBACK_USER = {
@@ -86,6 +87,11 @@ export default function Callback() {
           if (savedNonce && userPayload.nonce !== savedNonce) {
             throw new Error('Identity verification failed (nonce mismatch).');
           }
+        }
+
+        const profile = await getUserProfile(data.access_token);
+        if (profile) {
+          userPayload = profile;
         }
 
         localStorage.setItem('qf_access_token', data.access_token);

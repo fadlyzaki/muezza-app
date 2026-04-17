@@ -13,7 +13,8 @@ function normalizeBookmarksResponse(payload) {
 
   return bookmarks
     .map(normalizeBookmark)
-    .filter((bookmark) => bookmark.verse_key);
+    .filter((bookmark) => bookmark.verse_key)
+    .sort(sortNewestFirst);
 }
 
 function normalizeBookmark(bookmark) {
@@ -35,6 +36,15 @@ function normalizeBookmark(bookmark) {
     bookmark?.verseKey ||
     bookmark?.ayah_key ||
     (surahId && ayahNumber ? `${surahId}:${ayahNumber}` : null);
+  const createdAt =
+    bookmark?.createdAt ||
+    bookmark?.created_at ||
+    bookmark?.insertedAt ||
+    bookmark?.inserted_at ||
+    bookmark?.created ||
+    bookmark?.dateAdded ||
+    bookmark?.date_added ||
+    null;
 
   return {
     ...bookmark,
@@ -48,7 +58,18 @@ function normalizeBookmark(bookmark) {
       SURAH_NAMES_SIMPLE[surahId] ||
       (surahId ? `Surah ${surahId}` : 'Saved Ayah'),
     ayah_number: ayahNumber || bookmark?.ayah_number,
+    created_at: createdAt,
   };
+}
+
+function getBookmarkTimestamp(bookmark) {
+  const value = bookmark?.created_at || bookmark?.createdAt || bookmark?.date_added || bookmark?.dateAdded;
+  const time = value ? new Date(value).getTime() : 0;
+  return Number.isFinite(time) ? time : 0;
+}
+
+function sortNewestFirst(a, b) {
+  return getBookmarkTimestamp(b) - getBookmarkTimestamp(a);
 }
 
 export async function getBookmarks(accessToken) {

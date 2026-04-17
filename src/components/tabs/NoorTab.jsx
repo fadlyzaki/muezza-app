@@ -9,6 +9,20 @@ const NOOR_STAGES = [
   { id: 'badr', label: 'The Badr', icon: '🌕', range: 'Day 30+', desc: 'Complete spiritual luminosity.' }
 ];
 
+function formatBookmarkDate(bookmark) {
+  const value = bookmark?.created_at || bookmark?.createdAt || bookmark?.date_added || bookmark?.dateAdded;
+  if (!value) return null;
+
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return null;
+
+  return new Intl.DateTimeFormat(undefined, {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  }).format(date);
+}
+
 export function NoorTab({ 
   streak, 
   user, 
@@ -25,11 +39,13 @@ export function NoorTab({
   
   const currentStage = NOOR_STAGES[currentStageIdx];
 
-  const userName = user?.first_name 
+  const userName = user?.username
+    ? `@${user.username}`
+    : user?.first_name 
     ? `${user.first_name}${user.last_name ? ` ${user.last_name}` : ''}`
     : user?.email || null;
 
-  const userInitial = (user?.first_name || user?.email || 'U').charAt(0).toUpperCase();
+  const userInitial = (user?.username || user?.first_name || user?.email || 'U').charAt(0).toUpperCase();
 
   return (
     <div className="px-4 sm:px-6 py-4 pb-32 animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -171,28 +187,37 @@ export function NoorTab({
                 <p className="text-[10px] text-slate-400 font-medium">Bookmark verses in the reader to build your archive.</p>
               </div>
             ) : (
-              bookmarks.map((bookmark) => (
-                <button
-                  key={bookmark.id || bookmark.verse_key}
-                  onClick={() => onOpenSurahByBookmark(bookmark)}
-                  className="w-full bg-white p-4 sm:p-5 rounded-2xl sm:rounded-3xl border border-slate-100 flex items-center justify-between hover:border-emerald-200 transition-all shadow-sm group"
-                >
-                  <div className="flex items-center space-x-3 sm:space-x-4 min-w-0">
-                    <div className="p-2.5 sm:p-3 bg-slate-50 rounded-xl sm:rounded-2xl group-hover:bg-emerald-50 transition-colors shrink-0">
-                      <BookmarkIcon className="w-4 h-4 sm:w-5 sm:h-5 text-slate-400 group-hover:text-emerald-500" />
+              bookmarks.map((bookmark) => {
+                const bookmarkDate = formatBookmarkDate(bookmark);
+
+                return (
+                  <button
+                    key={bookmark.id || bookmark.verse_key}
+                    onClick={() => onOpenSurahByBookmark(bookmark)}
+                    className="w-full bg-white p-4 sm:p-5 rounded-2xl sm:rounded-3xl border border-slate-100 flex items-center justify-between hover:border-emerald-200 transition-all shadow-sm group"
+                  >
+                    <div className="flex items-center space-x-3 sm:space-x-4 min-w-0">
+                      <div className="p-2.5 sm:p-3 bg-slate-50 rounded-xl sm:rounded-2xl group-hover:bg-emerald-50 transition-colors shrink-0">
+                        <BookmarkIcon className="w-4 h-4 sm:w-5 sm:h-5 text-slate-400 group-hover:text-emerald-500" />
+                      </div>
+                      <div className="text-left min-w-0">
+                        <p className="font-black text-slate-800 truncate tracking-tight text-sm">{bookmark.surah_name}</p>
+                        <p className="text-[9px] sm:text-[10px] text-slate-400 font-bold uppercase tracking-widest">
+                          Ayah {bookmark.ayah_number || bookmark.verse_key}
+                        </p>
+                        {bookmarkDate && (
+                          <p className="text-[9px] sm:text-[10px] text-slate-300 font-bold uppercase tracking-widest mt-1">
+                            Added {bookmarkDate}
+                          </p>
+                        )}
+                      </div>
                     </div>
-                    <div className="text-left min-w-0">
-                      <p className="font-black text-slate-800 truncate tracking-tight text-sm">{bookmark.surah_name}</p>
-                      <p className="text-[9px] sm:text-[10px] text-slate-400 font-bold uppercase tracking-widest">
-                        Ayah {bookmark.ayah_number || bookmark.verse_key}
-                      </p>
+                    <div className="p-2 bg-slate-100 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity">
+                      <RefreshCw className="w-4 h-4 text-slate-500" />
                     </div>
-                  </div>
-                  <div className="p-2 bg-slate-100 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity">
-                    <RefreshCw className="w-4 h-4 text-slate-500" />
-                  </div>
-                </button>
-              ))
+                  </button>
+                );
+              })
             )}
           </div>
         </div>

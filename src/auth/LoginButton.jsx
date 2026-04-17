@@ -4,11 +4,12 @@ import { LogIn, LogOut } from 'lucide-react';
 
 export default function LoginButton() {
   const { user, login, logout } = useAuth();
+  const userLabel = user?.username ? `@${user.username}` : user?.first_name || user?.email || 'Synced';
 
   if (user) {
     return (
       <div className="flex flex-col items-center gap-2">
-        <p className="text-xs text-slate-500 font-medium">Logged in</p>
+        <p className="text-xs text-slate-500 font-medium">{userLabel}</p>
         <button 
           onClick={logout}
           className="flex items-center gap-2 text-sm text-red-500 hover:text-red-600 font-medium transition-colors bg-red-50 hover:bg-red-100 py-1.5 px-3 rounded-lg"

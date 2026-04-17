@@ -935,11 +935,13 @@ function MuezzaApp() {
           verse_key: verse.verse_key,
           surah_id: selectedSurah?.id || surahId,
           ayah_number: ayahNumber,
+          created_at: new Date().toISOString(),
           surah_name:
             selectedSurah?.name_simple ||
             SURAH_NAMES_SIMPLE[surahId] ||
             (surahId ? `Surah ${surahId}` : 'Saved Ayah'),
         },
+        ...currentBookmarks,
       ]);
     }
   };
