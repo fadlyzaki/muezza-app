@@ -39,13 +39,15 @@ export function NoorTab({
   
   const currentStage = NOOR_STAGES[currentStageIdx];
 
-  const userName = user?.username
-    ? `@${user.username}`
+  const userName = user?.username || user?.preferred_username
+    ? `@${user.username || user.preferred_username}`
+    : user?.name
+    ? user.name
     : user?.first_name 
     ? `${user.first_name}${user.last_name ? ` ${user.last_name}` : ''}`
     : user?.email || null;
 
-  const userInitial = (user?.username || user?.first_name || user?.email || 'U').charAt(0).toUpperCase();
+  const userInitial = (user?.username || user?.preferred_username || user?.name || user?.first_name || user?.email || 'U').charAt(0).toUpperCase();
 
   return (
     <div className="px-4 sm:px-6 py-4 pb-32 animate-in fade-in slide-in-from-bottom-4 duration-500">

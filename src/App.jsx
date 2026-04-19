@@ -1132,15 +1132,17 @@ function MuezzaApp() {
                   <button
                     onClick={() => setActiveTab('noor')}
                     className="flex items-center space-x-1.5 sm:space-x-2 px-2 py-1.5 sm:px-4 sm:py-2.5 rounded-xl sm:rounded-2xl bg-emerald-50 border border-emerald-100 shadow-sm active:scale-95 transition-all group"
-                    title={`Synced as ${user.first_name || user.email || 'User'}`}
+                    title={`Synced as ${user.username || user.preferred_username || user.name || user.first_name || user.email || 'User'}`}
                   >
                     <div className="relative">
                       <div className="w-6 h-6 sm:w-7 sm:h-7 bg-emerald-600 rounded-full flex items-center justify-center text-white text-[10px] sm:text-xs font-black shadow-sm">
-                        {(user.first_name || user.email || 'U').charAt(0).toUpperCase()}
+                        {(user.username || user.preferred_username || user.name || user.first_name || user.email || 'U').charAt(0).toUpperCase()}
                       </div>
                       <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-emerald-500 rounded-full border-2 border-white"></div>
                     </div>
-                    <span className="hidden sm:block text-[10px] font-black text-emerald-800 uppercase tracking-wider">Synced</span>
+                    <span className="hidden sm:block text-[10px] font-black text-emerald-800 tracking-wider truncate max-w-[120px]">
+                      {user.username || user.preferred_username || user.name || user.first_name || 'Synced'}
+                    </span>
                   </button>
                 ) : (
                   <button
@@ -1235,7 +1237,12 @@ function MuezzaApp() {
               onRefresh={() => {}} 
               isSyncing={false}
               bookmarks={userBookmarks}
-              onOpenSurahByBookmark={(bm) => openSurah(createSurahFromBookmark(bm))}
+              onOpenSurahByBookmark={(bm) => {
+                setActiveTab('quran');
+                setTimeout(() => {
+                  openSurah(createSurahFromBookmark(bm));
+                }, 100);
+              }}
               onLogout={logout}
               onLogin={() => {}}
             />
