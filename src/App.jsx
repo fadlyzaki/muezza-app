@@ -229,6 +229,7 @@ function MuezzaApp() {
   const [hasMoreVerses, setHasMoreVerses] = useState(false);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [quranError, setQuranError] = useState(null);
+  const [targetVerseKey, setTargetVerseKey] = useState(null);
 
   const [prayerTimes, setPrayerTimes] = useState(null);
   const [locationStatus, setLocationStatus] = useState('idle');
@@ -545,7 +546,7 @@ function MuezzaApp() {
       scrollContainer?.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    if (page === 1) {
+    if (!append) {
       setIsLoadingQuran(true);
       setQuranError(null);
       setVerses([]);
@@ -873,6 +874,7 @@ function MuezzaApp() {
 
   const openSurah = (surah) => {
     if (!surah?.id) return;
+    setTargetVerseKey(null);
     fetchSurahPage(surah, 1, { scrollTop: true });
   };
 
@@ -1104,61 +1106,71 @@ function MuezzaApp() {
         <div className="flex-1 overflow-y-auto scrollbar-hide">
           <div className="w-full max-w-6xl mx-auto min-h-full flex flex-col">
             {/* Top Navigation Bar (Header) */}
-            <header className="flex justify-between items-center px-4 sm:px-6 py-3 sm:py-6 bg-white/80 backdrop-blur-md z-40 sticky top-0 border-b border-slate-100/50">
-              <div className="flex items-center space-x-2 sm:space-x-4">
-                <button
-                  onClick={() => setActiveTab('noor')}
-                  className="flex items-center space-x-1.5 sm:space-x-2.5 px-2.5 sm:px-4 py-2 sm:py-2.5 rounded-xl sm:rounded-2xl bg-emerald-50 border border-emerald-100/50 active:scale-95 transition-all group"
-                >
-                  <Zap className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${streakLocal > 0 ? 'text-amber-500 fill-amber-500 animate-pulse' : 'text-slate-400'}`} />
-                  <span className="text-[10px] sm:text-[11px] font-black text-emerald-900 leading-none lowercase tracking-tighter">{streakLocal}<span className="hidden sm:inline"> NOOR STREAK</span></span>
-                </button>
-
-                <button 
-                  onClick={() => setIsLocationModalOpen(true)}
-                  className="flex items-center space-x-1.5 sm:space-x-2 bg-slate-50 px-2.5 sm:px-4 py-2 sm:py-2.5 rounded-xl sm:rounded-2xl border border-slate-100 shadow-sm active:scale-95 transition-all group"
-                >
-                  <MapPin className="w-3.5 h-3.5 text-emerald-600 group-hover:animate-bounce" />
-                  <span className="hidden sm:inline text-[11px] font-black text-slate-800 tracking-tight">{formatLocationLabel(savedLocation)}</span>
-                </button>
-              </div>
-
+            <header className="flex justify-between items-center px-3 sm:px-6 py-2 sm:py-5 bg-white/90 backdrop-blur-xl z-40 sticky top-0 border-b border-slate-100/80 shadow-[0_4px_20px_-10px_rgba(0,0,0,0.05)]">
               <div className="flex items-center space-x-1.5 sm:space-x-3">
-                <div className="hidden sm:flex items-center space-x-2 bg-amber-50/80 px-4 py-2.5 rounded-2xl border border-amber-100 shadow-sm">
-                  <span className="text-amber-500 text-sm">🪙</span>
-                  <span className="font-mono text-xs font-black text-amber-900 tracking-tighter">{dinar} DINAR</span>
-                </div>
                 {user ? (
                   <button
                     onClick={() => setActiveTab('noor')}
-                    className="flex items-center space-x-1.5 sm:space-x-2 px-2 py-1.5 sm:px-4 sm:py-2.5 rounded-xl sm:rounded-2xl bg-emerald-50 border border-emerald-100 shadow-sm active:scale-95 transition-all group"
+                    className="flex items-center space-x-2 p-1 sm:px-2 sm:py-2 rounded-full bg-emerald-50 border border-emerald-100 shadow-sm active:scale-95 transition-all hover:bg-emerald-100/60 group"
                     title={`Synced as ${user.username || user.preferred_username || user.name || user.first_name || user.email || 'User'}`}
                   >
-                    <div className="relative">
-                      <div className="w-6 h-6 sm:w-7 sm:h-7 bg-emerald-600 rounded-full flex items-center justify-center text-white text-[10px] sm:text-xs font-black shadow-sm">
+                    <div className="relative shrink-0">
+                      <div className="w-[34px] h-[34px] sm:w-9 sm:h-9 bg-emerald-600 rounded-full flex items-center justify-center text-white text-xs font-black shadow-inner shadow-black/10 group-hover:scale-105 transition-transform duration-300">
                         {(user.username || user.preferred_username || user.name || user.first_name || user.email || 'U').charAt(0).toUpperCase()}
                       </div>
-                      <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-emerald-500 rounded-full border-2 border-white"></div>
+                      <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-500 rounded-full border-2 border-emerald-50 flex items-center justify-center overflow-hidden">
+                        <div className="w-1.5 h-1.5 bg-white rounded-full animate-pulse"></div>
+                      </div>
                     </div>
-                    <span className="hidden sm:block text-[10px] font-black text-emerald-800 tracking-wider truncate max-w-[120px]">
+                    <span className="hidden sm:block pr-3 text-xs font-black text-emerald-800 tracking-tight truncate max-w-[120px]">
                       {user.username || user.preferred_username || user.name || user.first_name || 'Synced'}
                     </span>
                   </button>
                 ) : (
                   <button
                     onClick={() => setActiveTab('noor')}
-                    className="flex items-center px-2 py-1.5 sm:px-4 sm:py-2.5 rounded-xl sm:rounded-2xl bg-slate-50 border border-slate-100 shadow-sm active:scale-95 transition-all group hover:border-emerald-200"
+                    className="flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-slate-50 border border-slate-200 shadow-sm active:scale-95 transition-all hover:border-slate-300 group"
+                    title="Account Offline"
                   >
-                    <div className="w-6 h-6 sm:w-7 sm:h-7 bg-slate-200 rounded-full flex items-center justify-center">
-                      <CloudOff className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-slate-400" />
+                    <div className="w-full h-full rounded-full bg-slate-100 flex items-center justify-center group-hover:bg-slate-200 transition-colors">
+                      <CloudOff className="w-4 h-4 sm:w-[18px] sm:h-[18px] text-slate-400 group-hover:text-slate-500" />
                     </div>
                   </button>
                 )}
+
+                <button 
+                  onClick={() => setIsLocationModalOpen(true)}
+                  className="flex items-center justify-center w-10 h-10 sm:w-auto sm:h-auto sm:px-4 sm:py-2.5 rounded-full bg-slate-50 border border-slate-100 shadow-sm active:scale-95 transition-all hover:bg-white hover:border-emerald-200 hover:shadow-emerald-500/5 group"
+                >
+                  <MapPin className="w-4 h-4 sm:w-[18px] sm:h-[18px] text-emerald-600 group-hover:animate-bounce" />
+                  <span className="hidden sm:inline sm:ml-2 text-xs font-bold text-slate-600 tracking-tight">{formatLocationLabel(savedLocation)}</span>
+                </button>
+              </div>
+
+              <div className="flex items-center space-x-1.5 sm:space-x-3">
+                <button
+                  onClick={() => setActiveTab('noor')}
+                  className="flex items-center space-x-1 sm:space-x-1.5 px-2.5 py-1.5 sm:px-4 sm:py-2.5 rounded-full bg-slate-900 border border-slate-800 shadow-lg shadow-slate-900/10 active:scale-95 transition-all hover:shadow-slate-900/20"
+                >
+                  <Zap className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${streakLocal > 0 ? 'text-amber-400 fill-amber-400 drop-shadow-[0_0_8px_rgba(251,191,36,0.6)]' : 'text-slate-500'}`} />
+                  <span className="text-[11px] sm:text-sm font-black text-white leading-none tracking-tight">
+                    {streakLocal} <span className="hidden sm:inline text-[10px] opacity-70 ml-0.5 uppercase tracking-widest font-bold">Noor</span>
+                  </span>
+                </button>
+
+                <div className="flex items-center space-x-1 sm:space-x-1.5 px-2.5 py-1.5 sm:px-4 sm:py-2.5 rounded-full bg-gradient-to-br from-amber-50 to-orange-50/50 border border-amber-200/60 shadow-sm transition-all">
+                  <span className="text-[11px] sm:text-sm leading-none drop-shadow-sm">🪙</span>
+                  <span className="font-mono text-[11px] sm:text-sm font-black text-amber-700 tracking-tighter">
+                    {dinar} <span className="hidden sm:inline opacity-60 ml-0.5 text-[10px] uppercase font-sans tracking-widest font-bold">Dinar</span>
+                  </span>
+                </div>
+                
                 <button 
                   onClick={() => setShowInfoModal(true)}
-                  className="hidden sm:flex p-3 rounded-2xl bg-white border border-slate-100 text-slate-400 hover:text-emerald-600 hover:border-emerald-200 transition-all shadow-sm"
+                  className="hidden sm:flex items-center justify-center w-10 h-10 rounded-full bg-slate-50 border border-slate-100 text-slate-400 hover:text-emerald-600 hover:border-emerald-200 hover:bg-emerald-50 transition-all shadow-sm active:scale-95"
+                  title="System Info"
                 >
-                  <Info className="w-5 h-5" />
+                  <Info className="w-[18px] h-[18px]" />
                 </button>
               </div>
             </header>
@@ -1197,6 +1209,8 @@ function MuezzaApp() {
 
           {activeTab === 'quran' && (
             <QuranTab 
+              targetVerseKey={targetVerseKey}
+              onClearTargetVerseKey={() => setTargetVerseKey(null)}
               surahs={surahs}
               isLoadingQuran={isLoadingQuran}
               quranError={quranError}
@@ -1240,7 +1254,10 @@ function MuezzaApp() {
               onOpenSurahByBookmark={(bm) => {
                 setActiveTab('quran');
                 setTimeout(() => {
-                  openSurah(createSurahFromBookmark(bm));
+                  const verseNumber = parseInt(bm.verse_key.split(':')[1], 10);
+                  const targetPage = Math.ceil((verseNumber || 1) / 20);
+                  setTargetVerseKey(bm.verse_key);
+                  fetchSurahPage(createSurahFromBookmark(bm), targetPage, { scrollTop: false, append: false });
                 }, 100);
               }}
               onLogout={logout}

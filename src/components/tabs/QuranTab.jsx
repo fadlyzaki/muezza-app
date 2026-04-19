@@ -20,6 +20,8 @@ import CatSVG from '../CatSVG';
 import { ErrorState } from '../common/ErrorState';
 
 export function QuranTab({ 
+  targetVerseKey,
+  onClearTargetVerseKey,
   selectedSurah, 
   surahs, 
   onOpenSurah, 
@@ -48,6 +50,48 @@ export function QuranTab({
   getVerseAudioUrl,
   getTranslationText
 }) {
+  const loaderRef = React.useRef(null);
+
+  React.useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasMoreVerses && !isLoadingMore) {
+          onLoadMore();
+        }
+      },
+      {
+        root: document.getElementById('main-scroll-container'),
+        rootMargin: '400px',
+        threshold: 0,
+      }
+    );
+
+    const currentLoader = loaderRef.current;
+    if (currentLoader) {
+      observer.observe(currentLoader);
+    }
+
+    return () => {
+      if (currentLoader) observer.unobserve(currentLoader);
+    };
+  }, [hasMoreVerses, isLoadingMore, onLoadMore]);
+
+  React.useEffect(() => {
+    if (targetVerseKey && verses.some(v => v.verse_key === targetVerseKey)) {
+      const element = document.getElementById(`verse-${targetVerseKey}`);
+      if (element) {
+        setTimeout(() => {
+          element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          element.classList.add('ring-2', 'ring-emerald-400', 'ring-offset-2', 'transition-all', 'duration-500');
+          setTimeout(() => {
+            element.classList.remove('ring-2', 'ring-emerald-400', 'ring-offset-2');
+          }, 2000);
+          if (onClearTargetVerseKey) onClearTargetVerseKey();
+        }, 100);
+      }
+    }
+  }, [verses, targetVerseKey, onClearTargetVerseKey]);
+
   if (selectedSurah) {
     return (
        <div className="flex flex-col h-full bg-[#FAF8F4] animate-in slide-in-from-right-10 duration-500 overflow-hidden">
@@ -125,7 +169,7 @@ export function QuranTab({
                     const isActiveAudio = activeAudioVerseKey === verse.verse_key;
 
                     return (
-                      <div key={verse.id} className="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 relative overflow-hidden group">
+                      <div id={`verse-${verse.verse_key}`} key={verse.id} className="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 relative overflow-hidden group">
                         <div className="flex justify-between items-start mb-4 gap-3">
                           <span className="text-xs font-bold text-emerald-600 bg-emerald-50 px-3 py-1.5 rounded-lg border border-emerald-100/50">
                             {verse.verse_key}
@@ -198,7 +242,7 @@ export function QuranTab({
                   })}
 
                   {hasMoreVerses && (
-                    <div className="flex justify-center p-8">
+                    <div ref={loaderRef} className="flex justify-center p-8">
                       <button
                         onClick={onLoadMore}
                         disabled={isLoadingMore}
@@ -209,7 +253,7 @@ export function QuranTab({
                         ) : (
                           <Plus className="w-4 h-4 text-emerald-500" />
                         )}
-                        <span>{isLoadingMore ? 'Streaming verses...' : 'Load more script'}</span>
+                        <span>{isLoadingMore ? 'Streaming verses...' : 'Scroll down for more'}</span>
                       </button>
                     </div>
                   )}
