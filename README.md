@@ -1,5 +1,5 @@
 # Muezza: Grounded Quranic Habits
-### [System Architecture v6.0 // Responsive Pro Protocol]
+### [System Architecture v7.0 // Unified 5-Tab Protocol]
 
 <p align="center">
   <img src="public/muezza-og.png" width="600" alt="Muezza System Preview" style="border-radius: 2rem; box-shadow: 0 20px 50px rgba(0,0,0,0.1);" />
@@ -13,10 +13,13 @@ Muezza is a high-fidelity digital companion designed to transmute abstract spiri
 
 ---
 
-### I. Responsive Architecture (Responsive Pro)
-*   **Desktop Dashboard**: A professional sidebar-based command center for deep ritual management.
-*   **Mobile App**: A thumb-friendly, bottom-navigation PWA for on-the-go spiritual consistency.
-*   **Atmospheric Layout**: Content area transitions between focused mobile columns and expansive dashboard grids dynamically.
+### I. Unified 5-Tab Architecture (Responsive Pro)
+*   **Vitals Hub (Home)**: High-density dashboard combining the mascot, prayers, habits, and contextual **Seasonal Missions** that automatically appear based on Islamic calendar proximity.
+*   **The Quran**: Immersive reader enhanced with a Daily Ayah Quest, adaptive Reading Plans, and a Rihla Map for thematic exploration.
+*   **Muezza Advisor**: 8 Emotional Archetypes providing scholarly counsel grounded in Quranic Tafsir.
+*   **Spiritual Souq**: Bi-modal reward engine for acquiring spiritual equipment and refillable sustenance.
+*   **Spiritual Path (Noor)**: Progression tracking with a Bookmark Prompt engine to turn saved ayahs into habits, plus an opt-in Community Reflection system.
+*   **Responsive Layout**: Content area transitions seamlessly between a focused mobile bottom-nav and an expansive desktop sidebar.
 
 ### II. The Ritual Substrate
 *   **Auto-Skip Automation**: Background logic engine that automatically marks rituals as "Missed" 15 minutes before the next prayer window opens.
@@ -28,9 +31,10 @@ Muezza is a high-fidelity digital companion designed to transmute abstract spiri
 *   **OAuth2 PKCE Flow**: Secure, stateless authentication bridging Muezza with the global Quran.com user profile.
 *   **Cloud Boundary**: Transactional synchronization of **Bookmarks** and **Noor Streaks**, ensuring spiritual continuity across any device.
 
-### III. The Habit Engine
+### III. The Habit Engine & Contextual Quests
 *   **Deep-Linked Foundations**: Quran translation/reading habits are natively injected in onboarding and feature contextual bridges to jump directly to the user's latest synced Ayah.
-*   **Energy Memoization**: A derived reactive state aggregating 5 obligatory prayers and customizable Sunnah/Niyyah checklists into a 0–100% daily energy state.
+*   **Hijri-Aware Missions**: Seasonal bundles (Ramadan, Dhul Hijjah, Muharram) automatically surface tasks based on proximity to the Islamic calendar.
+*   **Energy Memoization**: A derived reactive state aggregating prayers and habits into a 0–100% daily energy state.
 *   **Evolution Logic**: Visual pet evolution computational derived from historical streak length (Kitten: 0–7 days, Adult: 8–30 days, Majestic: 31+ days).
 
 ---
