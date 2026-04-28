@@ -3,7 +3,7 @@ import { ShoppingBag, Coins, CheckCircle2, Droplets, Sparkles } from 'lucide-rea
 import CatSVG from '../CatSVG';
 import { SHOP_ITEMS } from '../../constants/muezza_data';
 
-export function SouqTab({ dinar, inventory, onBuy, catStage }) {
+export function SouqTab({ dinar, inventory, onBuy }) {
   const equipmentItems = SHOP_ITEMS.filter(item => item.type !== 'food');
   const foodItems = SHOP_ITEMS.filter(item => item.type === 'food');
 

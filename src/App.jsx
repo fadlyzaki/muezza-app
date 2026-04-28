@@ -9,6 +9,7 @@ import {
   ChevronLeft,
   Circle,
   Coins,
+
   Flame,
   Home,
   Info,
@@ -39,6 +40,14 @@ import { useAuth } from './auth/useAuth';
 import LoginButton from './auth/LoginButton';
 import { getStreaks, addStreak } from './api/streaks';
 import { addBookmark, getBookmarks } from './api/bookmarks';
+import {
+  creditActivityDay,
+  createMissionGoal,
+  fetchUserPreferences,
+  publishMissionReflection,
+  saveMissionNote,
+  saveReadingSession,
+} from './api/missions';
 import CatSVG from './components/CatSVG';
 import Onboarding from './components/Onboarding';
 
@@ -55,14 +64,16 @@ import {
   DEFAULT_DINAR,
   DEFAULT_STREAK,
   INFO_MODAL_VERSION,
-  SURAH_NAMES_SIMPLE
+  SURAH_NAMES_SIMPLE,
+  DAILY_AYAH_FALLBACK,
+  MISSION_BUNDLES,
+  READING_PLANS
 } from './constants/muezza_data';
 
 import {
   getTodayKey,
-  inferHabitKind,
-  normalizeHabit,
-  normalizePrayer,
+  getHijriContext,
+  getActiveBundles,
   normalizeHabits,
   normalizePrayers,
   resetHabitProgress,
@@ -70,10 +81,10 @@ import {
   getTranslationText,
   getVerseAudioUrl,
   getBookmarkVerseKey,
+  parseVerseKey,
+  createRangeFromVerseKey,
   formatLocationLabel,
   fetchJson,
-  readStorageJson,
-  hasStoredAppState,
   deriveInitialOnboardingState,
   hasMeaningfulDailyState,
   reverseGeocode
@@ -157,21 +168,11 @@ const SidebarButton = ({ active, onClick, icon: Icon, label }) => (
     }`}
   >
     <div className={`p-2 rounded-2xl transition-all ${active ? 'bg-emerald-500' : 'bg-transparent group-hover:bg-white'}`}>
-      <Icon className={`w-5 h-5 ${active ? 'text-white' : 'text-slate-400 group-hover:text-emerald-600'}`} />
+      {React.createElement(Icon, {
+        className: `w-5 h-5 ${active ? 'text-white' : 'text-slate-400 group-hover:text-emerald-600'}`,
+      })}
     </div>
     <span className="font-black text-sm tracking-tight">{label}</span>
-  </button>
-);
-
-const BottomNavButton = ({ active, onClick, icon: Icon, label }) => (
-  <button
-    onClick={onClick}
-    className={`flex flex-col items-center space-y-1 transition-colors flex-1 ${active ? 'text-emerald-600' : 'text-slate-400 hover:text-slate-600'}`}
-  >
-    <div className={`p-2 rounded-xl transition-all ${active ? 'bg-emerald-50' : 'bg-transparent'}`}>
-      <Icon className="w-5 h-5 sm:w-6 sm:h-6" />
-    </div>
-    <span className="text-[9px] font-bold">{label}</span>
   </button>
 );
 
@@ -200,12 +201,25 @@ function MuezzaApp() {
   const [lastInsightRef, setLastInsightRef] = useLocalStorage('muezza_last_insight', null);
   const [lastResetDate, setLastResetDate] = useLocalStorage('muezza_last_reset_date', null);
   const [savedLocation, setSavedLocation] = useLocalStorage('muezza_location', FALLBACK_LOCATION);
-  const [translationId, setTranslationId] = useLocalStorage('muezza_translation_id', 20);
+  const [translationId] = useLocalStorage('muezza_translation_id', 20);
   const [reciterId] = useLocalStorage('muezza_reciter_id', DEFAULT_RECITER_ID);
   const [hasSeenInfoModal, setHasSeenInfoModal] = useLocalStorage(
     'muezza_info_modal_seen',
     null,
   );
+  const [missionProgress, setMissionProgress] = useLocalStorage('muezza_mission_progress', {
+    completedTasks: {},
+    badges: [],
+    rihlaThemes: {},
+    catchUpQuest: null,
+  });
+  const [dailyAyahCache, setDailyAyahCache] = useLocalStorage('muezza_daily_ayah', null);
+  const [activeReadingPlanId, setActiveReadingPlanId] = useLocalStorage('muezza_reading_plan_id', READING_PLANS[0].id);
+  const [reflectionDrafts, setReflectionDrafts] = useLocalStorage('muezza_reflection_drafts', {});
+  const [communityOptIn, setCommunityOptIn] = useLocalStorage('muezza_community_opt_in', false);
+  const [missionSyncStatus, setMissionSyncStatus] = useState('');
+  const [isLoadingDailyAyah, setIsLoadingDailyAyah] = useState(false);
+  const [dailyAyahError, setDailyAyahError] = useState(null);
 
   const [streakServer, setStreakServer] = useState(null);
   const [userBookmarks, setUserBookmarks] = useState([]);
@@ -232,7 +246,7 @@ function MuezzaApp() {
   const [targetVerseKey, setTargetVerseKey] = useState(null);
 
   const [prayerTimes, setPrayerTimes] = useState(null);
-  const [locationStatus, setLocationStatus] = useState('idle');
+  const [, setLocationStatus] = useState('idle');
   const [activeAudioVerseKey, setActiveAudioVerseKey] = useState(null);
   const [isAudioPlaying, setIsAudioPlaying] = useState(false);
   const [showInfoModal, setShowInfoModal] = useState(false);
@@ -257,8 +271,6 @@ function MuezzaApp() {
     return 'kitten';
   }, [streakLocal, streakServer]);
 
-  const streak = streakServer !== null ? streakServer : streakLocal;
-
   const quranReadingHabit = useMemo(
     () => habits.find((habit) => habit.kind === 'quran_reading'),
     [habits],
@@ -281,6 +293,23 @@ function MuezzaApp() {
     [userBookmarks],
   );
 
+  const todayKey = useMemo(() => getTodayKey(), []);
+  const hijriContext = useMemo(() => getHijriContext(), []);
+  const activeBundles = useMemo(() => getActiveBundles(MISSION_BUNDLES, hijriContext), [hijriContext.month, hijriContext.weekday]);
+  const featuredMissionBundle = useMemo(() => {
+    const monthBundle = MISSION_BUNDLES.find(
+      (bundle) => bundle.activeWhen?.hijriMonth && bundle.activeWhen.hijriMonth === hijriContext.month,
+    );
+    if (monthBundle) return monthBundle;
+
+    const jummahBundle = MISSION_BUNDLES.find((bundle) => bundle.activeWhen?.weekday === hijriContext.weekday);
+    return jummahBundle || MISSION_BUNDLES[0];
+  }, [hijriContext.month, hijriContext.weekday]);
+
+  const dailyAyah = dailyAyahCache?.date === todayKey && dailyAyahCache?.verse
+    ? dailyAyahCache.verse
+    : DAILY_AYAH_FALLBACK;
+
   const handleOnboardingComplete = (selectedGoal) => {
     if (selectedGoal?.habits) {
       setHabits(selectedGoal.habits);
@@ -298,9 +327,10 @@ function MuezzaApp() {
         return;
       }
 
-      const [streaksData, bookmarksData] = await Promise.all([
+      const [streaksData, bookmarksData, preferencesResult] = await Promise.all([
         getStreaks(accessToken),
         getBookmarks(accessToken),
+        fetchUserPreferences(accessToken),
       ]);
 
       if (Number.isFinite(streaksData)) {
@@ -310,6 +340,10 @@ function MuezzaApp() {
       }
 
       setUserBookmarks(Array.isArray(bookmarksData) ? bookmarksData : []);
+
+      if (preferencesResult?.ok) {
+        setMissionSyncStatus('Preferences synced');
+      }
     };
 
     fetchUserData();
@@ -433,7 +467,17 @@ function MuezzaApp() {
               addStreak(accessToken).catch(() => {});
             }
           } else {
-            setStreakLocal(0);
+            setMissionProgress((current) => ({
+              ...(current || {}),
+              completedTasks: current?.completedTasks || {},
+              badges: current?.badges || [],
+              rihlaThemes: current?.rihlaThemes || {},
+              catchUpQuest: {
+                date: today,
+                previousDate: lastResetDate,
+                recovered: false,
+              },
+            }));
           }
         }
 
@@ -463,7 +507,10 @@ function MuezzaApp() {
     prayers,
     setHabits,
     setLastResetDate,
+    setMissionProgress,
+    setPendingWisdom,
     setPrayers,
+    setStreakLocal,
     streakLocal,
   ]);
 
@@ -530,6 +577,31 @@ function MuezzaApp() {
     if (activeTab !== 'quran' || surahs.length > 0) return;
     fetchSurahs();
   }, [activeTab, surahs.length]);
+
+  const loadDailyAyah = async ({ force = false } = {}) => {
+    if (!force && dailyAyahCache?.date === todayKey && dailyAyahCache?.verse) return;
+
+    setIsLoadingDailyAyah(true);
+    setDailyAyahError(null);
+
+    try {
+      const payload = await fetchJson(`/api/random-ayah?translationId=${translationId}&reciterId=${reciterId}`);
+      const verse = payload?.verse || payload?.data?.verse || DAILY_AYAH_FALLBACK;
+      setDailyAyahCache({ date: todayKey, verse });
+      setMissionSyncStatus('Daily ayah refreshed');
+    } catch (error) {
+      console.warn('Daily ayah API unavailable; using offline fallback.', error);
+      setDailyAyahError('Daily ayah is using the offline fallback.');
+      setDailyAyahCache({ date: todayKey, verse: DAILY_AYAH_FALLBACK });
+    } finally {
+      setIsLoadingDailyAyah(false);
+    }
+  };
+
+  useEffect(() => {
+    if (!hasCompletedOnboarding) return;
+    loadDailyAyah();
+  }, [hasCompletedOnboarding]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => () => {
     if (audioPlayerRef.current) {
@@ -669,7 +741,7 @@ function MuezzaApp() {
     }, 60000);
 
     return () => clearInterval(interval);
-  }, [prayerTimes]);
+  }, [prayerTimes, setPrayers]);
 
   const resetHabitComposer = () => {
     setShowAddHabit(false);
@@ -878,6 +950,32 @@ function MuezzaApp() {
     fetchSurahPage(surah, 1, { scrollTop: true });
   };
 
+  const openVerseKey = (verseKey) => {
+    const parsed = parseVerseKey(verseKey);
+    if (!parsed) return;
+
+    setActiveTab('quran');
+    setTargetVerseKey(verseKey);
+    window.setTimeout(() => {
+      const targetPage = Math.ceil((parsed.verseNumber || 1) / 20);
+      fetchSurahPage(
+        {
+          id: parsed.chapterId,
+          name_simple: SURAH_NAMES_SIMPLE[parsed.chapterId] || `Surah ${parsed.chapterId}`,
+          translated_name: { name: SURAH_NAMES_SIMPLE[parsed.chapterId] || `Surah ${parsed.chapterId}` },
+        },
+        targetPage,
+        { scrollTop: false, append: false },
+      );
+    }, 100);
+
+    if (accessToken) {
+      saveReadingSession(accessToken, verseKey).then((result) => {
+        setMissionSyncStatus(result.ok ? 'Reading session synced' : 'Saved locally');
+      });
+    }
+  };
+
   const loadMoreVerses = () => {
     if (!selectedSurah || isLoadingMore) return;
     fetchSurahPage(selectedSurah, currentPage + 1, { append: true });
@@ -955,6 +1053,150 @@ function MuezzaApp() {
     }
   };
 
+  const completeMissionTask = async (bundle, task) => {
+    if (!bundle?.id || !task?.id) return;
+    const key = `${bundle.id}:${task.id}`;
+
+    if (missionProgress?.completedTasks?.[key]) return;
+
+    const nextCompletedTasks = {
+      ...(missionProgress.completedTasks || {}),
+      [key]: new Date().toISOString(),
+    };
+    const completedBundle = bundle.tasks?.every((item) => nextCompletedTasks[`${bundle.id}:${item.id}`]);
+    const nextBadges = new Set(missionProgress.badges || []);
+    if (completedBundle && bundle.badgeId) {
+      nextBadges.add(bundle.badgeId);
+    }
+
+    setMissionProgress({
+      ...missionProgress,
+      completedTasks: nextCompletedTasks,
+      badges: Array.from(nextBadges),
+      catchUpQuest:
+        task.kind === 'catch_up'
+          ? { ...(missionProgress.catchUpQuest || {}), recovered: true, recoveredAt: new Date().toISOString() }
+          : missionProgress.catchUpQuest,
+    });
+
+    setDinar((currentDinar) => currentDinar + Number(task.reward || 10));
+
+    if (completedBundle && bundle.rewardItemId && !inventory.includes(bundle.rewardItemId)) {
+      setInventory((currentInventory) =>
+        currentInventory.includes(bundle.rewardItemId)
+          ? currentInventory
+          : [...currentInventory, bundle.rewardItemId],
+      );
+    }
+
+    if (task.kind === 'catch_up') {
+      setStreakLocal((current) => Math.max(current, 1));
+      setPendingWisdom(null);
+    }
+
+    const verseKey = task.quran?.verseKey || dailyAyah?.verse_key;
+    const range = task.quran?.range || createRangeFromVerseKey(verseKey);
+
+    if (accessToken && verseKey) {
+      const [sessionResult, activityResult] = await Promise.all([
+        saveReadingSession(accessToken, verseKey),
+        creditActivityDay(accessToken, { verseKey, range, seconds: task.kind === 'audio' ? 180 : 90 }),
+      ]);
+      if (sessionResult.ok || activityResult.ok) {
+        setMissionSyncStatus('Mission synced with Quran Foundation');
+      } else {
+        setMissionSyncStatus('Mission saved locally');
+      }
+    }
+
+    if (accessToken && task.kind === 'goal') {
+      const activePlan = READING_PLANS.find((plan) => plan.id === activeReadingPlanId) || READING_PLANS[0];
+      const result = await createMissionGoal(accessToken, activePlan);
+      setMissionSyncStatus(result.ok ? 'Quran goal synced' : 'Goal saved locally');
+    }
+  };
+
+  const selectReadingPlan = async (plan) => {
+    if (!plan) return;
+    setActiveReadingPlanId(plan.id);
+    setMissionSyncStatus('Reading plan saved locally');
+
+    if (accessToken) {
+      const result = await createMissionGoal(accessToken, plan);
+      setMissionSyncStatus(result.ok ? 'Reading goal synced' : 'Reading plan saved locally');
+    }
+  };
+
+  const updateReflectionDraft = (id, value) => {
+    setReflectionDrafts((current) => ({ ...current, [id]: value }));
+  };
+
+  const saveReflection = async (id, verseKey) => {
+    const body = reflectionDrafts?.[id]?.trim();
+    if (!body) return;
+
+    setMissionSyncStatus('Reflection saved locally');
+    if (accessToken) {
+      const result = await saveMissionNote(accessToken, { body, verseKey, saveToQR: false });
+      setMissionSyncStatus(result.ok ? 'Private note synced' : 'Reflection saved locally');
+    }
+  };
+
+  const publishReflection = async (id, verseKey) => {
+    const body = reflectionDrafts?.[id]?.trim();
+    if (!body || !communityOptIn) return;
+
+    setMissionSyncStatus('Publishing reflection...');
+    if (accessToken) {
+      const result = await publishMissionReflection(accessToken, { body, verseKey, draft: false });
+      setMissionSyncStatus(result.ok ? 'Reflection published' : 'Reflection kept local');
+    } else {
+      setMissionSyncStatus('Sync with Quran.com to publish');
+    }
+  };
+
+  const createBookmarkHabit = (bookmark) => {
+    const verseKey = getBookmarkVerseKey(bookmark);
+    const title = `Reflect on ${bookmark?.surah_name || 'saved ayah'} ${bookmark?.ayah_number || verseKey}`;
+    if (habits.some((habit) => habit.title === title)) return;
+
+    setHabits([
+      ...habits,
+      {
+        id: Date.now(),
+        title,
+        category: 'Ruh',
+        completed: false,
+        kind: 'ayah_reflection',
+        energyReward: 25,
+        coinReward: 25,
+      },
+    ]);
+    setMissionSyncStatus('Bookmark habit created');
+  };
+
+  const completeRihlaTheme = async (theme) => {
+    if (!theme?.id || missionProgress?.rihlaThemes?.[theme.id]) return;
+
+    setMissionProgress({
+      ...missionProgress,
+      rihlaThemes: {
+        ...(missionProgress.rihlaThemes || {}),
+        [theme.id]: new Date().toISOString(),
+      },
+    });
+    setDinar((currentDinar) => currentDinar + 15);
+
+    if (accessToken) {
+      const result = await creditActivityDay(accessToken, {
+        verseKey: theme.verseKey,
+        range: theme.range,
+        seconds: 120,
+      });
+      setMissionSyncStatus(result.ok ? 'Rihla synced' : 'Rihla saved locally');
+    }
+  };
+
   const closeInfoModal = () => {
     setShowInfoModal(false);
     setInfoModalTab('guide');
@@ -1015,17 +1257,6 @@ function MuezzaApp() {
     );
   };
 
-  const handleStreakRestore = () => {
-    const val = prompt('Enter your current streak number to restore:', streakLocal.toString());
-    if (val !== null) {
-      const num = parseInt(val, 10);
-      if (!isNaN(num)) {
-        setStreakLocal(num);
-        alert('Streak restored successfully!');
-      }
-    }
-  };
-
   const handleExportData = () => {
     const data = {
       habits,
@@ -1043,14 +1274,6 @@ function MuezzaApp() {
     a.click();
     URL.revokeObjectURL(url);
   };
-
-  const hour = new Date().getHours();
-  const greeting = hour < 12 ? 'Good Morning' : hour < 18 ? 'Good Afternoon' : 'Good Evening';
-  const todayStr = new Date().toLocaleDateString('en-US', {
-    weekday: 'long',
-    month: 'long',
-    day: 'numeric',
-  });
 
   if (!hasCompletedOnboarding) {
     return <Onboarding onComplete={handleOnboardingComplete} />;
@@ -1143,7 +1366,7 @@ function MuezzaApp() {
                   className="flex items-center justify-center w-10 h-10 sm:w-auto sm:h-auto sm:px-4 sm:py-2.5 rounded-full bg-slate-50 border border-slate-100 shadow-sm active:scale-95 transition-all hover:bg-white hover:border-emerald-200 hover:shadow-emerald-500/5 group"
                 >
                   <MapPin className="w-4 h-4 sm:w-[18px] sm:h-[18px] text-emerald-600 group-hover:animate-bounce" />
-                  <span className="hidden sm:inline sm:ml-2 text-xs font-bold text-slate-600 tracking-tight">{formatLocationLabel(savedLocation)}</span>
+                  <span className="hidden sm:inline sm:ml-2 text-xs font-bold text-slate-600 tracking-tight">{locationLabel}</span>
                 </button>
               </div>
 
@@ -1186,7 +1409,7 @@ function MuezzaApp() {
               onPet={handlePetCat}
               isPetting={showHearts}
               inventory={inventory}
-              catStage={streakLocal >= 30 ? 'majestic' : streakLocal >= 7 ? 'adult' : 'kitten'}
+              catStage={catStage}
               onTogglePrayer={togglePrayer}
               onToggleMissedPrayer={toggleMissedPrayer}
               onToggleHabit={toggleHabit}
@@ -1204,6 +1427,11 @@ function MuezzaApp() {
                   }, 100);
                 }
               }}
+              featuredBundle={featuredMissionBundle}
+              activeBundles={activeBundles}
+              missionProgress={missionProgress}
+              onCompleteMissionTask={completeMissionTask}
+              onOpenVerse={openVerseKey}
             />
           )}
 
@@ -1232,15 +1460,31 @@ function MuezzaApp() {
               onVerseTafsir={handleVerseTafsir}
               getVerseAudioUrl={getVerseAudioUrl}
               getTranslationText={getTranslationText}
+              dailyAyah={dailyAyah}
+              dailyAyahError={dailyAyahError}
+              isLoadingDailyAyah={isLoadingDailyAyah}
+              onRefreshDailyAyah={() => loadDailyAyah({ force: true })}
+              onListenVerse={toggleVerseAudio}
+              onAskTafsir={handleVerseTafsir}
+              onBookmarkVerse={saveBookmark}
+              onOpenVerse={openVerseKey}
+              activeReadingPlanId={activeReadingPlanId}
+              onSelectReadingPlan={selectReadingPlan}
+              user={user}
+              syncStatus={missionSyncStatus}
+              rihlaThemes={missionProgress?.rihlaThemes || {}}
+              onCompleteRihlaTheme={completeRihlaTheme}
             />
           )}
+
+
 
           {activeTab === 'souq' && (
             <SouqTab 
               dinar={dinar}
               inventory={inventory}
               onBuy={buyItem}
-              catStage={streakLocal >= 30 ? 'majestic' : streakLocal >= 7 ? 'adult' : 'kitten'}
+              catStage={catStage}
             />
           )}
 
@@ -1262,6 +1506,14 @@ function MuezzaApp() {
               }}
               onLogout={logout}
               onLogin={() => {}}
+              onCreateBookmarkHabit={createBookmarkHabit}
+              communityOptIn={communityOptIn}
+              onToggleCommunityOptIn={setCommunityOptIn}
+              reflectionDrafts={reflectionDrafts}
+              onUpdateReflection={updateReflectionDraft}
+              onSaveReflection={saveReflection}
+              onPublishReflection={publishReflection}
+              dailyAyah={dailyAyah}
             />
           )}
 
@@ -1272,7 +1524,7 @@ function MuezzaApp() {
               isThinking={isAdvisorThinking}
               onResetAdvice={resetAdvice}
               inventory={inventory}
-              catStage={streakLocal >= 30 ? 'majestic' : streakLocal >= 7 ? 'adult' : 'kitten'}
+              catStage={catStage}
               advisorLogs={advisorLogs}
             />
           )}
@@ -1301,6 +1553,8 @@ function MuezzaApp() {
             </div>
             <span className="text-[9px] font-bold">Quran</span>
           </button>
+
+
 
           <button
             onClick={() => setActiveTab('advisor')}

@@ -1,6 +1,35 @@
-import { Sparkles, CheckCircle2, Circle, Pencil, Plus, Trash2, X, Activity, ArrowRight, BookOpen } from 'lucide-react';
+import { Sparkles, CheckCircle2, Circle, Pencil, Plus, Trash2, X, Activity, ArrowRight, BookOpen, Coins, Target } from 'lucide-react';
 import CatSVG from '../CatSVG';
-import { PRAYER_ICONS } from '../../constants/muezza_data';
+import { PRAYER_ICONS, EVERGREEN_MISSION_TASKS } from '../../constants/muezza_data';
+
+const accentClasses = {
+  emerald: 'border-emerald-100 bg-emerald-50/40 text-emerald-700',
+  amber: 'border-amber-100 bg-amber-50/60 text-amber-700',
+  indigo: 'border-indigo-100 bg-indigo-50/60 text-indigo-700',
+  sky: 'border-sky-100 bg-sky-50/60 text-sky-700',
+};
+
+function taskKey(bundleId, taskId) {
+  return `${bundleId}:${taskId}`;
+}
+
+function getBundleProgress(bundle, completedTasks) {
+  const done = bundle.tasks.filter((task) => completedTasks[taskKey(bundle.id, task.id)]).length;
+  return {
+    done,
+    total: bundle.tasks.length,
+    percent: Math.round((done / Math.max(bundle.tasks.length, 1)) * 100),
+  };
+}
+
+function RewardChip({ children }) {
+  return (
+    <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2.5 py-1 text-[10px] font-black uppercase tracking-widest text-amber-700 border border-amber-100">
+      <Coins className="w-3 h-3" />
+      {children}
+    </span>
+  );
+}
 
 export function HomeTab({ 
   energy, 
@@ -21,8 +50,18 @@ export function HomeTab({
   onStartJourney,
   onOpenInfoModal,
   prayerTimes,
-  onOpenQuran
+  onOpenQuran,
+  // Mission props
+  featuredBundle,
+  activeBundles,
+  missionProgress,
+  onCompleteMissionTask,
+  onOpenVerse
 }) {
+  const completedTasks = missionProgress?.completedTasks || {};
+  const badges = missionProgress?.badges || [];
+  const featuredProgress = featuredBundle ? getBundleProgress(featuredBundle, completedTasks) : null;
+
   return (
     <div className="px-4 pt-4 pb-32 sm:px-6 sm:py-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="bg-white rounded-[2rem] sm:rounded-[4rem] p-4 sm:p-12 mb-6 sm:mb-12 shadow-xl shadow-emerald-900/5 border border-emerald-50 relative overflow-hidden group">
@@ -174,6 +213,46 @@ export function HomeTab({
         </div>
       </div>
 
+      {/* Featured Mission Banner */}
+      {featuredBundle && (
+        <section className="relative overflow-hidden rounded-[2rem] sm:rounded-[3rem] bg-slate-950 text-white p-5 sm:p-8 mb-8 shadow-2xl shadow-slate-900/20 border border-slate-800">
+          <div className="absolute inset-0 opacity-40 bg-[radial-gradient(circle_at_20%_20%,rgba(16,185,129,0.28),transparent_32%),radial-gradient(circle_at_80%_30%,rgba(245,158,11,0.24),transparent_30%)]" />
+          <div className="relative z-10 grid gap-5 sm:grid-cols-[1fr_auto] sm:items-center">
+            <div>
+              <p className="text-[10px] font-black uppercase tracking-[0.35em] text-emerald-300 mb-3">Today's Mission</p>
+              <div className="flex items-center gap-3 mb-3">
+                <span className="text-3xl sm:text-4xl leading-none">{featuredBundle.icon}</span>
+                <div>
+                  <h2 className="text-xl sm:text-2xl font-black tracking-tighter">{featuredBundle.title}</h2>
+                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">
+                    {featuredBundle.season}
+                    {featuredBundle._status === 'upcoming' && (
+                      <span className="ml-2 text-amber-400">• Coming Soon</span>
+                    )}
+                  </p>
+                </div>
+              </div>
+              <p className="text-xs sm:text-sm text-slate-300 leading-relaxed max-w-2xl">{featuredBundle.summary}</p>
+            </div>
+            <div className="flex items-center gap-4 sm:flex-col sm:items-end">
+              <CatSVG awake={true} equipped={['glasses_smart', featuredBundle.rewardItemId]} className="w-20 h-20 sm:w-24 sm:h-24" isPetting={false} />
+              {featuredProgress && (
+                <div className="min-w-[120px]">
+                  <div className="flex justify-between text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">
+                    <span>Today</span>
+                    <span>{featuredProgress.percent}%</span>
+                  </div>
+                  <div className="h-3 rounded-full bg-white/10 overflow-hidden border border-white/10">
+                    <div className="h-full rounded-full bg-emerald-400 transition-all duration-700" style={{ width: `${featuredProgress.percent}%` }} />
+                  </div>
+                  <p className="text-[10px] text-slate-400 font-bold mt-2">{featuredProgress.done}/{featuredProgress.total} tasks complete</p>
+                </div>
+              )}
+            </div>
+          </div>
+        </section>
+      )}
+
       <div className="mb-8 space-y-6">
         <div className="flex items-center justify-between px-2">
           <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.4em]">Habit Matrix</h4>
@@ -261,6 +340,102 @@ export function HomeTab({
           </button>
         </div>
       </div>
+
+      {/* Active Seasonal Bundles — only shown when near Islamic event */}
+      {activeBundles && activeBundles.length > 0 && (
+        <section className="mb-8">
+          <div className="flex items-center justify-between px-2 mb-3">
+            <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.35em]">Seasonal Missions</h4>
+            <span className="text-[9px] font-black text-emerald-600 uppercase tracking-widest bg-emerald-50 border border-emerald-100 px-2 py-1 rounded-full">{badges.length} Badges</span>
+          </div>
+          <div className="grid gap-4 lg:grid-cols-2">
+            {activeBundles.map((bundle) => {
+              const progress = getBundleProgress(bundle, completedTasks);
+              const isUpcoming = bundle._status === 'upcoming';
+              return (
+                <div key={bundle.id} className={`bg-white rounded-[2rem] p-5 border shadow-sm transition-all ${isUpcoming ? 'border-amber-100 opacity-90' : 'border-slate-100'}`}>
+                  <div className="flex items-start justify-between gap-3 mb-4">
+                    <div className="flex items-center gap-3">
+                      <span className="text-3xl">{bundle.icon}</span>
+                      <div>
+                        <h3 className="font-black text-slate-900 tracking-tight">{bundle.title}</h3>
+                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">{progress.done}/{progress.total} complete</p>
+                      </div>
+                    </div>
+                    <span className={`text-[9px] font-black uppercase tracking-widest rounded-full border px-2.5 py-1 ${
+                      isUpcoming 
+                        ? 'border-amber-200 bg-amber-50 text-amber-600' 
+                        : (accentClasses[bundle.accent] || accentClasses.emerald)
+                    }`}>
+                      {isUpcoming ? 'Coming Soon' : 'Active'}
+                    </span>
+                  </div>
+                  <div className="space-y-2">
+                    {bundle.tasks.map((task) => {
+                      const done = completedTasks[taskKey(bundle.id, task.id)];
+                      return (
+                        <div key={task.id} className="flex items-center gap-3 rounded-2xl border border-slate-100 bg-slate-50/60 p-3">
+                          <button
+                            onClick={() => onCompleteMissionTask(bundle, task)}
+                            className={`shrink-0 w-9 h-9 rounded-xl flex items-center justify-center transition-all active:scale-95 ${
+                              done ? 'bg-emerald-500 text-white' : 'bg-white border border-slate-100 text-slate-300 hover:text-emerald-600'
+                            }`}
+                            title={done ? 'Completed' : 'Complete task'}
+                          >
+                            {done ? <CheckCircle2 className="w-5 h-5" /> : <Circle className="w-5 h-5" />}
+                          </button>
+                          <div className="min-w-0 flex-1">
+                            <p className={`text-sm font-black tracking-tight ${done ? 'text-slate-400 line-through' : 'text-slate-800'}`}>{task.title}</p>
+                            <RewardChip>+{task.reward || 10}</RewardChip>
+                          </div>
+                          {task.quran?.verseKey && (
+                            <button
+                              onClick={() => onOpenVerse(task.quran.verseKey)}
+                              className="shrink-0 p-2.5 rounded-xl bg-white border border-slate-100 text-emerald-600 hover:bg-emerald-50 transition-all"
+                              title="Open ayah"
+                            >
+                              <BookOpen className="w-4 h-4" />
+                            </button>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </section>
+      )}
+
+      {/* Evergreen Quests */}
+      <section className="mb-8">
+        <div className="bg-white rounded-[2rem] p-5 border border-slate-100 shadow-sm">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="font-black text-slate-900 tracking-tight">Evergreen Quests</h3>
+            <Sparkles className="w-5 h-5 text-emerald-500" />
+          </div>
+          <div className="space-y-2">
+            {EVERGREEN_MISSION_TASKS.map((task) => {
+              const done = completedTasks[taskKey('evergreen', task.id)];
+              return (
+                <button
+                  key={task.id}
+                  onClick={() => onCompleteMissionTask({ id: 'evergreen', badgeId: 'badge_daily_light', rewardItemId: null, tasks: EVERGREEN_MISSION_TASKS }, task)}
+                  className={`w-full text-left rounded-2xl p-3 border transition-all active:scale-[0.98] ${
+                    done ? 'bg-emerald-50 border-emerald-100 text-emerald-800' : 'bg-slate-50 border-slate-100 text-slate-600 hover:border-emerald-100'
+                  }`}
+                >
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="text-xs font-black">{task.title}</span>
+                    {done ? <CheckCircle2 className="w-4 h-4 shrink-0" /> : <RewardChip>+{task.reward}</RewardChip>}
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      </section>
     </div>
   );
 }

@@ -76,6 +76,20 @@ const CatSVG = ({ awake, equipped, isPetting, onPet, stage = 'adult', className 
             <path d="M10 -5 L10 -15 Q20 -15 20 -5" stroke="#f4a261" strokeWidth="2" fill="none" />
           </g>
         )}
+        {equipped?.includes('kahf_lantern') && (
+          <g transform="translate(150, 95)">
+            <rect x="0" y="10" width="18" height="28" fill="#0f766e" rx="4" />
+            <path d="M2 10 Q9 -2 16 10" fill="#fbbf24" />
+            <circle cx="9" cy="24" r="5" fill="#fde68a" className="animate-pulse" />
+            <path d="M9 -2 L9 -13 Q19 -13 19 -4" stroke="#fbbf24" strokeWidth="2" fill="none" />
+          </g>
+        )}
+        {equipped?.includes('hijri_scroll') && (
+          <g transform="translate(32, 128)">
+            <rect x="0" y="0" width="32" height="18" rx="4" fill="#f5deb3" stroke="#d4a373" strokeWidth="2" />
+            <path d="M7 6 H25 M7 12 H20" stroke="#8b5e34" strokeWidth="2" strokeLinecap="round" />
+          </g>
+        )}
         {equipped?.includes('tasbih_amber') && (
           <g transform="translate(48, 118)">
             <path d="M0 0 Q12 22 28 18" stroke="#b5651d" strokeWidth="3" fill="none" />
@@ -169,7 +183,7 @@ const CatSVG = ({ awake, equipped, isPetting, onPet, stage = 'adult', className 
                 <path d="M127 85 L140 80" />
               </g>
             )}
-            {equipped?.includes('sunglasses_rose') && (
+        {equipped?.includes('sunglasses_rose') && (
               <g stroke="#7f1d1d" strokeWidth="3" fill="none">
                 <rect x="71" y="74" width="24" height="16" rx="6" fill="#fda4af" fillOpacity="0.4" />
                 <rect x="105" y="74" width="24" height="16" rx="6" fill="#fda4af" fillOpacity="0.4" />
@@ -183,6 +197,18 @@ const CatSVG = ({ awake, equipped, isPetting, onPet, stage = 'adult', className 
                 <path d="M0 8 Q8 0 16 8 Q8 10 0 8" fill="#cdb4db" />
                 <path d="M16 8 Q24 0 32 8 Q24 10 16 8" fill="#cdb4db" />
                 <circle cx="16" cy="8" r="4" fill="#b185db" />
+              </g>
+            )}
+            {equipped?.includes('crescent_collar') && (
+              <g transform="translate(77, 112)">
+                <path d="M0 0 Q23 16 46 0" stroke="#10b981" strokeWidth="7" strokeLinecap="round" fill="none" />
+                <path d="M23 12 A7 7 0 1 1 30 2 A5 5 0 1 0 23 12" fill="#fbbf24" />
+              </g>
+            )}
+            {equipped?.includes('ihram_wrap') && (
+              <g transform="translate(68, 105)">
+                <path d="M0 12 Q32 26 64 12 L58 44 Q32 56 6 44 Z" fill="#f8fafc" stroke="#e2e8f0" strokeWidth="2" />
+                <path d="M12 20 Q32 30 52 20" stroke="#cbd5e1" strokeWidth="2" fill="none" />
               </g>
             )}
 

@@ -1,6 +1,7 @@
 import React from 'react';
-import { Flame, Star, Sparkles, RefreshCw, Bookmark as BookmarkIcon, CheckCircle2, LogOut, CloudOff, Shield } from 'lucide-react';
+import { Flame, Star, Sparkles, RefreshCw, Bookmark as BookmarkIcon, CheckCircle2, LogOut, CloudOff, Shield, BookOpen, Target, MessageCircle, Send, Lock } from 'lucide-react';
 import LoginButton from '../../auth/LoginButton';
+import { COMMUNITY_REFLECTION_PROMPTS } from '../../constants/muezza_data';
 
 const NOOR_STAGES = [
   { id: 'spark', label: 'The Spark', range: 'Day 1–3', icon: '🔥', desc: 'A flicker of spiritual intent.' },
@@ -30,7 +31,16 @@ export function NoorTab({
   isSyncing, 
   bookmarks, 
   onOpenSurahByBookmark,
-  onLogout 
+  onLogout,
+  // New mission props
+  onCreateBookmarkHabit,
+  communityOptIn,
+  onToggleCommunityOptIn,
+  reflectionDrafts,
+  onUpdateReflection,
+  onSaveReflection,
+  onPublishReflection,
+  dailyAyah
 }) {
   const currentStageIdx = 
     streak >= 30 ? 3 :
@@ -48,6 +58,9 @@ export function NoorTab({
     : user?.email || null;
 
   const userInitial = (user?.username || user?.preferred_username || user?.name || user?.first_name || user?.email || 'U').charAt(0).toUpperCase();
+
+  const latestBookmark = bookmarks?.[0];
+  const bookmarkVerseKey = latestBookmark?.verse_key;
 
   return (
     <div className="px-4 sm:px-6 py-4 pb-32 animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -179,6 +192,7 @@ export function NoorTab({
         </div>
       </div>
 
+      {/* Spiritual Archives (Bookmarks) */}
       {user && (
         <div className="mb-8 sm:mb-10">
           <h4 className="text-xs font-black text-slate-400 uppercase tracking-widest px-2 mb-3 sm:mb-4">Spiritual Archives</h4>
@@ -224,6 +238,79 @@ export function NoorTab({
           </div>
         </div>
       )}
+
+      {/* Bookmark Prompt — create habit from saved ayah */}
+      <section className="bg-white rounded-[2rem] p-5 border border-slate-100 shadow-sm mb-6">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="font-black text-slate-900 tracking-tight">Bookmark Prompt</h3>
+          <BookOpen className="w-5 h-5 text-sky-500" />
+        </div>
+        {latestBookmark ? (
+          <div className="space-y-4">
+            <div className="rounded-2xl bg-sky-50 border border-sky-100 p-4">
+              <p className="text-sm font-black text-slate-800">{latestBookmark.surah_name}</p>
+              <p className="text-[10px] font-black uppercase tracking-widest text-sky-700 mt-1">Ayah {latestBookmark.ayah_number || bookmarkVerseKey}</p>
+            </div>
+            <button
+              onClick={() => onCreateBookmarkHabit(latestBookmark)}
+              className="w-full py-3 rounded-2xl bg-slate-900 text-white text-xs font-black flex items-center justify-center gap-2 active:scale-95 transition-all"
+            >
+              <Target className="w-4 h-4 text-emerald-300" />
+              Create Habit
+            </button>
+          </div>
+        ) : (
+          <div className="rounded-2xl bg-slate-50 border border-slate-100 p-5 text-center">
+            <p className="text-xs font-bold text-slate-400">Bookmark an ayah to unlock personalized prompts.</p>
+          </div>
+        )}
+      </section>
+
+      {/* Community */}
+      <section className="bg-white rounded-[2rem] p-5 border border-slate-100 shadow-sm mb-6">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="font-black text-slate-900 tracking-tight">Community</h3>
+          <MessageCircle className="w-5 h-5 text-indigo-500" />
+        </div>
+        <button
+          onClick={() => onToggleCommunityOptIn(!communityOptIn)}
+          className={`w-full rounded-2xl p-4 border text-left transition-all active:scale-[0.98] ${
+            communityOptIn ? 'bg-indigo-50 border-indigo-100 text-indigo-800' : 'bg-slate-50 border-slate-100 text-slate-500'
+          }`}
+        >
+          <p className="text-xs font-black uppercase tracking-widest">{communityOptIn ? 'Opted in' : 'Private mode'}</p>
+          <p className="text-xs font-bold mt-2 leading-relaxed">Only reflections you publish are shared. Prayers and habits stay private.</p>
+        </button>
+      </section>
+
+      {/* Reflection */}
+      <section className="bg-white rounded-[2rem] p-5 sm:p-6 border border-slate-100 shadow-sm">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-indigo-600 mb-1">Reflection</p>
+            <h3 className="text-xl font-black tracking-tighter text-slate-900">{COMMUNITY_REFLECTION_PROMPTS[0]}</h3>
+          </div>
+          <MessageCircle className="w-5 h-5 text-indigo-500 shrink-0" />
+        </div>
+        <textarea
+          value={reflectionDrafts?.daily || ''}
+          onChange={(event) => onUpdateReflection('daily', event.target.value)}
+          className="w-full min-h-28 rounded-2xl bg-slate-50 border border-slate-100 p-4 text-sm font-bold text-slate-700 placeholder:text-slate-300 focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-200 transition-all"
+          placeholder="Write a private note from today's ayah..."
+        />
+        <div className="grid sm:grid-cols-2 gap-3 mt-3">
+          <button onClick={() => onSaveReflection('daily', dailyAyah?.verse_key)} className="py-3 rounded-2xl bg-indigo-50 text-indigo-700 border border-indigo-100 text-xs font-black flex items-center justify-center gap-2 active:scale-95 transition-all">
+            <Shield className="w-4 h-4" /> Save Private Note
+          </button>
+          <button
+            onClick={() => onPublishReflection('daily', dailyAyah?.verse_key)}
+            disabled={!communityOptIn}
+            className="py-3 rounded-2xl bg-slate-900 text-white text-xs font-black flex items-center justify-center gap-2 active:scale-95 transition-all disabled:bg-slate-100 disabled:text-slate-400"
+          >
+            <Send className="w-4 h-4" /> Publish Reflection
+          </button>
+        </div>
+      </section>
     </div>
   );
 }

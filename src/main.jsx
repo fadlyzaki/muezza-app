@@ -8,6 +8,7 @@ import { AuthProvider } from './auth/AuthContext.jsx'
 
 const path = window.location.pathname;
 
+// eslint-disable-next-line react-refresh/only-export-components
 const Router = () => {
   if (path === '/callback') return <Callback />;
   if (path === '/privacy') return <PrivacyPolicy />;

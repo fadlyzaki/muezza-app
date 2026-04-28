@@ -185,6 +185,10 @@ export const SHOP_ITEMS = [
   { id: 'bow_lilac', name: 'Lilac Bow', price: 90, type: 'accessory', icon: '🎀', desc: 'A dainty lilac bow for the ear.' },
   { id: 'lantern_gold', name: 'Golden Fanoos', price: 200, type: 'decor', icon: '🏮', desc: 'Illuminates the room.' },
   { id: 'sajjadah_midnight', name: 'Midnight Sajjadah', price: 220, type: 'rug', icon: '🌌', desc: 'A deep-blue rug with moonlit accents.' },
+  { id: 'crescent_collar', name: 'Ramadan Crescent Collar', price: 180, type: 'accessory', icon: '🌙', desc: 'Unlocked by Ramadan missions.' },
+  { id: 'ihram_wrap', name: 'Hajj White Wrap', price: 190, type: 'accessory', icon: '🕋', desc: 'A simple wrap for the Dhul Hijjah path.' },
+  { id: 'hijri_scroll', name: 'Hijrah Intention Scroll', price: 130, type: 'decor', icon: '📜', desc: 'A keepsake for annual renewal.' },
+  { id: 'kahf_lantern', name: 'Jummah Kahf Lantern', price: 170, type: 'decor', icon: '✨', desc: 'A weekly light for Surah Al-Kahf.' },
   
   // Food & Sustenance
   // Food & Sustenance
@@ -327,3 +331,123 @@ export const MOOD_RESPONSES = {
     tafsir: "Confidence is the byproduct of consciousness. When you are aware of the Highest Security, the local threats of the world lose their power over you."
   }
 };
+
+export const DAILY_AYAH_FALLBACK = {
+  id: 'fallback-94-6',
+  title: 'Daily Ayah Mission',
+  verse_key: '94:6',
+  chapter_id: 94,
+  verse_number: 6,
+  text_uthmani: 'إِنَّ مَعَ ٱلْعُسْرِ يُسْرًا',
+  translations: [{ text: 'Indeed, with hardship comes ease.' }],
+  audio: null,
+};
+
+export const MISSION_BUNDLES = [
+  {
+    id: 'ramadan',
+    title: 'Ramadan Companion',
+    season: 'Ramadan',
+    badge: 'Ramadan Crescent',
+    badgeId: 'badge_ramadan_crescent',
+    rewardItemId: 'crescent_collar',
+    accent: 'emerald',
+    icon: '🌙',
+    activeWhen: { hijriMonth: 9 },
+    activeWindow: { before: 1, after: 0 },
+    summary: 'A daily path for Quran, taraweeh reflection, sadaqah, and the last ten nights.',
+    tasks: [
+      { id: 'ramadan_juz', title: 'Read today’s juz/page portion', kind: 'quran', reward: 18, quran: { mode: 'juz', value: 1, verseKey: '2:1' } },
+      { id: 'ramadan_audio', title: 'Listen to a recitation after iftar', kind: 'audio', reward: 12, quran: { mode: 'surah', value: 67, verseKey: '67:1' } },
+      { id: 'ramadan_taraweeh', title: 'Write one taraweeh reflection', kind: 'reflection', reward: 15, quran: { verseKey: '97:1' } },
+      { id: 'ramadan_sadaqah', title: 'Do one sadaqah action', kind: 'habit', reward: 12 },
+      { id: 'ramadan_qadr', title: 'Last ten nights: seek Laylatul Qadr', kind: 'reflection', reward: 25, quran: { verseKey: '97:3' } },
+    ],
+  },
+  {
+    id: 'dhul_hijjah',
+    title: 'Dhul Hijjah & Hajj Path',
+    season: 'Dhul Hijjah',
+    badge: 'Ten Blessed Days',
+    badgeId: 'badge_ten_blessed_days',
+    rewardItemId: 'ihram_wrap',
+    accent: 'amber',
+    icon: '🕋',
+    activeWhen: { hijriMonth: 12 },
+    activeWindow: { before: 1, after: 0 },
+    summary: 'First ten days challenge, sacrifice reflection, takbir, and Hajj rites learning.',
+    tasks: [
+      { id: 'hajj_ten_days', title: 'Complete a first ten days good deed', kind: 'habit', reward: 14 },
+      { id: 'hajj_rites', title: 'Study one Hajj rite', kind: 'quran', reward: 14, quran: { mode: 'surah', value: 22, verseKey: '22:27' } },
+      { id: 'hajj_takbir', title: 'Make takbir and gratitude dhikr', kind: 'habit', reward: 12 },
+      { id: 'hajj_sacrifice', title: 'Reflect on sacrifice and sincerity', kind: 'reflection', reward: 18, quran: { verseKey: '22:37' } },
+    ],
+  },
+  {
+    id: 'muharram',
+    title: 'Islamic New Year Reset',
+    season: 'Muharram',
+    badge: 'Hijrah Compass',
+    badgeId: 'badge_hijrah_compass',
+    rewardItemId: 'hijri_scroll',
+    accent: 'indigo',
+    icon: '📜',
+    activeWhen: { hijriMonth: 1 },
+    activeWindow: { before: 1, after: 0 },
+    summary: 'Renew intentions, reset goals, and set the Noor direction for the year.',
+    tasks: [
+      { id: 'new_year_niyyah', title: 'Write one renewed intention', kind: 'reflection', reward: 15, quran: { verseKey: '59:18' } },
+      { id: 'new_year_hijrah', title: 'Read a Hijrah reflection ayah', kind: 'quran', reward: 12, quran: { verseKey: '9:40' } },
+      { id: 'new_year_goal', title: 'Choose one yearly Quran goal', kind: 'goal', reward: 18 },
+    ],
+  },
+  {
+    id: 'jummah',
+    title: 'Weekly Jummah Rhythm',
+    season: 'Friday',
+    badge: 'Kahf Lantern',
+    badgeId: 'badge_kahf_lantern',
+    rewardItemId: 'kahf_lantern',
+    accent: 'sky',
+    icon: '✨',
+    activeWhen: { weekday: 5 },
+    summary: 'Surah Al-Kahf, salawat, charity, and a Friday reflection reward.',
+    tasks: [
+      { id: 'jummah_kahf', title: 'Read from Surah Al-Kahf', kind: 'quran', reward: 16, quran: { mode: 'surah', value: 18, verseKey: '18:1' } },
+      { id: 'jummah_salawat', title: 'Send salawat with presence', kind: 'habit', reward: 10 },
+      { id: 'jummah_charity', title: 'Give or plan a small charity', kind: 'habit', reward: 12 },
+      { id: 'jummah_reflection', title: 'Write a Friday reflection', kind: 'reflection', reward: 16, quran: { verseKey: '62:9' } },
+    ],
+  },
+];
+
+export const EVERGREEN_MISSION_TASKS = [
+  { id: 'daily_ayah_read', title: 'Read today’s ayah', kind: 'daily_ayah', reward: 10 },
+  { id: 'daily_ayah_listen', title: 'Listen to today’s ayah', kind: 'daily_ayah_audio', reward: 10 },
+  { id: 'daily_ayah_tafsir', title: 'Ask Muezza for tafsir insight', kind: 'daily_ayah_tafsir', reward: 12 },
+  { id: 'bookmark_seed', title: 'Turn a saved ayah into one small habit', kind: 'bookmark_habit', reward: 16 },
+  { id: 'audio_streak', title: 'Complete a short recitation session', kind: 'audio', reward: 12 },
+  { id: 'catch_up_mercy', title: 'Restore momentum with a mercy quest', kind: 'catch_up', reward: 18 },
+];
+
+export const READING_PLANS = [
+  { id: 'page_1', title: 'One Page Calm', type: 'QURAN_PAGES', amount: 1, duration: 1, category: 'QURAN', range: '1:1-1:7', label: '1 page/day' },
+  { id: 'juz_30', title: 'Juz Amma Reset', type: 'QURAN_RANGE', amount: '78:1-114:6', duration: 14, category: 'QURAN', range: '78:1-114:6', label: 'Juz 30' },
+  { id: 'ramadan_pages', title: 'Ramadan Page Flow', type: 'RAMADAN_CHALLENGE', amount: 20, duration: 30, category: 'RAMADAN_CHALLENGE', range: '2:1-2:20', label: '20 pages/day' },
+  { id: 'kahf_weekly', title: 'Weekly Al-Kahf', type: 'QURAN_RANGE', amount: '18:1-18:110', duration: 7, category: 'QURAN', range: '18:1-18:110', label: 'Surah Al-Kahf' },
+];
+
+export const RIHLA_THEMES = [
+  { id: 'sabr', title: 'Sabr', icon: '⏳', verseKey: '2:153', range: '2:153-2:157', desc: 'Steadiness when the day feels heavy.' },
+  { id: 'shukr', title: 'Shukr', icon: '🤲', verseKey: '14:7', range: '14:7-14:7', desc: 'Gratitude as a multiplier of attention.' },
+  { id: 'tawbah', title: 'Tawbah', icon: '🌱', verseKey: '39:53', range: '39:53-39:53', desc: 'Return without theatrical guilt.' },
+  { id: 'rizq', title: 'Rizq', icon: '🍃', verseKey: '65:3', range: '65:2-65:3', desc: 'Trust while still doing the work.' },
+  { id: 'mercy', title: 'Mercy', icon: '💧', verseKey: '7:156', range: '7:156-7:156', desc: 'A wider door than the self expects.' },
+  { id: 'courage', title: 'Courage', icon: '🛡️', verseKey: '3:139', range: '3:139-3:139', desc: 'A bright spine for difficult choices.' },
+];
+
+export const COMMUNITY_REFLECTION_PROMPTS = [
+  'What did this ayah invite you to do differently today?',
+  'Which word felt most alive to you, and why?',
+  'What is one small mercy you noticed after reading?',
+];

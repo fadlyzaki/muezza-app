@@ -14,10 +14,19 @@ import {
   Book,
   AlertCircle,
   Plus,
-  RefreshCw
+  RefreshCw,
+  Headphones,
+  Loader2,
+  Target,
+  Lock,
+  Shield,
+  Compass,
+  CheckCircle2
 } from 'lucide-react';
 import CatSVG from '../CatSVG';
 import { ErrorState } from '../common/ErrorState';
+import { READING_PLANS, RIHLA_THEMES } from '../../constants/muezza_data';
+import { getTranslationText as getTranslationTextUtil, getVerseReference } from '../../utils/muezza_utils';
 
 export function QuranTab({ 
   targetVerseKey,
@@ -39,16 +48,25 @@ export function QuranTab({
   onToggleBookmark,
   bookmarkedVerseKeys,
   onVerseTafsir,
-  isJourneying,
-  journeyResult,
-  journeyError,
-  onCloseJourney,
-  journeyMode,
-  onHardResetJourney,
   quranReadingHabit,
   onToggleHabit,
   getVerseAudioUrl,
-  getTranslationText
+  getTranslationText,
+  // New mission props
+  dailyAyah,
+  dailyAyahError,
+  isLoadingDailyAyah,
+  onRefreshDailyAyah,
+  onListenVerse,
+  onAskTafsir,
+  onBookmarkVerse,
+  onOpenVerse,
+  activeReadingPlanId,
+  onSelectReadingPlan,
+  user,
+  syncStatus,
+  rihlaThemes,
+  onCompleteRihlaTheme
 }) {
   const loaderRef = React.useRef(null);
 
@@ -91,6 +109,9 @@ export function QuranTab({
       }
     }
   }, [verses, targetVerseKey, onClearTargetVerseKey]);
+
+  const ayahTranslation = dailyAyah ? getTranslationTextUtil(dailyAyah) : '';
+  const activeReadingPlan = READING_PLANS.find((plan) => plan.id === activeReadingPlanId) || READING_PLANS[0];
 
   if (selectedSurah) {
     return (
@@ -277,6 +298,90 @@ export function QuranTab({
         </div>
       </div>
 
+      {/* Daily Ayah Quest */}
+      {dailyAyah && (
+        <section className="bg-white rounded-[2rem] p-5 sm:p-6 border border-emerald-100 shadow-sm mb-6">
+          <div className="flex items-center justify-between gap-4 mb-5">
+            <div>
+              <p className="text-[10px] font-black uppercase tracking-[0.3em] text-emerald-600 mb-1">Daily Ayah</p>
+              <h3 className="text-xl font-black tracking-tighter text-slate-900">Quran-powered quest</h3>
+            </div>
+            <button
+              onClick={onRefreshDailyAyah}
+              disabled={isLoadingDailyAyah}
+              className="p-3 rounded-2xl bg-emerald-50 border border-emerald-100 text-emerald-600 active:scale-95 transition-all disabled:opacity-50"
+              title="Refresh daily ayah"
+            >
+              {isLoadingDailyAyah ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
+            </button>
+          </div>
+
+          <div className="space-y-4">
+            {dailyAyahError && (
+              <div className="p-3 rounded-2xl bg-amber-50 border border-amber-100 text-xs font-black text-amber-700 uppercase tracking-widest">
+                {dailyAyahError}
+              </div>
+            )}
+            <p className="text-right text-2xl leading-[2] quran-font text-slate-800" dir="rtl">
+              {dailyAyah?.text_uthmani}
+            </p>
+            <div className="rounded-2xl bg-slate-50 border border-slate-100 p-4">
+              <p className="text-sm leading-relaxed text-slate-600">{ayahTranslation}</p>
+              <p className="text-[10px] font-black uppercase tracking-widest text-emerald-600 mt-3">{getVerseReference(dailyAyah)}</p>
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+              <button onClick={() => onOpenVerse(dailyAyah?.verse_key)} className="py-3 rounded-2xl bg-slate-900 text-white text-xs font-black flex items-center justify-center gap-2 active:scale-95 transition-all">
+                <BookOpen className="w-4 h-4" /> Read
+              </button>
+              <button onClick={() => onListenVerse(dailyAyah)} className="py-3 rounded-2xl bg-emerald-50 text-emerald-700 border border-emerald-100 text-xs font-black flex items-center justify-center gap-2 active:scale-95 transition-all">
+                <Headphones className="w-4 h-4" /> Listen
+              </button>
+              <button onClick={() => onAskTafsir(dailyAyah)} className="py-3 rounded-2xl bg-amber-50 text-amber-700 border border-amber-100 text-xs font-black flex items-center justify-center gap-2 active:scale-95 transition-all">
+                <Sparkles className="w-4 h-4" /> Tafsir
+              </button>
+              <button onClick={() => onBookmarkVerse(dailyAyah)} className="py-3 rounded-2xl bg-sky-50 text-sky-700 border border-sky-100 text-xs font-black flex items-center justify-center gap-2 active:scale-95 transition-all">
+                <Star className="w-4 h-4" /> Save
+              </button>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Quran Reading Plan */}
+      <section className="bg-white rounded-[2rem] p-5 sm:p-6 border border-slate-100 shadow-sm mb-6">
+        <div className="flex items-center justify-between mb-5">
+          <div>
+            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-amber-600 mb-1">Quran Plan</p>
+            <h3 className="text-xl font-black tracking-tighter text-slate-900">{activeReadingPlan.title}</h3>
+          </div>
+          <Target className="w-5 h-5 text-amber-500" />
+        </div>
+        <div className="grid grid-cols-2 gap-2 mb-5">
+          {READING_PLANS.map((plan) => (
+            <button
+              key={plan.id}
+              onClick={() => onSelectReadingPlan(plan)}
+              className={`text-left rounded-2xl p-3 border transition-all active:scale-[0.98] ${
+                activeReadingPlan.id === plan.id
+                  ? 'bg-amber-50 border-amber-200 text-amber-800'
+                  : 'bg-slate-50 border-slate-100 text-slate-500 hover:border-amber-100'
+              }`}
+            >
+              <p className="text-xs font-black tracking-tight">{plan.title}</p>
+              <p className="text-[9px] font-black uppercase tracking-widest opacity-60 mt-1">{plan.label}</p>
+            </button>
+          ))}
+        </div>
+        <div className="rounded-2xl bg-slate-50 border border-slate-100 p-4 flex items-center justify-between gap-3">
+          <div>
+            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Sync</p>
+            <p className="text-xs font-bold text-slate-600 mt-1">{user ? syncStatus || 'Cloud-ready' : 'Local-first until Quran.com sync'}</p>
+          </div>
+          {user ? <Shield className="w-5 h-5 text-emerald-500" /> : <Lock className="w-5 h-5 text-slate-300" />}
+        </div>
+      </section>
+
+      {/* Surah List */}
       {isLoadingQuran ? (
         <div className="space-y-3">
           {[1, 2, 3, 4, 5, 6].map((i) => (
@@ -303,7 +408,7 @@ export function QuranTab({
           icon={WifiOff}
         />
       ) : (
-        <div className="space-y-3">
+        <div className="space-y-3 mb-6">
           {surahs.length > 0 ? (
             surahs.map((surah) => (
               <button
@@ -334,6 +439,38 @@ export function QuranTab({
             </div>
           )}
         </div>
+      )}
+
+      {/* Rihla Map */}
+      {rihlaThemes !== undefined && (
+        <section className="bg-white rounded-[2rem] p-5 sm:p-6 border border-slate-100 shadow-sm mb-6">
+          <div className="flex items-center justify-between mb-5">
+            <div>
+              <p className="text-[10px] font-black uppercase tracking-[0.3em] text-emerald-600 mb-1">Rihla Map</p>
+              <h3 className="text-xl font-black tracking-tighter text-slate-900">Journeys through Quranic themes</h3>
+            </div>
+            <Compass className="w-6 h-6 text-emerald-500" />
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+            {RIHLA_THEMES.map((theme) => {
+              const done = rihlaThemes?.[theme.id];
+              return (
+                <div key={theme.id} className={`rounded-2xl border p-4 transition-all ${done ? 'bg-emerald-50 border-emerald-100' : 'bg-slate-50 border-slate-100'}`}>
+                  <div className="flex items-start justify-between gap-2 mb-3">
+                    <span className="text-2xl">{theme.icon}</span>
+                    {done && <CheckCircle2 className="w-4 h-4 text-emerald-500" />}
+                  </div>
+                  <p className="text-sm font-black text-slate-900">{theme.title}</p>
+                  <p className="text-[10px] text-slate-500 font-bold leading-relaxed mt-1 min-h-8">{theme.desc}</p>
+                  <div className="grid grid-cols-2 gap-2 mt-4">
+                    <button onClick={() => onOpenVerse(theme.verseKey)} className="py-2 rounded-xl bg-white border border-slate-100 text-[10px] font-black text-emerald-700">Open</button>
+                    <button onClick={() => onCompleteRihlaTheme(theme)} className="py-2 rounded-xl bg-slate-900 text-white text-[10px] font-black">Done</button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </section>
       )}
 
       {/* Journey Modal handled by App Level orchestrator */}

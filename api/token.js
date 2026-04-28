@@ -22,7 +22,7 @@ export default async function handler(req, res) {
     // In a prod app, refresh_token should be set as httpOnly cookie.
     // For this MVP, we return it to the client to manage in localStorage.
     return res.status(200).json(data);
-  } catch (error) {
+  } catch {
     // Ensuring we never leak secrets, codes, or tokens in logs or responses
     // and that we use the specific error message from the prompt.
     return res.status(500).json({ error: 'Failed to exchange authorization code for tokens' });
