@@ -303,8 +303,11 @@ function MuezzaApp() {
     if (monthBundle) return monthBundle;
 
     const jummahBundle = MISSION_BUNDLES.find((bundle) => bundle.activeWhen?.weekday === hijriContext.weekday);
-    return jummahBundle || MISSION_BUNDLES[0];
-  }, [hijriContext.month, hijriContext.weekday]);
+    if (jummahBundle) return jummahBundle;
+
+    // Use the first upcoming/active bundle if available, else null
+    return activeBundles.length > 0 ? activeBundles[0] : null;
+  }, [hijriContext.month, hijriContext.weekday, activeBundles]);
 
   const dailyAyah = dailyAyahCache?.date === todayKey && dailyAyahCache?.verse
     ? dailyAyahCache.verse

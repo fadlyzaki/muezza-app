@@ -331,12 +331,12 @@ export function HomeTab({
 
           <button
             onClick={onAddHabitClick}
-            className="w-full py-6 border-2 border-dashed border-slate-100 rounded-[2rem] flex flex-col items-center justify-center space-y-2 hover:border-emerald-300 hover:bg-emerald-50/30 transition-all group"
+            className="w-full py-4 border-2 border-dashed border-slate-100 rounded-[1.5rem] flex items-center justify-center space-x-2 hover:border-emerald-300 hover:bg-emerald-50/30 transition-all group"
           >
-            <div className="w-10 h-10 bg-slate-50 rounded-2xl flex items-center justify-center group-hover:bg-emerald-100 transition-colors">
-               <Plus className="w-6 h-6 text-slate-300 group-hover:text-emerald-600" />
+            <div className="w-8 h-8 bg-slate-50 rounded-xl flex items-center justify-center group-hover:bg-emerald-100 transition-colors">
+               <Plus className="w-4 h-4 text-slate-400 group-hover:text-emerald-600" />
             </div>
-            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest group-hover:text-emerald-700 transition-colors">Add Performance Habit</span>
+            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest group-hover:text-emerald-700 transition-colors">Add Habit</span>
           </button>
         </div>
       </div>
