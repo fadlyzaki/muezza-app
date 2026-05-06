@@ -10,12 +10,11 @@ Before launch, request/confirm a Quran Foundation production OAuth app with thes
 
 - Redirect URI: `https://muezza-app.vercel.app/callback`
 - Allowed origin: `https://muezza-app.vercel.app`
-- Scopes currently accepted by production: `bookmark`, `collection`, `streak`, `activity_day`
-- Scopes needed for prelive parity: `openid`, `offline_access`, `user`, `bookmark`, `collection`, `streak`, `activity_day`
+- Scopes approved for production: `openid`, `offline_access`, `user`, `bookmark`, `collection`, `streak`, `activity_day`, `reading_session`, `goal`, `note`, `preference`, `post`
 - Production client ID and production client secret
 
 > [!IMPORTANT]
-> The current production OAuth client rejects `openid` and `user`, so production uses the narrower approved UserAPI scopes for now. To make production exactly match prelive, ask Quran Foundation to enable `openid`, `offline_access`, and `user` on the production client, then update `VITE_QURAN_AUTH_SCOPES` to match prelive.
+> Quran Foundation has approved the advanced production scopes. Existing users should run a fresh login after deployment so the returned OAuth token includes the newly approved permissions.
 
 ## 2. Environment Variables
 
@@ -26,7 +25,7 @@ Configure the following variables in your deployment platform. In Vercel, add th
 |---|---|
 | `VITE_APP_URL` | `https://muezza-app.vercel.app` |
 | `VITE_QURAN_CLIENT_ID` | `f5f9b40f-0419-4b3b-be9a-7dd290c643a6` |
-| `VITE_QURAN_AUTH_SCOPES` | `bookmark collection streak activity_day` |
+| `VITE_QURAN_AUTH_SCOPES` | `openid offline_access user bookmark collection streak activity_day reading_session goal note preference post` |
 | `QF_CLIENT_SECRET` | Your Quran Foundation production Client Secret |
 
 > [!IMPORTANT]
@@ -69,7 +68,7 @@ In your Quran Foundation Developer Dashboard, ensure the following Redirect URIs
    - `VITE_APP_URL=https://muezza-app.vercel.app`
    - `VITE_QF_ENV=production`
    - `VITE_QURAN_CLIENT_ID=f5f9b40f-0419-4b3b-be9a-7dd290c643a6`
-   - `VITE_QURAN_AUTH_SCOPES=bookmark collection streak activity_day`
+   - `VITE_QURAN_AUTH_SCOPES=openid offline_access user bookmark collection streak activity_day reading_session goal note preference post`
    - `QF_CLIENT_SECRET=<production client secret>`
 2. **Remove prelive-only overrides** from the production environment:
    - `VITE_QURAN_API_BASE=https://prelive-oauth2.quran.foundation`
@@ -86,6 +85,14 @@ After deployment, verify:
 - Callback returns to `https://muezza-app.vercel.app/callback`.
 - UserAPI requests go to `https://apis.quran.foundation`, not `https://apis-prelive.quran.foundation`.
 - Streak request uses `/auth/v1/streaks?type=QURAN&first=20`.
+- Activity-day request uses `/auth/v1/activity-days` with `type=QURAN`.
 - Bookmark request uses `/auth/v1/bookmarks?type=ayah&mushafId=4&first=20`.
+- Bookmark write uses `/auth/v1/collections/__default__/bookmarks`.
 - Noor → Spiritual Archives shows the correct Surah name and Ayah number.
+- Noor → Sync Health shows active statuses for Bookmarks, Noor Streaks, Reading Sessions, Goals, Private Notes, Community Posts, and Profile after a fresh login.
+- Advanced sync calls for `/reading-sessions`, `/goals`, `/notes`, `/preferences`, `/posts`, and `/users/profile` succeed in production, while still failing gracefully with local fallback if the token is stale or production returns 401/403.
 - Browser local storage contains new production tokens after login; clear old local storage if testing after prelive.
+
+## 6. Scope Regression Path
+
+If Quran Foundation temporarily disables an approved scope, keep the app deployed and reduce `VITE_QURAN_AUTH_SCOPES` to the last confirmed working subset. The Noor Sync Health panel and local fallbacks should make the affected surfaces visible without breaking the rest of the app.

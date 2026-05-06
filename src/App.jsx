@@ -176,8 +176,18 @@ const SidebarButton = ({ active, onClick, icon: Icon, label }) => (
   </button>
 );
 
+const SYNC_CAPABILITIES = [
+  { id: 'bookmarks', label: 'Bookmarks', scopes: ['bookmark', 'collection'] },
+  { id: 'streaks', label: 'Noor Streaks', scopes: ['streak', 'activity_day'] },
+  { id: 'sessions', label: 'Reading Sessions', scopes: ['reading_session'] },
+  { id: 'goals', label: 'Goals', scopes: ['goal'] },
+  { id: 'notes', label: 'Private Notes', scopes: ['note'] },
+  { id: 'community', label: 'Community Posts', scopes: ['post'] },
+  { id: 'profile', label: 'Profile', scopes: ['user'] },
+];
+
 function MuezzaApp() {
-  const { accessToken, user, logout } = useAuth();
+  const { accessToken, user, tokenScope, logout } = useAuth();
   const audioPlayerRef = useRef(null);
 
   useEffect(() => {
@@ -258,6 +268,38 @@ function MuezzaApp() {
   const [isLocationSearching, setIsLocationSearching] = useState(false);
   const [locationSearchResults, setLocationSearchResults] = useState([]);
 
+  const grantedScopes = useMemo(
+    () => new Set(String(tokenScope || '').split(/\s+/).filter(Boolean)),
+    [tokenScope],
+  );
+
+  const syncCapabilities = useMemo(
+    () =>
+      SYNC_CAPABILITIES.map((capability) => {
+        if (!accessToken || !user) {
+          return { ...capability, status: 'inactive', detail: 'Connect Quran.com' };
+        }
+
+        if (grantedScopes.size === 0) {
+          return { ...capability, status: 'unknown', detail: 'Refresh login' };
+        }
+
+        const missingScopes = capability.scopes.filter((scope) => !grantedScopes.has(scope));
+        if (missingScopes.length > 0) {
+          return { ...capability, status: 'limited', detail: `Missing ${missingScopes.join(', ')}` };
+        }
+
+        return { ...capability, status: 'active', detail: 'Cloud active' };
+      }),
+    [accessToken, grantedScopes, user],
+  );
+
+  const hasGrantedScopes = (requiredScopes) => {
+    if (!accessToken || !user) return false;
+    if (grantedScopes.size === 0) return false;
+    return requiredScopes.every((scope) => grantedScopes.has(scope));
+  };
+
   // Advisor States
   const [adviceResult, setAdviceResult] = useState(null);
   const [isAdvisorThinking, setIsAdvisorThinking] = useState(false);
@@ -295,7 +337,7 @@ function MuezzaApp() {
 
   const todayKey = useMemo(() => getTodayKey(), []);
   const hijriContext = useMemo(() => getHijriContext(), []);
-  const activeBundles = useMemo(() => getActiveBundles(MISSION_BUNDLES, hijriContext), [hijriContext.month, hijriContext.weekday]);
+  const activeBundles = useMemo(() => getActiveBundles(MISSION_BUNDLES, hijriContext), [hijriContext]);
   const featuredMissionBundle = useMemo(() => {
     const monthBundle = MISSION_BUNDLES.find(
       (bundle) => bundle.activeWhen?.hijriMonth && bundle.activeWhen.hijriMonth === hijriContext.month,
@@ -312,6 +354,12 @@ function MuezzaApp() {
   const dailyAyah = dailyAyahCache?.date === todayKey && dailyAyahCache?.verse
     ? dailyAyahCache.verse
     : DAILY_AYAH_FALLBACK;
+  const canSyncPreferences = hasGrantedScopes(['preference']);
+  const canSyncActivityDays = hasGrantedScopes(['activity_day']);
+  const canSyncReadingSessions = hasGrantedScopes(['reading_session']);
+  const canSyncGoals = hasGrantedScopes(['goal']);
+  const canSyncNotes = hasGrantedScopes(['note']);
+  const canPublishPosts = hasGrantedScopes(['post']);
 
   const handleOnboardingComplete = (selectedGoal) => {
     if (selectedGoal?.habits) {
@@ -333,7 +381,7 @@ function MuezzaApp() {
       const [streaksData, bookmarksData, preferencesResult] = await Promise.all([
         getStreaks(accessToken),
         getBookmarks(accessToken),
-        fetchUserPreferences(accessToken),
+        canSyncPreferences ? fetchUserPreferences(accessToken) : Promise.resolve(null),
       ]);
 
       if (Number.isFinite(streaksData)) {
@@ -350,7 +398,7 @@ function MuezzaApp() {
     };
 
     fetchUserData();
-  }, [accessToken]);
+  }, [accessToken, canSyncPreferences]);
 
   useEffect(() => {
     if (!hasCompletedOnboarding) return undefined;
@@ -972,10 +1020,12 @@ function MuezzaApp() {
       );
     }, 100);
 
-    if (accessToken) {
+    if (accessToken && canSyncReadingSessions) {
       saveReadingSession(accessToken, verseKey).then((result) => {
         setMissionSyncStatus(result.ok ? 'Reading session synced' : 'Saved locally');
       });
+    } else if (accessToken) {
+      setMissionSyncStatus('Reading session saved locally');
     }
   };
 
@@ -1100,22 +1150,28 @@ function MuezzaApp() {
     const verseKey = task.quran?.verseKey || dailyAyah?.verse_key;
     const range = task.quran?.range || createRangeFromVerseKey(verseKey);
 
-    if (accessToken && verseKey) {
+    if (accessToken && verseKey && (canSyncReadingSessions || canSyncActivityDays)) {
       const [sessionResult, activityResult] = await Promise.all([
-        saveReadingSession(accessToken, verseKey),
-        creditActivityDay(accessToken, { verseKey, range, seconds: task.kind === 'audio' ? 180 : 90 }),
+        canSyncReadingSessions ? saveReadingSession(accessToken, verseKey) : Promise.resolve({ ok: false }),
+        canSyncActivityDays
+          ? creditActivityDay(accessToken, { verseKey, range, seconds: task.kind === 'audio' ? 180 : 90 })
+          : Promise.resolve({ ok: false }),
       ]);
       if (sessionResult.ok || activityResult.ok) {
         setMissionSyncStatus('Mission synced with Quran Foundation');
       } else {
         setMissionSyncStatus('Mission saved locally');
       }
+    } else if (accessToken && verseKey) {
+      setMissionSyncStatus('Mission saved locally');
     }
 
-    if (accessToken && task.kind === 'goal') {
+    if (accessToken && task.kind === 'goal' && canSyncGoals) {
       const activePlan = READING_PLANS.find((plan) => plan.id === activeReadingPlanId) || READING_PLANS[0];
       const result = await createMissionGoal(accessToken, activePlan);
       setMissionSyncStatus(result.ok ? 'Quran goal synced' : 'Goal saved locally');
+    } else if (accessToken && task.kind === 'goal') {
+      setMissionSyncStatus('Goal saved locally');
     }
   };
 
@@ -1124,7 +1180,7 @@ function MuezzaApp() {
     setActiveReadingPlanId(plan.id);
     setMissionSyncStatus('Reading plan saved locally');
 
-    if (accessToken) {
+    if (accessToken && canSyncGoals) {
       const result = await createMissionGoal(accessToken, plan);
       setMissionSyncStatus(result.ok ? 'Reading goal synced' : 'Reading plan saved locally');
     }
@@ -1139,9 +1195,11 @@ function MuezzaApp() {
     if (!body) return;
 
     setMissionSyncStatus('Reflection saved locally');
-    if (accessToken) {
+    if (accessToken && canSyncNotes) {
       const result = await saveMissionNote(accessToken, { body, verseKey, saveToQR: false });
       setMissionSyncStatus(result.ok ? 'Private note synced' : 'Reflection saved locally');
+    } else if (accessToken) {
+      setMissionSyncStatus('Reflection saved locally');
     }
   };
 
@@ -1150,9 +1208,11 @@ function MuezzaApp() {
     if (!body || !communityOptIn) return;
 
     setMissionSyncStatus('Publishing reflection...');
-    if (accessToken) {
+    if (accessToken && canPublishPosts) {
       const result = await publishMissionReflection(accessToken, { body, verseKey, draft: false });
       setMissionSyncStatus(result.ok ? 'Reflection published' : 'Reflection kept local');
+    } else if (accessToken) {
+      setMissionSyncStatus('Reflection kept local');
     } else {
       setMissionSyncStatus('Sync with Quran.com to publish');
     }
@@ -1190,13 +1250,15 @@ function MuezzaApp() {
     });
     setDinar((currentDinar) => currentDinar + 15);
 
-    if (accessToken) {
+    if (accessToken && canSyncActivityDays) {
       const result = await creditActivityDay(accessToken, {
         verseKey: theme.verseKey,
         range: theme.range,
         seconds: 120,
       });
       setMissionSyncStatus(result.ok ? 'Rihla synced' : 'Rihla saved locally');
+    } else if (accessToken) {
+      setMissionSyncStatus('Rihla saved locally');
     }
   };
 
@@ -1497,6 +1559,7 @@ function MuezzaApp() {
               user={user}
               onRefresh={() => {}} 
               isSyncing={false}
+              syncCapabilities={syncCapabilities}
               bookmarks={userBookmarks}
               onOpenSurahByBookmark={(bm) => {
                 setActiveTab('quran');

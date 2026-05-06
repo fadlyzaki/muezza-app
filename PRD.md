@@ -60,23 +60,38 @@ _Streaks are synced via the QF Streaks API. Offline fallback ensures reliability
 
 ## 4. API Integration Architecture
 
-Muezza extensively utilizes the Quran Foundation capabilities:
+Muezza uses Quran Foundation APIs across content, OAuth, and optional user sync. Quran Foundation has approved the full production OAuth surface for the current release, including bookmarks, streaks, reading sessions, goals, notes, preferences, posts, and profile access. The app still keeps local fallbacks so stale tokens or temporary API failures do not interrupt core use.
 
 | Domain | Integrated Endpoints | Implementation Status |
 |---|---|---|
 | **Content API v4** | `GET /v4/chapters`<br>`GET /v4/verses/by_chapter/{id}` | Fully Integrated |
 | **Tafsir API v4** | `GET /v4/tafsirs/{id}/by_ayah/{verse}` | Fully Integrated |
 | **Audio CDN** | `https://audio.qurancdn.com/...` | Fully Integrated |
-| **User APIs** | `GET /auth/v1/streaks`<br>`POST /auth/v1/bookmarks` | Fully Integrated |
+| **User APIs: Production Approved** | `GET /auth/v1/streaks`<br>`POST /auth/v1/activity-days`<br>`GET /auth/v1/bookmarks`<br>`POST /auth/v1/collections/__default__/bookmarks` | Fully Integrated |
+| **User APIs: Advanced Sync** | `POST /auth/v1/reading-sessions`<br>`POST /auth/v1/goals`<br>`POST /auth/v1/notes`<br>`GET /auth/v1/preferences`<br>`POST /auth/v1/posts`<br>`GET /auth/v1/users/profile` | Production-enabled with local fallback |
 | **Auth / OAuth2** | `GET /oauth2/auth`<br>`POST /oauth2/token` | Fully Integrated (Basic Auth Exchange) |
 | **Aladhan API** | `GET /v1/timings` (Prayer times) | Integrated (Requires Geo-permission) |
 | **Nominatim API** | `GET /search` (City fallback) | Integrated (Manual location override) |
+
+### 4.1 API Scope Matrix
+
+| Feature | Endpoint / Scope | Code Status | Production OAuth Status | Fallback Behavior | Next Action |
+|---|---|---|---|---|---|
+| OAuth login | `GET /oauth2/auth`, `POST /oauth2/token` | Implemented | Approved with current client settings | User remains local-first if login fails | Keep redirect URI and origin aligned with production |
+| Bookmark sync | `bookmark`, `collection`; `/bookmarks`, `/collections/__default__/bookmarks` | Implemented | Approved | Bookmark UI requires Quran.com sync; existing local app state remains safe | Verify add/list bookmark flow after each production deploy |
+| Noor streak sync | `streak`, `activity_day`; `/streaks`, `/activity-days` | Implemented | Approved | Local streak remains source of continuity when sync fails | Continue using QURAN activity days for production |
+| Reading session sync | `reading_session`; `/reading-sessions` | Implemented | Approved | Reading plans and mission progress stay in localStorage if sync fails | Verify production token grants scope after fresh login |
+| Goal sync | `goal`; `/goals` | Implemented | Approved | Selected plan is stored locally and status shows local save if sync fails | Verify plan selection sync in production |
+| Private notes | `note`; `/notes` | Implemented | Approved | Reflection drafts remain local if sync fails | Verify private note save in production |
+| Preferences | `preference`; `/preferences` | Implemented | Approved | App ignores missing preferences and keeps defaults | Verify preferences request after fresh login |
+| Community posts | `post`; `/posts` | Implemented behind opt-in | Approved | Publish action keeps reflection local if sync fails | Verify opt-in publishing flow |
+| User profile | `user` / profile access; `/users/profile` | Implemented as best-effort | Approved | OAuth token fallback labels the user as synced if profile fetch fails | Verify profile display after fresh login |
 
 ---
 
 ## 5. Value Expansion Roadmap
 
-Muezza's next phase should make the app feel timely, Quran-grounded, and emotionally alive: not only a daily tracker, but a companion that changes with the Islamic calendar, the user's Quran journey, and moments of renewed intention.
+Muezza's next phase should make the app feel timely, Quran-grounded, and emotionally alive while staying resilient. Advanced Quran Foundation scopes are production-approved, and the app keeps local-first behavior as a reliability layer rather than as a product limitation.
 
 | Opportunity | Concept | Quran Foundation / App Leverage | Priority | Status |
 |---|---|---|---|---|
@@ -86,14 +101,46 @@ Muezza's next phase should make the app feel timely, Quran-grounded, and emotion
 | **Muharram / Islamic New Year Reset** | A gentle annual reset for intentions, Hijrah reflection, spiritual goal setting, and a year-long Noor direction. | Quran Reflect-style prompts, user goals/notes APIs where available, onboarding path refresh. | Medium | ✅ Local-first v1 |
 | **Weekly Jummah Rhythm** | Friday micro-bundle with Surah Al-Kahf reminder, salawat goal, charity nudge, and a Friday reflection reward. | Quran reader deep link, audio recitation, bookmarks, weekly streak affordances. | Medium | ✅ Local-first v1 |
 | **Ayah of the Day Missions** | A daily ayah becomes an actionable mission: read, listen, reflect, save, or connect it to one small act. | Random/ranged verse retrieval, translations, audio, tafsir, bookmarks. | High | ✅ Integrated |
-| **Adaptive Quran Plans** | Plans by juz, page, surah, theme, or time budget so users can maintain Quran engagement even on low-energy days. | Content API divisions, verse pagination, audio metadata, reading session APIs where available. | High | ✅ Local-first v1 + Sync |
+| **Adaptive Quran Plans** | Plans by juz, page, surah, theme, or time budget so users can maintain Quran engagement even on low-energy days. | Content API divisions, verse pagination, audio metadata, reading session APIs where available. | High | ✅ Local-first v1 + approved sync |
 | **Bookmark-Driven Habits** | Saved ayahs can suggest gentle habit prompts, reflection cards, or Rihla destinations based on the user's own Quran journey. | Quran Foundation bookmarks, verse metadata, tafsir, local habit creation. | Medium | ✅ Integrated |
 | **Audio Recitation Streaks** | Listening quests reward users for completing short recitation sessions, repeating memorization passages, or finishing a surah audio track. | Audio CDN, reciter selection, local progress, Noor Streaks. | Medium | ✅ Local-first v1 |
 | **Compassionate Catch-Up Quests** | Missed days unlock restorative tasks instead of punitive streak loss: make up a reflection, read a short passage, or reset with intention. | Current auto-skip ritual logic, habit engine, Muezza counsel, streak fallback. | High | ✅ Integrated |
 | **Rihla Map** | Muezza's 100% energy journey becomes a map through Quranic themes such as sabr, shukr, tawbah, rizq, mercy, and courage. | Tafsir API, thematic verse ranges, mascot progression, Souq collectibles. | Medium | ✅ Local-first v1 |
 | **Private Community Challenges** | Optional global or friend-level challenges show aggregate participation without exposing private worship logs. | Quran Foundation profile linkage, anonymous counters, local-first privacy posture. | Low | ✅ Opt-in Reflection v1 |
 
-### 5.1 Differentiation Opportunities
+### 5.1 Improvement Options
+
+**Production Readiness**
+- Scope-gated UI states now show active, stale, or local-first status based on the granted token scopes.
+- Refresh tokens are kept in server-managed `HttpOnly` cookies instead of browser localStorage.
+- Noor now includes a compact sync health panel for bookmarks, streaks, reading sessions, notes, goals, posts, and profile.
+- Add a production OAuth smoke checklist covering redirect URI, accepted scopes, callback, bookmark write, and activity-day write.
+
+**Quran Engagement**
+- Add smarter reading plans by time budget, juz, page, surah, theme, and recovery mode.
+- Add memorization mode with repeat audio, verse hiding, self-check, and short review streaks.
+- Expose reciter choice and translation/resource settings once the current English-only reader is stable.
+- Turn bookmarked ayahs into suggested actions, duas, reflection prompts, or tiny habit templates.
+
+**Retention**
+- Add seasonal badges and Souq unlocks that are earned through Ramadan, Dhul Hijjah, Muharram, and Jummah tasks.
+- Expand compassionate recovery flows so missed days create restorative quests instead of only streak pressure.
+- Add lightweight reminders for prayer windows, reading plan progress, Jummah, and seasonal missions.
+- Add weekly recap cards that celebrate completed acts without exposing private worship details.
+
+**Community And Privacy**
+- Keep community features opt-in, publish-only, and separate from private prayer/habit logs.
+- Add anonymous aggregate challenges before friend-level or public identity features.
+- Add privacy controls for reflection posts, Quran Reflect sharing, profile display, and delete/export flows.
+- Use verified profile identity for community features while keeping prayer and habit data private.
+
+**Data Resilience**
+- Add local export/import for habits, prayer state, inventory, reflections, and mission progress.
+- Add an offline sync queue for reading sessions, notes, goals, and posts so temporary API failures do not lose intent.
+- Add conflict states that explain when local progress differs from Quran Foundation cloud state.
+- Add graceful 401/403 handling that disables only the affected advanced sync feature, not the full app.
+
+### 5.2 Differentiation Opportunities
 
 - **Season-aware spirituality:** Muezza can feel different during Ramadan, Dhul Hijjah, Muharram, and Jummah without asking the user to build plans from scratch.
 - **Quran as the task engine:** Instead of treating Quran content as a separate reader tab, ayahs, tafsir, audio, bookmarks, and reading progress can generate meaningful daily actions.
@@ -101,13 +148,16 @@ Muezza's next phase should make the app feel timely, Quran-grounded, and emotion
 - **Compassion over guilt:** Catch-up quests and gentle reset flows preserve momentum for real humans with imperfect weeks.
 - **Privacy-preserving community:** Social motivation should remain optional and aggregate-first, maintaining Muezza's local-first handling of personal worship data.
 
-### 5.2 API Scope Expansion Requests
+### 5.3 Approved Production Scopes
 
-To make the newest 5-Tab implementation run smoothly and fully cloud-native, Muezza seeks expanded OAuth2 scopes from the Quran Foundation:
-- **Reading Sessions API (`read:sessions`, `write:sessions`)**: To sync the newly integrated **Quran Reading Plans** (Juz/Surah tracking) across substrates.
-- **Goals & Notes APIs (`read:notes`, `write:notes`)**: To seamlessly sync user entries from the **Community Reflection** and **Rihla Map** text areas.
-- **Extended User Profile (`read:profile`)**: To better support the community opt-in features without compromising privacy, allowing aggregate challenges based on verified user IDs.
-- **Streaks Expansion**: While we currently use the standard streaks, advanced hooks to tie specific Seasonal Missions (e.g., Ramadan 30-day bundle) directly to the QF streaks backend would enhance cross-platform gamification.
+Quran Foundation has approved the expanded OAuth2 scopes needed to make the newest 5-Tab implementation cloud-native in production:
+- **Reading Sessions (`reading_session`)**: Sync Quran Reading Plans, Daily Ayah reads, Rihla completions, and seasonal mission reading activity across devices.
+- **Goals (`goal`)**: Sync selected reading plans and seasonal Quran goals instead of keeping them only in localStorage.
+- **Notes (`note`)**: Sync private reflection notes from Community Reflection, Rihla Map, and seasonal prompts.
+- **Preferences (`preference`)**: Persist user reader and mission preferences across devices.
+- **Community Posts (`post`)**: Publish opt-in reflections only when the user explicitly chooses to share.
+- **Extended User Profile (`user`, plus `openid`/`offline_access`)**: Support safer identity, longer sessions, and privacy-preserving community features.
+- **Seasonal Streak Hooks**: Extend current `streak` and `activity_day` usage so Ramadan, Dhul Hijjah, Jummah, and recovery quests can map to dedicated backend streak categories when available.
 
 ---
 

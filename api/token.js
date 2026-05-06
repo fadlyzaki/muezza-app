@@ -19,9 +19,18 @@ export default async function handler(req, res) {
       isConfidential: true // Muezza uses confidential client pattern
     });
 
-    // In a prod app, refresh_token should be set as httpOnly cookie.
-    // For this MVP, we return it to the client to manage in localStorage.
-    return res.status(200).json(data);
+    const { refresh_token: refreshToken, ...publicTokenData } = data;
+
+    if (refreshToken) {
+      const isLocalhost = String(req.headers.host || '').includes('localhost');
+      const secureAttribute = isLocalhost ? '' : '; Secure';
+      res.setHeader(
+        'Set-Cookie',
+        `qf_refresh_token=${encodeURIComponent(refreshToken)}; HttpOnly; SameSite=Lax; Path=/api; Max-Age=2592000${secureAttribute}`,
+      );
+    }
+
+    return res.status(200).json(publicTokenData);
   } catch {
     // Ensuring we never leak secrets, codes, or tokens in logs or responses
     // and that we use the specific error message from the prompt.

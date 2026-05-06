@@ -29,6 +29,7 @@ export function NoorTab({
   user, 
   onRefresh, 
   isSyncing, 
+  syncCapabilities = [],
   bookmarks, 
   onOpenSurahByBookmark,
   onLogout,
@@ -112,6 +113,46 @@ export function NoorTab({
                 <p className="text-[9px] font-black text-amber-600/60 uppercase tracking-widest">Day Streak</p>
               </div>
             </div>
+
+            {syncCapabilities.length > 0 && (
+              <div className="mt-4 pt-4 border-t border-slate-50">
+                <div className="flex items-center justify-between mb-3">
+                  <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Sync Health</p>
+                  <p className="text-[10px] font-black uppercase tracking-widest text-emerald-600">
+                    {syncCapabilities.filter((capability) => capability.status === 'active').length}/{syncCapabilities.length} active
+                  </p>
+                </div>
+                <div className="grid sm:grid-cols-2 gap-2">
+                  {syncCapabilities.map((capability) => {
+                    const isActive = capability.status === 'active';
+                    const isAttention = capability.status === 'limited' || capability.status === 'unknown';
+
+                    return (
+                      <div
+                        key={capability.id}
+                        className={`rounded-xl border p-3 flex items-center justify-between gap-3 ${
+                          isActive
+                            ? 'bg-emerald-50/60 border-emerald-100 text-emerald-800'
+                            : isAttention
+                              ? 'bg-amber-50/70 border-amber-100 text-amber-800'
+                              : 'bg-slate-50 border-slate-100 text-slate-500'
+                        }`}
+                      >
+                        <div className="min-w-0">
+                          <p className="text-[10px] font-black uppercase tracking-widest truncate">{capability.label}</p>
+                          <p className="text-[9px] font-bold opacity-70 truncate">{capability.detail}</p>
+                        </div>
+                        {isActive ? (
+                          <CheckCircle2 className="w-4 h-4 shrink-0" />
+                        ) : (
+                          <Lock className="w-4 h-4 shrink-0" />
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
           </div>
         ) : (
           <div className="bg-slate-900 rounded-2xl sm:rounded-[2rem] p-6 sm:p-8 text-center border-2 border-dashed border-slate-800 animate-in fade-in duration-700">

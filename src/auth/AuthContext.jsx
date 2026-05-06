@@ -12,6 +12,7 @@ const FALLBACK_USER = {
 
 export function AuthProvider({ children }) {
   const [accessToken, setAccessToken] = useState(() => localStorage.getItem('qf_access_token'));
+  const [tokenScope, setTokenScope] = useState(() => localStorage.getItem('qf_token_scope') || '');
   const [user, setUser] = useState(() => {
     const idToken = localStorage.getItem('qf_id_token');
     if (!idToken) {
@@ -50,6 +51,7 @@ export function AuthProvider({ children }) {
     // Store parameters for the callback route
     localStorage.setItem('pkce_code_verifier', codeVerifier);
     localStorage.setItem('oauth_state', state);
+    localStorage.setItem('qf_requested_scope', scopes);
     if (nonce) {
       localStorage.setItem('oauth_nonce', nonce);
     } else {
@@ -72,14 +74,17 @@ export function AuthProvider({ children }) {
   const logout = () => {
     setAccessToken(null);
     setUser(null);
+    setTokenScope('');
     localStorage.removeItem('qf_access_token');
     localStorage.removeItem('qf_id_token');
     localStorage.removeItem('qf_refresh_token');
+    localStorage.removeItem('qf_token_scope');
+    localStorage.removeItem('qf_requested_scope');
     localStorage.removeItem('qf_user');
   };
 
   return (
-    <AuthContext.Provider value={{ accessToken, user, isLoading, login, logout, setAccessToken, setUser }}>
+    <AuthContext.Provider value={{ accessToken, user, tokenScope, isLoading, login, logout, setAccessToken, setUser, setTokenScope }}>
       {children}
     </AuthContext.Provider>
   );

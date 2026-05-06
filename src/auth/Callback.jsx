@@ -11,7 +11,7 @@ const FALLBACK_USER = {
 };
 
 export default function Callback() {
-  const { setAccessToken, setUser } = useAuth();
+  const { setAccessToken, setTokenScope, setUser } = useAuth();
   const [error, setError] = useState(null);
   const hasProcessedCallbackRef = useRef(false);
 
@@ -94,20 +94,22 @@ export default function Callback() {
           userPayload = profile;
         }
 
+        const grantedScope = data.scope || localStorage.getItem('qf_requested_scope') || '';
         localStorage.setItem('qf_access_token', data.access_token);
         if (data.id_token) localStorage.setItem('qf_id_token', data.id_token);
+        localStorage.setItem('qf_token_scope', grantedScope);
         localStorage.setItem('qf_user', JSON.stringify(userPayload));
-        if (data.refresh_token) {
-           localStorage.setItem('qf_refresh_token', data.refresh_token);
-        }
+        localStorage.removeItem('qf_refresh_token');
         
         setAccessToken(data.access_token);
+        setTokenScope(grantedScope);
         setUser(userPayload);
         
         // Clean up
         localStorage.removeItem('oauth_state');
         localStorage.removeItem('oauth_nonce');
         localStorage.removeItem('pkce_code_verifier');
+        localStorage.removeItem('qf_requested_scope');
         
         // Redirect home and strip query string
         window.location.replace('/');
@@ -118,7 +120,7 @@ export default function Callback() {
     };
 
     processCallback();
-  }, [setAccessToken, setUser]);
+  }, [setAccessToken, setTokenScope, setUser]);
 
   if (error) {
     return (
