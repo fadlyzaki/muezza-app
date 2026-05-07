@@ -2,8 +2,10 @@ const PRELIVE_AUTH_BASE_URL = 'https://prelive-oauth2.quran.foundation';
 const PRODUCTION_AUTH_BASE_URL = 'https://oauth2.quran.foundation';
 const PRELIVE_USER_API_BASE_URL = 'https://apis-prelive.quran.foundation';
 const PRODUCTION_USER_API_BASE_URL = 'https://apis.quran.foundation';
-const FULL_USER_AUTH_SCOPES = 'openid offline_access user bookmark collection streak activity_day reading_session goal note preference post';
-const PRODUCTION_USER_AUTH_SCOPES = FULL_USER_AUTH_SCOPES;
+const USER_API_AUTH_SCOPES = 'user bookmark collection streak activity_day reading_session goal note preference post';
+const FULL_USER_AUTH_SCOPES = `openid offline_access ${USER_API_AUTH_SCOPES}`;
+const PRODUCTION_USER_AUTH_SCOPES = USER_API_AUTH_SCOPES;
+const PRODUCTION_SESSION_SCOPES = new Set(['openid', 'offline_access']);
 const DEFAULT_AUTH_SCOPES = {
   prelive: FULL_USER_AUTH_SCOPES,
   production: PRODUCTION_USER_AUTH_SCOPES,
@@ -46,7 +48,16 @@ export function getQuranAuthBaseUrl() {
 
 export function getQuranAuthScopes() {
   const env = inferQuranEnvironment();
-  return import.meta.env.VITE_QURAN_AUTH_SCOPES || DEFAULT_AUTH_SCOPES[env] || DEFAULT_AUTH_SCOPES.production;
+  const configuredScopes = import.meta.env.VITE_QURAN_AUTH_SCOPES || DEFAULT_AUTH_SCOPES[env] || DEFAULT_AUTH_SCOPES.production;
+  const scopes = configuredScopes.split(/\s+/).filter(Boolean);
+
+  if (env !== 'production' || import.meta.env.VITE_QURAN_ENABLE_OIDC === 'true') {
+    return [...new Set(scopes)].join(' ');
+  }
+
+  return [...new Set(scopes)]
+    .filter((scope) => !PRODUCTION_SESSION_SCOPES.has(scope))
+    .join(' ');
 }
 
 export function getQuranUserApiBaseUrl() {

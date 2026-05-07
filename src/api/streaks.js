@@ -1,6 +1,5 @@
-import { getQuranUserApiBaseUrl } from '../lib/quranFoundation';
+import { qfUserRequest } from './quranUserRequest';
 
-const API_BASE = `${getQuranUserApiBaseUrl()}/auth/v1`;
 const MUSHAF_ID = 4;
 
 function normalizeStreakDays(payload) {
@@ -19,34 +18,20 @@ function normalizeStreakDays(payload) {
   return Number.isFinite(latestStreak?.days) ? latestStreak.days : null;
 }
 
-function getUserTimezone() {
-  return Intl.DateTimeFormat().resolvedOptions().timeZone;
-}
-
 export async function getStreaks(accessToken) {
-  const clientId = import.meta.env.VITE_QURAN_CLIENT_ID;
-  if (!accessToken || !clientId) return null;
+  if (!accessToken) return null;
   
   try {
-    const url = new URL(`${API_BASE}/streaks`);
-    url.searchParams.set('type', 'QURAN');
-    url.searchParams.set('first', '20');
-
-    const res = await fetch(url.toString(), {
-      headers: {
-        'x-auth-token': accessToken,
-        'x-client-id': clientId,
-        'x-timezone': getUserTimezone()
-      }
+    const result = await qfUserRequest(accessToken, '/streaks', {
+      searchParams: {
+        type: 'QURAN',
+        first: 20,
+      },
     });
-    if (res.status === 401 || res.status === 403) {
-      window.dispatchEvent(new CustomEvent('qf_unauthorized'));
+    if (!result.ok) {
+      throw new Error(result.error || 'Failed to fetch streaks');
     }
-    const data = await res.json();
-    if (!res.ok) {
-      throw new Error(data?.message || data?.error || 'Failed to fetch streaks');
-    }
-    return normalizeStreakDays(data);
+    return normalizeStreakDays(result.data);
   } catch (error) {
     console.error("Error fetching streaks:", error);
     return null;
@@ -54,30 +39,20 @@ export async function getStreaks(accessToken) {
 }
 
 export async function addStreak(accessToken) {
-  const clientId = import.meta.env.VITE_QURAN_CLIENT_ID;
-  if (!accessToken || !clientId) return false;
+  if (!accessToken) return false;
   
   try {
-    const res = await fetch(`${API_BASE}/activity-days`, {
+    const result = await qfUserRequest(accessToken, '/activity-days', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-auth-token': accessToken,
-        'x-client-id': clientId,
-        'x-timezone': getUserTimezone()
-      },
       // Per pre-live docs, QURAN type uses seconds and ranges to power streaks
-      body: JSON.stringify({
+      body: {
         type: 'QURAN',
         seconds: 60, // Minimum activity to maintain/bump streak
         ranges: ['1:1-1:1'], // Placeholder activity range
         mushafId: MUSHAF_ID // Standard Uthmani Mushaf
-      })
+      }
     });
-    if (res.status === 401 || res.status === 403) {
-      window.dispatchEvent(new CustomEvent('qf_unauthorized'));
-    }
-    return res.ok;
+    return result.ok;
   } catch {
     return false;
   }

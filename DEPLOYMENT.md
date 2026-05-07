@@ -10,11 +10,12 @@ Before launch, request/confirm a Quran Foundation production OAuth app with thes
 
 - Redirect URI: `https://muezza-app.vercel.app/callback`
 - Allowed origin: `https://muezza-app.vercel.app`
-- Scopes approved for production: `openid`, `offline_access`, `user`, `bookmark`, `collection`, `streak`, `activity_day`, `reading_session`, `goal`, `note`, `preference`, `post`
+- User API scopes approved for production: `user`, `bookmark`, `collection`, `streak`, `activity_day`, `reading_session`, `goal`, `note`, `preference`, `post`
+- Optional session scopes, only when Quran Foundation confirms they are enabled for this client: `openid`, `offline_access`
 - Production client ID and production client secret
 
 > [!IMPORTANT]
-> Quran Foundation has approved the advanced production scopes. Existing users should run a fresh login after deployment so the returned OAuth token includes the newly approved permissions.
+> The production login intentionally avoids `openid` and `offline_access` by default because the current production client rejects `openid`. Existing users should run a fresh login after deployment so the returned OAuth token includes the production-safe User API permissions.
 
 ## 2. Environment Variables
 
@@ -25,7 +26,7 @@ Configure the following variables in your deployment platform. In Vercel, add th
 |---|---|
 | `VITE_APP_URL` | `https://muezza-app.vercel.app` |
 | `VITE_QURAN_CLIENT_ID` | `f5f9b40f-0419-4b3b-be9a-7dd290c643a6` |
-| `VITE_QURAN_AUTH_SCOPES` | `openid offline_access user bookmark collection streak activity_day reading_session goal note preference post` |
+| `VITE_QURAN_AUTH_SCOPES` | `user bookmark collection streak activity_day reading_session goal note preference post` |
 | `QF_CLIENT_SECRET` | Your Quran Foundation production Client Secret |
 
 > [!IMPORTANT]
@@ -55,6 +56,13 @@ Leave these unset unless Quran Foundation provides custom hosts:
 | `VITE_QURAN_AUTH_BASE` | `https://oauth2.quran.foundation` |
 | `VITE_QURAN_USER_API_BASE` | `https://apis.quran.foundation` |
 
+### Optional OIDC / Refresh Tokens
+Leave this unset unless Quran Foundation confirms the production OAuth client can request `openid` and `offline_access`. When enabling it, add `openid offline_access` back into `VITE_QURAN_AUTH_SCOPES` too:
+
+| Variable | Value |
+|---|---|
+| `VITE_QURAN_ENABLE_OIDC` | `true` |
+
 ## 3. Whitelisting Redirect URIs
 
 In your Quran Foundation Developer Dashboard, ensure the following Redirect URIs are explicitly whitelisted:
@@ -68,7 +76,7 @@ In your Quran Foundation Developer Dashboard, ensure the following Redirect URIs
    - `VITE_APP_URL=https://muezza-app.vercel.app`
    - `VITE_QF_ENV=production`
    - `VITE_QURAN_CLIENT_ID=f5f9b40f-0419-4b3b-be9a-7dd290c643a6`
-   - `VITE_QURAN_AUTH_SCOPES=openid offline_access user bookmark collection streak activity_day reading_session goal note preference post`
+   - `VITE_QURAN_AUTH_SCOPES=user bookmark collection streak activity_day reading_session goal note preference post`
    - `QF_CLIENT_SECRET=<production client secret>`
 2. **Remove prelive-only overrides** from the production environment:
    - `VITE_QURAN_API_BASE=https://prelive-oauth2.quran.foundation`
@@ -82,8 +90,9 @@ In your Quran Foundation Developer Dashboard, ensure the following Redirect URIs
 After deployment, verify:
 
 - Login redirects to Quran Foundation production OAuth, not prelive.
+- Login URL does not request `openid` or `offline_access` unless `VITE_QURAN_ENABLE_OIDC=true` is intentionally enabled.
 - Callback returns to `https://muezza-app.vercel.app/callback`.
-- UserAPI requests go to `https://apis.quran.foundation`, not `https://apis-prelive.quran.foundation`.
+- Browser User API requests go to same-origin `/api/qf-user`; the serverless proxy forwards to `https://apis.quran.foundation`, not `https://apis-prelive.quran.foundation`.
 - Streak request uses `/auth/v1/streaks?type=QURAN&first=20`.
 - Activity-day request uses `/auth/v1/activity-days` with `type=QURAN`.
 - Bookmark request uses `/auth/v1/bookmarks?type=ayah&mushafId=4&first=20`.

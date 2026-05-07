@@ -1,7 +1,6 @@
-import { getQuranUserApiBaseUrl } from '../lib/quranFoundation';
+import { qfUserRequest } from './quranUserRequest';
 import { SURAH_NAMES_SIMPLE } from '../constants/muezza_data';
 
-const API_BASE = `${getQuranUserApiBaseUrl()}/auth/v1`;
 const MUSHAF_ID = 4;
 
 function normalizeBookmarksResponse(payload) {
@@ -74,29 +73,20 @@ function sortNewestFirst(a, b) {
 }
 
 export async function getBookmarks(accessToken) {
-  const clientId = import.meta.env.VITE_QURAN_CLIENT_ID;
-  if (!accessToken || !clientId) return [];
+  if (!accessToken) return [];
   
   try {
-    const url = new URL(`${API_BASE}/bookmarks`);
-    url.searchParams.set('type', 'ayah');
-    url.searchParams.set('mushafId', String(MUSHAF_ID));
-    url.searchParams.set('first', '20');
-
-    const res = await fetch(url.toString(), {
-      headers: {
-        'x-auth-token': accessToken,
-        'x-client-id': clientId
-      }
+    const result = await qfUserRequest(accessToken, '/bookmarks', {
+      searchParams: {
+        type: 'ayah',
+        mushafId: MUSHAF_ID,
+        first: 20,
+      },
     });
-    if (res.status === 401 || res.status === 403) {
-      window.dispatchEvent(new CustomEvent('qf_unauthorized'));
+    if (!result.ok) {
+      throw new Error(result.error || 'Failed to fetch bookmarks');
     }
-    const data = await res.json();
-    if (!res.ok) {
-      throw new Error(data?.message || data?.error || 'Failed to fetch bookmarks');
-    }
-    return normalizeBookmarksResponse(data);
+    return normalizeBookmarksResponse(result.data);
   } catch (error) {
     console.error("Error fetching bookmarks:", error);
     return [];
@@ -104,36 +94,24 @@ export async function getBookmarks(accessToken) {
 }
 
 export async function addBookmark(accessToken, verseKey) {
-   const clientId = import.meta.env.VITE_QURAN_CLIENT_ID;
-   if (!accessToken || !clientId || !verseKey) return false;
+   if (!accessToken || !verseKey) return false;
    
    try {
-     // Quran.com-style bookmarks are stored in the __default__ collection
-     const endpoint = `${API_BASE}/collections/__default__/bookmarks`;
-     
      // Parse "1:5" into surah (key) and ayah (verseNumber)
      const [surahNum, ayahNum] = verseKey.split(':').map(Number);
      if (!surahNum || !ayahNum) return false;
 
-     const res = await fetch(endpoint, {
+     const result = await qfUserRequest(accessToken, '/collections/__default__/bookmarks', {
        method: 'POST',
-       headers: {
-         'Content-Type': 'application/json',
-         'x-auth-token': accessToken,
-         'x-client-id': clientId
-       },
        // Payload aligned with Quran Foundation 'ayah' item schema
-       body: JSON.stringify({ 
+       body: {
          type: 'ayah',
          key: surahNum,
          verseNumber: ayahNum,
          mushaf: MUSHAF_ID
-       })
+       }
      });
-     if (res.status === 401 || res.status === 403) {
-       window.dispatchEvent(new CustomEvent('qf_unauthorized'));
-     }
-     return res.ok;
+     return result.ok;
    } catch (error) {
      console.error("Error adding bookmark:", error);
      return false;

@@ -1,56 +1,13 @@
-import { getQuranUserApiBaseUrl } from '../lib/quranFoundation';
+import { qfUserRequest } from './quranUserRequest';
 import { createRangeFromVerseKey } from '../utils/muezza_utils';
 
-const API_BASE = `${getQuranUserApiBaseUrl()}/auth/v1`;
 const MUSHAF_ID = 4;
 
-function getClientId() {
-  return import.meta.env.VITE_QURAN_CLIENT_ID;
-}
-
-function getUserTimezone() {
-  return Intl.DateTimeFormat().resolvedOptions().timeZone;
-}
-
 async function qfRequest(accessToken, pathname, options = {}) {
-  const clientId = getClientId();
-  if (!accessToken || !clientId) return { ok: false, data: null, error: 'Missing Quran Foundation session.' };
+  if (!accessToken) return { ok: false, data: null, error: 'Missing Quran Foundation session.' };
 
   try {
-    const url = new URL(`${API_BASE}${pathname}`);
-    Object.entries(options.searchParams || {}).forEach(([key, value]) => {
-      if (value !== undefined && value !== null && value !== '') {
-        url.searchParams.set(key, String(value));
-      }
-    });
-
-    const res = await fetch(url.toString(), {
-      method: options.method || 'GET',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-        'x-auth-token': accessToken,
-        'x-client-id': clientId,
-        'x-timezone': getUserTimezone(),
-        ...(options.headers || {}),
-      },
-      body: options.body ? JSON.stringify(options.body) : undefined,
-    });
-
-    if (res.status === 401) {
-      window.dispatchEvent(new CustomEvent('qf_unauthorized'));
-    }
-
-    const data = await res.json().catch(() => null);
-    if (!res.ok) {
-      return {
-        ok: false,
-        data,
-        error: data?.message || data?.error || `Quran Foundation request failed (${res.status}).`,
-      };
-    }
-
-    return { ok: true, data, error: null };
+    return await qfUserRequest(accessToken, pathname, options);
   } catch (error) {
     console.error('Quran Foundation mission sync failed:', error);
     return { ok: false, data: null, error: error.message };

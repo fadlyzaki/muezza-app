@@ -1,6 +1,4 @@
-import { getQuranUserApiBaseUrl } from '../lib/quranFoundation';
-
-const API_BASE = `${getQuranUserApiBaseUrl()}/auth/v1`;
+import { qfUserRequest } from './quranUserRequest';
 
 function normalizeUserProfile(profile) {
   if (!profile) return null;
@@ -17,28 +15,14 @@ function normalizeUserProfile(profile) {
 }
 
 export async function getUserProfile(accessToken) {
-  const clientId = import.meta.env.VITE_QURAN_CLIENT_ID;
-  if (!accessToken || !clientId) return null;
+  if (!accessToken) return null;
 
   try {
-    const url = new URL(`${API_BASE}/users/profile`);
-    url.searchParams.set('qdc', 'true');
-
-    const res = await fetch(url.toString(), {
-      headers: {
-        'x-auth-token': accessToken,
-        'x-client-id': clientId,
-      },
+    const result = await qfUserRequest(accessToken, '/users/profile', {
+      searchParams: { qdc: 'true' },
     });
-
-    if (res.status === 401 || res.status === 403) {
-      window.dispatchEvent(new CustomEvent('qf_unauthorized'));
-    }
-
-    if (!res.ok) return null;
-
-    const data = await res.json();
-    return normalizeUserProfile(data);
+    if (!result.ok) return null;
+    return normalizeUserProfile(result.data);
   } catch {
     return null;
   }
